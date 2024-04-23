@@ -1,4 +1,4 @@
-package com.insider.Main.controller;
+package com.insider.login.main.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
