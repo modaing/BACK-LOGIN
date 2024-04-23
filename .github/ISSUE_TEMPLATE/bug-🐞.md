@@ -1,7 +1,7 @@
 ---
 name: "Bug \U0001F41E"
 about: Describe this issue template's purpose here.
-title: ''
+title: 'fit # - []'
 labels: ''
 assignees: modaing
 
