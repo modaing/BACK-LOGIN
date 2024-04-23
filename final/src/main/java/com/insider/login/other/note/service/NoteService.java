@@ -9,10 +9,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Service
@@ -57,8 +59,14 @@ public class NoteService {
         }
     }
 
+    /** 상세 조회 */
+    public Optional<Note> findById(int noteNo) {
+
+        return noteRepository.findById(noteNo);
+    }
 
 
+    /** 쪽지 등록 */
     @Transactional
     public Map<String, Object> insertNote(NoteDTO noteDTO) {
 
@@ -77,6 +85,7 @@ public class NoteService {
         return result;
     }
 
+    /** 쪽지 삭제여부 업데이트 */
     @Transactional
     public Map<String, Object> deleteNote(int noteNo, String deleteYn) {
 
@@ -99,7 +108,6 @@ public class NoteService {
         }
         return result;
     }
-
 
 
 }

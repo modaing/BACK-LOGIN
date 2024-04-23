@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 @SpringBootTest
@@ -43,6 +44,24 @@ public class NoteServiceTests {
         // then
         Assertions.assertNotNull(noteList);
         noteList.forEach(note -> System.out.println("noteList: " + note));
+
+    }
+
+    @Test
+    @DisplayName("쪽지 상세 조회 테스트")
+    public void selectNoteByNoteNo() {
+
+        // given
+        int noteNo = 1;
+
+        // when
+        Optional<Note> note = noteService.findById(noteNo);
+
+        // then
+        Assertions.assertNotNull(note);
+        Assertions.assertEquals(note.get().getNoteNo(), 1);
+        System.out.println(note);
+
 
     }
 

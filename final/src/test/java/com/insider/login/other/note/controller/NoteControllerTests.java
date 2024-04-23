@@ -73,6 +73,30 @@ public class NoteControllerTests {
     }
 
     @Test
+    @DisplayName(" 쪽지 상세 조회 테스트 ")
+    public void testSelectNoteByNoteNo() throws Exception {
+
+        // given
+        int noteNo = 1;
+
+        // when
+        MvcResult result = mockMvc.perform(get("/notes/{noteNo}", noteNo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(noteNo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.httpStatusCode").value(200))
+                .andExpect(jsonPath("$.message").value("조회 성공"))
+                .andExpect(jsonPath("$.results").exists())
+                .andReturn();
+
+        // then
+        String content = result.getResponse().getContentAsString();
+        System.out.println("Response Content: " + content);
+
+
+    }
+
+    @Test
     @DisplayName("컨트롤러 쪽지 insert 테스트")
     public void testInsertNote() throws Exception {
 
@@ -80,7 +104,7 @@ public class NoteControllerTests {
         NoteDTO noteDTO = new NoteDTO(2, "2020-20-20", "제목", "내용", 2, 3, "N");
 
         // when
-        MvcResult result = mockMvc.perform(post("/notes")
+        MvcResult result = mockMvc.perform(post("/notes/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(noteDTO)))
                 .andExpect(status().isOk())

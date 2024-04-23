@@ -3,6 +3,7 @@ package com.insider.login.other.note.controller;
 import com.insider.login.common.CommonController;
 import com.insider.login.common.ResponseMessage;
 import com.insider.login.other.note.dto.NoteDTO;
+import com.insider.login.other.note.entity.Note;
 import com.insider.login.other.note.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,9 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class NoteController extends CommonController {
@@ -69,6 +72,22 @@ public class NoteController extends CommonController {
 
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/notes/{noteNo}")
+    public ResponseEntity<ResponseMessage> selectNoteByNoteNo(@PathVariable ("noteNo") int noteNo){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        Optional<Note> note = noteService.findById(noteNo);
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("note", note);
+
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
+
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
     @PostMapping("/notes")
