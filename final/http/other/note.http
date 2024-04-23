@@ -12,5 +12,13 @@ Content-Type: application/json
   "noteTitle": "TEST 1",
   "noteContent": "CONTENT 1",
   "senderId": 12345,
-  "receiverId": 98765
+  "receiverId": 12345
+}
+
+### 쪽지 삭제
+PUT http://localhost:8080/notes/1
+Content-Type: application/json
+
+{
+  "deleteYn": "Y"
 }
