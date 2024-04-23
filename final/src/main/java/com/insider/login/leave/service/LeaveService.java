@@ -1,9 +1,8 @@
-package com.insider.leave.service;
+package com.insider.login.leave.service;
 
-import com.insider.leave.entity.LeaveSubmit;
-import com.insider.leave.repository.LeaveAccrualRepository;
-import com.insider.leave.repository.LeaveRepository;
-import com.insider.leave.repository.LeaveSubmitRepository;
+import com.insider.login.leave.repository.LeaveAccrualRepository;
+import com.insider.login.leave.repository.LeaveRepository;
+import com.insider.login.leave.repository.LeaveSubmitRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +20,8 @@ public class LeaveService {
         this.leaveSubmitRepository = leaveSubmitRepository;
     }
 
-    public List<LeaveSubmit> selectLeaveSubmitListByMemberId(String applicantId) {
-    }
+//    public List<LeaveSubmit> selectLeaveSubmitListByMemberId(String applicantId) {
+//    }
 
 //    public List<LeaveSubmit>selectLeaveSubmitListByMemberId(String applicantId) {
 ////

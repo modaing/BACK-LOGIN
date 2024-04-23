@@ -1,4 +1,4 @@
-package com.insider.leave.dto;
+package com.insider.login.leave.dto;
 
 public class LeaveAccrualDTO {
 

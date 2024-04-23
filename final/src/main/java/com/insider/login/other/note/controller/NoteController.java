@@ -1,7 +1,7 @@
 package com.insider.login.other.note.controller;
 
-import com.insider.login.other.common.CommonController;
-import com.insider.login.other.common.ResponseMessage;
+import com.insider.login.common.CommonController;
+import com.insider.login.common.ResponseMessage;
 import com.insider.login.other.note.dto.NoteDTO;
 import com.insider.login.other.note.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 

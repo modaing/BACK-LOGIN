@@ -1,4 +1,4 @@
-package com.insider.login.other.common;
+package com.insider.login.common;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
