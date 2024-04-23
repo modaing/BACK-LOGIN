@@ -1,18 +1,12 @@
-package com.insider.leave.controller;
+package com.insider.login.leave.controller;
 
-import com.insider.leave.controller.LeaveController;
-import com.insider.leave.entity.LeaveSubmit;
-import com.insider.leave.service.LeaveService;
-import jakarta.persistence.Column;
+import com.insider.login.leave.service.LeaveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-
-import static org.mockito.Mockito.when;
 
 @WebMvcTest(LeaveController.class)
 @AutoConfigureMockMvc
@@ -34,7 +28,6 @@ public class LeaveControllerTests {
                 + "\"leaveSubType\": \"연차\""
                 + "}";
 
-//        when(leaveService.selectLeaveSubmitListByMemberId()).thenReturn(/*반환받을 값*/);
 
         //when
         //then
