@@ -27,7 +27,7 @@ public class LeaveServiceTests {
         List<LeaveSubmit> leaveSubmits = leaveService.selectLeaveSubmitListByMemberId(applicantId);
 
         //then
-        Assertions.assertNotNull(leaveSubmits);
+        Assertions.assertFalse(leaveSubmits.isEmpty());
         leaveSubmits.forEach(System.out::println);
     }
 
