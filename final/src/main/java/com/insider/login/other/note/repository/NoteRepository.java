@@ -14,4 +14,5 @@ public interface NoteRepository extends JpaRepository<Note, Integer> {
     Page<Note> findByReceiverIdAndDeleteYn(int memberId, Pageable pageable, String deleteYn);
 
 
+    Note findByNoteNo(int noteNo);
 }

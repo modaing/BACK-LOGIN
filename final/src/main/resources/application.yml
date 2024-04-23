@@ -4,12 +4,11 @@ spring:
     url: jdbc:mysql://mysql.coffit.today:3306/insider
     username: hikdt2312
     password: hikdt2312
+
   jpa:
     show-sql: true
     database: mysql
     generate-ddl: false
-    hibernate:
-      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
