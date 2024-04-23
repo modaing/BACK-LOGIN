@@ -1,4 +1,4 @@
-package com.insider.login.other.controller;
+package com.insider.login.other.note.controller;
 
 import com.insider.login.other.common.CommonController;
 import com.insider.login.other.common.ResponseMessage;
@@ -14,13 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 public class NoteController extends CommonController {
-
-
 
     private NoteService noteService;
 
@@ -70,6 +69,17 @@ public class NoteController extends CommonController {
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
 
     }
+
+    @PostMapping("/notes")
+    public ResponseEntity<ResponseMessage> insertNote(@RequestBody NoteDTO noteDTO) {
+
+        noteDTO.setSendNoteDate(nowDate());
+        noteDTO.setDeleteYn("N");
+
+        return ResponseEntity.ok().body(new ResponseMessage(200, "성공", noteService.insertNote(noteDTO)));
+    }
+
+
 
 
 

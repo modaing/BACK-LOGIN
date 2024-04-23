@@ -1,5 +1,6 @@
 package com.insider.login.other.note.entity;
 
+import com.insider.login.other.note.dto.NoteDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,6 +40,21 @@ public class Note {
 
     public Note() {
 
+    }
+
+    /* 테스트 */
+    public Note(NoteDTO noteDTO) {
+        this.noteNo = noteDTO.getNoteNo();
+        this.noteTitle = noteDTO.getNoteTitle();
+        this.noteContent = noteDTO.getNoteContent();
+        this.sendNoteDate = noteDTO.getSendNoteDate();
+        this.receiverId = noteDTO.getReceiverId();
+        this.senderId = noteDTO.getSenderId();
+        this.deleteYn = noteDTO.getDeleteYn();
+    }
+
+    public Note(String deleteYn) {
+        this.deleteYn = deleteYn;
     }
 
 
