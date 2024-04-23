@@ -3,3 +3,14 @@ GET http://localhost:8080/members/12345/notes?receiverId=12345&sort=noteNo&delet
 
 ### 보낸 쪽지 목록 전체 조회
 GET http://localhost:8080/members/12345/notes?senderId=12345&sort=noteNo&deleteYn=N
+
+### 쪽지 발송
+POST http://localhost:8080/notes
+Content-Type: application/json
+
+{
+  "noteTitle": "TEST 1",
+  "noteContent": "CONTENT 1",
+  "senderId": 12345,
+  "receiverId": 98765
+}

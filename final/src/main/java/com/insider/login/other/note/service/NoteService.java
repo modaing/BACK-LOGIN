@@ -1,5 +1,6 @@
 package com.insider.login.other.note.service;
 
+import com.insider.login.other.common.ResponseMessage;
 import com.insider.login.other.note.dto.NoteDTO;
 import com.insider.login.other.note.entity.Note;
 import com.insider.login.other.note.repository.NoteRepository;
@@ -9,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -48,7 +50,7 @@ public class NoteService {
             return Page.empty();
         }
 
-        // notes가 null인 경우에는 빈 페이지를 반환
+
         if (notes != null) {
             return notes.map(note -> modelMapper.map(note, NoteDTO.class));
         } else {
@@ -56,8 +58,22 @@ public class NoteService {
         }
     }
 
+    public Map<String, Object> insertNote(NoteDTO noteDTO) {
 
+        Map<String, Object> result = new HashMap<>();
 
+        try {
+            Note note = modelMapper.map(noteDTO, Note.class);
+            noteRepository.save(note);
+
+            result.put("result", true);
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+            result.put("result", false);
+        }
+        return result;
+    }
 
 
 }
