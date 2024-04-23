@@ -1,6 +1,7 @@
-package com.insider.leave.common;
+package com.insider.login.leave.common;
 
-import com.insider.leave.entity.LeaveSubmit;
+
+import com.insider.login.leave.entity.LeaveSubmit;
 
 import java.sql.Date;
 

@@ -1,16 +1,13 @@
 package com.insider.login.other.note.service;
 
-import com.insider.login.other.common.ResponseMessage;
 import com.insider.login.other.note.dto.NoteDTO;
 import com.insider.login.other.note.entity.Note;
 import com.insider.login.other.note.repository.NoteRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;

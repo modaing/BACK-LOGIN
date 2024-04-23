@@ -1,4 +1,4 @@
-package com.insider.leave.entity;
+package com.insider.login.leave.entity;
 
 import jakarta.persistence.*;
 
