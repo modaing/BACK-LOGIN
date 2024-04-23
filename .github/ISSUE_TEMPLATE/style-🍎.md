@@ -1,5 +1,5 @@
 ---
-name: "style \U0001F34F"
+name: "Style \U0001F34E"
 about: Describe this issue template's purpose here.
 title: ''
 labels: ''
