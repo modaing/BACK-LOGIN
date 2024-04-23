@@ -61,26 +61,26 @@ public class NoteTests {
 
         // when을 사용하여 findByReceiverIdAndDeleteYn 메서드에 대한 스텁 설정
         when(noteRepository.findByReceiverIdAndDeleteYn(eq(1), any(Pageable.class), eq(deleteYn))).thenReturn(notePageReceiver);
-        when(noteRepository.findBySenderIdAndDeleteYn(eq(1), any(Pageable.class), eq(deleteYn))).thenReturn(notePageSender); // 추가된 부분
+        when(noteRepository.findBySenderIdAndDeleteYn(eq(1), any(Pageable.class), eq(deleteYn))).thenReturn(notePageSender);
 
         // 서비스 메서드 호출
-        Page<NoteDTO> resultReceiver = noteService.selectNoteList(memberId, null, 2222, pageable, deleteYn); // 받는 사람으로부터 온 쪽지 리스트 조회
-        Page<NoteDTO> resultSender = noteService.selectNoteList(memberId, 1111, null, pageable, deleteYn); // 보내는 사람으로부터 온 쪽지 리스트 조회
+        Page<NoteDTO> resultReceiver = noteService.selectNoteList(memberId, null, 2222, pageable, deleteYn); // 받은 쪽지 리스트 조회
+        Page<NoteDTO> resultSender = noteService.selectNoteList(memberId, 1111, null, pageable, deleteYn); // 보낸 쪽지 쪽지 리스트 조회
 
         // 결과 검증
         assertNotNull(resultReceiver);
         assertNotNull(resultSender);
 
-        // 받는 사람으로부터 온 쪽지 리스트 출력
-        System.out.println("받는 사람으로부터 온 쪽지 리스트:");
+        // 받는 쪽지 리스트 출력
+        System.out.println("받는 쪽지 리스트 출력:");
         for (Note note : notePageReceiver.getContent()) {
-            System.out.println("Note 정보: " + note); // 각 Note 객체의 정보 출력
+            System.out.println("Note 정보: " + note);
         }
 
-        // 보내는 사람으로부터 온 쪽지 리스트 출력
-        System.out.println("보내는 사람으로부터 온 쪽지 리스트:");
+        // 보낸 쪽지 리스트 출력
+        System.out.println("보낸 쪽지 리스트 출력:");
         for (Note note : notePageSender.getContent()) {
-            System.out.println("Note 정보: " + note); // 각 Note 객체의 정보 출력
+            System.out.println("Note 정보: " + note);
         }
 
     }
