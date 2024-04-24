@@ -26,27 +26,34 @@ public class LeaveSubmitDTO {
 
     private Date leaveSubProcessDate;           // 처리 일자
 
+    private String leaveSubReason;              // 신청 사유
+
     public LeaveSubmitDTO() {
     }
 
-    public LeaveSubmitDTO(String leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType) {
+    // 휴가 신청용
+    public LeaveSubmitDTO(int leaveSubNo, String leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubReason) {
+        this.leaveSubNo = leaveSubNo;
+        this.leaveSubApplicant = leaveSubApplicant;
+        this.leaveSubStartDate = leaveSubStartDate;
+        this.leaveSubEndDate = leaveSubEndDate;
+        this.leaveSubApplyDate = leaveSubApplyDate;
+        this.leaveSubReason = leaveSubReason;
+    }
+
+    // 휴가 취소 요청용
+    public LeaveSubmitDTO(String leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
         this.leaveSubApplicant = leaveSubApplicant;
         this.leaveSubStartDate = leaveSubStartDate;
         this.leaveSubEndDate = leaveSubEndDate;
         this.leaveSubApplyDate = leaveSubApplyDate;
         this.leaveSubType = leaveSubType;
+        this.leaveSubReason = leaveSubReason;
     }
 
-    public LeaveSubmitDTO(String leaveSubApplicant, String applicantName, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType) {
-        this.leaveSubApplicant = leaveSubApplicant;
-        this.applicantName = applicantName;
-        this.leaveSubStartDate = leaveSubStartDate;
-        this.leaveSubEndDate = leaveSubEndDate;
-        this.leaveSubApplyDate = leaveSubApplyDate;
-        this.leaveSubType = leaveSubType;
-    }
 
-    public LeaveSubmitDTO(int leaveSubNo, int refLeaveSubNo, String leaveSubApplicant, String applicantName, String approverName, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubStatus, Date leaveSubProcessDate) {
+
+    public LeaveSubmitDTO(int leaveSubNo, int refLeaveSubNo, String leaveSubApplicant, String applicantName, String approverName, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubStatus, Date leaveSubProcessDate, String leaveSubReason) {
         this.leaveSubNo = leaveSubNo;
         this.refLeaveSubNo = refLeaveSubNo;
         this.leaveSubApplicant = leaveSubApplicant;
@@ -58,6 +65,7 @@ public class LeaveSubmitDTO {
         this.leaveSubType = leaveSubType;
         this.leaveSubStatus = leaveSubStatus;
         this.leaveSubProcessDate = leaveSubProcessDate;
+        this.leaveSubReason = leaveSubReason;
     }
 
     public int getLeaveSubNo() {
@@ -148,12 +156,20 @@ public class LeaveSubmitDTO {
         this.leaveSubProcessDate = leaveSubProcessDate;
     }
 
+    public String getLeaveSubReason() {
+        return leaveSubReason;
+    }
+
+    public void setLeaveSubReason(String leaveSubReason) {
+        this.leaveSubReason = leaveSubReason;
+    }
+
     @Override
     public String toString() {
         return "LeaveSubmitDTO{" +
                 "leaveSubNo=" + leaveSubNo +
                 ", refLeaveSubNo=" + refLeaveSubNo +
-                ", applicantId='" + leaveSubApplicant + '\'' +
+                ", leaveSubApplicant='" + leaveSubApplicant + '\'' +
                 ", applicantName='" + applicantName + '\'' +
                 ", approverName='" + approverName + '\'' +
                 ", leaveSubStartDate=" + leaveSubStartDate +
@@ -162,6 +178,7 @@ public class LeaveSubmitDTO {
                 ", leaveSubType='" + leaveSubType + '\'' +
                 ", leaveSubStatus='" + leaveSubStatus + '\'' +
                 ", leaveSubProcessDate=" + leaveSubProcessDate +
+                ", leaveSubReason='" + leaveSubReason + '\'' +
                 '}';
     }
 }

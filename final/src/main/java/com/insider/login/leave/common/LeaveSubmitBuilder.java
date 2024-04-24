@@ -16,6 +16,7 @@ public class LeaveSubmitBuilder {
     private String leaveSubType;
     private String leaveSubStatus;
     private Date leaveSubProcessDate;
+    private String leaveSubReason;
 
     public LeaveSubmitBuilder setLeaveSubNo(int leaveSubNo) {
         this.leaveSubNo = leaveSubNo;
@@ -66,8 +67,12 @@ public class LeaveSubmitBuilder {
         this.leaveSubProcessDate = leaveSubProcessDate;
         return this;
     }
+    public LeaveSubmitBuilder setLeaveSubReason(String leaveSubReason) {
+        this.leaveSubReason = leaveSubReason;
+        return this;
+    }
 
     public LeaveSubmit build() {
-        return new LeaveSubmit(leaveSubNo, refLeaveSubNo, leaveSubApplicant, leaveSubApprover, leaveSubStartDate, leaveSubEndDate, leaveSubApplyDate, leaveSubType, leaveSubStatus, leaveSubProcessDate);
+        return new LeaveSubmit(leaveSubNo, refLeaveSubNo, leaveSubApplicant, leaveSubApprover, leaveSubStartDate, leaveSubEndDate, leaveSubApplyDate, leaveSubType, leaveSubStatus, leaveSubProcessDate, leaveSubReason);
     }
 }

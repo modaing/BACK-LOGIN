@@ -35,24 +35,29 @@ public class LeaveSubmit {
     @Column(name = "LEAVE_SUB_TYPE", nullable = false, columnDefinition = "VARCHAR(12)") // 연차, 오전반차, 오후반차, 특별휴가
     private String leaveSubType;                // 휴가 유형
 
-    @Column(name = "LEAVE_SUB_STATUS", nullable = false, columnDefinition = "VARCHAR(6) DEFAULT '대기'") // 승인, 반려, 대기
+    @Column(name = "LEAVE_SUB_STATUS", nullable = false, columnDefinition = "VARCHAR(6)") // 승인, 반려, 대기
     private String leaveSubStatus;              // 처리 상태
 
     @Column(name = "LEAVE_SUB_PROCESS_DATE", nullable = true , columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
     private Date leaveSubProcessDate;           // 처리 일자
 
+    @Column(name = "LEAVE_SUB_REASON", nullable = true, columnDefinition = "VARCHAR(300)")
+    private String leaveSubReason;              // 신청 사유
     protected LeaveSubmit() {
     }
 
-    public LeaveSubmit(String leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType) {
+    public LeaveSubmit(String leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
         this.leaveSubApplicant = leaveSubApplicant;
         this.leaveSubStartDate = leaveSubStartDate;
         this.leaveSubEndDate = leaveSubEndDate;
         this.leaveSubApplyDate = leaveSubApplyDate;
         this.leaveSubType = leaveSubType;
+        this.leaveSubReason = leaveSubReason;
     }
 
-    public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, String leaveSubApplicant, String leaveSubApprover, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubStatus, Date leaveSubProcessDate) {
+
+
+    public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, String leaveSubApplicant, String leaveSubApprover, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubStatus, Date leaveSubProcessDate, String leaveSubReason) {
         this.leaveSubNo = leaveSubNo;
         this.refLeaveSubNo = refLeaveSubNo;
         this.leaveSubApplicant = leaveSubApplicant;
@@ -63,6 +68,7 @@ public class LeaveSubmit {
         this.leaveSubType = leaveSubType;
         this.leaveSubStatus = leaveSubStatus;
         this.leaveSubProcessDate = leaveSubProcessDate;
+        this.leaveSubReason = leaveSubReason;
     }
 
     public int getLeaveSubNo() {
@@ -105,6 +111,10 @@ public class LeaveSubmit {
         return leaveSubProcessDate;
     }
 
+    public String getLeaveSubReason() {
+        return leaveSubReason;
+    }
+
     @Override
     public String toString() {
         return "LeaveSubmit{" +
@@ -118,6 +128,7 @@ public class LeaveSubmit {
                 ", leaveSubType='" + leaveSubType + '\'' +
                 ", leaveSubStatus='" + leaveSubStatus + '\'' +
                 ", leaveSubProcessDate=" + leaveSubProcessDate +
+                ", leaveSubReason='" + leaveSubReason + '\'' +
                 '}';
     }
 }
