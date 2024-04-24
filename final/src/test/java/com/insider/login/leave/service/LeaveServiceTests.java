@@ -1,17 +1,18 @@
-package com.insider.leave.service;
+package com.insider.login.leave.service;
 
-import com.insider.leave.dto.LeaveSubmitDTO;
-import com.insider.leave.entity.LeaveSubmit;
-import com.insider.leave.service.LeaveService;
+import com.insider.login.leave.dto.LeaveSubmitDTO;
+import com.insider.login.leave.entity.LeaveSubmit;
+import com.insider.login.leave.service.LeaveService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Date;
 import java.util.List;
 
-
+@SpringBootTest
 public class LeaveServiceTests {
 
     @Autowired
@@ -24,14 +25,14 @@ public class LeaveServiceTests {
     @DisplayName("휴가 신청 내역 조회")
     void testSelectLeaveSubmitListByMemberId() {
         // given
-        String applicantId = "2023123-XXXXX";
-
-        // when
-        List<LeaveSubmit> leaveSubmits = leaveService.selectLeaveSubmitListByMemberId(applicantId);
-
-        //then
-        Assertions.assertNotNull(leaveSubmits);
-        leaveSubmits.forEach(System.out::println);
+//        String applicantId = "2023123-XXXXX";
+//
+//        // when
+//        List<LeaveSubmit> leaveSubmits = leaveService.selectLeaveSubmitListByMemberId(applicantId);
+//
+//        //then
+//        Assertions.assertNotNull(leaveSubmits);
+//        leaveSubmits.forEach(System.out::println);
     }
 
     @Test

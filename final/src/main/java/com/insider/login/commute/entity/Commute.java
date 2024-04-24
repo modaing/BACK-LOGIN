@@ -43,4 +43,13 @@ public class Commute {
     private Duration totalWorkingHours;                     // 총 근무 시간
 
     protected Commute() {}
+
+    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, Duration totalWorkingHours) {
+        this.memberId = memberId;
+        this.workingDate = workingDate;
+        this.startWork = startWork;
+        this.endWork = endWork;
+        this.workingStatus = workingStatus;
+        this.totalWorkingHours = totalWorkingHours;
+    }
 }
