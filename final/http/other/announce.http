@@ -13,8 +13,27 @@ Content-Disposition: form-data; name="file"; filename="file.txt"
 --WebAppBoundary
 Content-Disposition: form-data; name="announceDTO"
 
-{"ancTitle":"인호 ㅎㅇ","ancContent":"ㅂ2","ancDate":"1997-1997","ancWriter":"김인호","hits":999}
+{
+"ancTitle":"인호 ㅎㅇ",
+"ancContent":"ㅂ2",
+"ancDate":"1997-1997",
+"ancWriter":"김인호",
+"hits":999
+}
 --WebAppBoundary--
 
+### 쪽지 발송
+POST http://localhost:8080/announce
+Content-Type: multipart/form-data; boundary=WebAppBoundary
 
+--WebAppBoundary
+Content-Disposition: form-data; name="announceDTO"
 
+{
+"ancTitle":"인호 ㅎㅇ",
+"ancContent":"ㅂ2",
+"ancDate":"1997-1997",
+"ancWriter":"김인호",
+"hits":999
+}
+--WebAppBoundary--

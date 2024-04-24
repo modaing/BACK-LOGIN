@@ -33,9 +33,10 @@ public class AnnounceController extends FileController {
         AnnounceDTO announceDTO = FileController.convertJsonToAnnounceDTO(announceDTOJson);
 
         Map<String, Object> serviceResult;
-        if (files == null && !files.isEmpty()) {
+        if (files != null) {
             // 파일이 있는 경우
             serviceResult = announceService.insertAncWithFile(announceDTO, files);
+            serviceResult.put("result", true);
         } else {
             // 파일이 없는 경우
             serviceResult = announceService.insertAnc(announceDTO);
