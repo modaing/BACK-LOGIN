@@ -11,7 +11,22 @@ public class CommonController {
 
     /** 페이징 관련 DATA 가져오는 메서드 */
     public static Pageable getPageable(int page, int size, String sort, String direction) {
-        return PageRequest.of(page, size, Sort.Direction.fromString(direction), sort);
+        Sort pageableSort;
+        if ("noteNo".equals(sort)) {
+            pageableSort = Sort.by("noteNo").descending();
+        } else {
+            pageableSort = Sort.unsorted();
+        }
+
+        Sort.Direction sortDirection;
+        try {
+            sortDirection = Sort.Direction.fromString(direction);
+        } catch (IllegalArgumentException e) {
+            // direction 값이 잘못된 경우 기본값인 DESC로 설정
+            sortDirection = Sort.Direction.DESC;
+        }
+
+        return PageRequest.of(page, size, pageableSort);
     }
 
     /** 현재 시간 가져오는 메서드 */
