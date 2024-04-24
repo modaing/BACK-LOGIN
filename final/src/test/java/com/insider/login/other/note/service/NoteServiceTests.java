@@ -23,8 +23,7 @@ public class NoteServiceTests {
     @Autowired
     private NoteService noteService;
 
-    @Autowired
-    private NoteRepository noteRepository;
+
 
     @Test
     @DisplayName("쪽지 조회 테스트")

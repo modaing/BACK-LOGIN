@@ -1,0 +1,20 @@
+# curl -X POST
+#  http://localhost:8080/announce
+#  -H 'Content-Type: multipart/form-data'
+#  -F 'file=@/path/to/file.txt'
+#  -F 'announceDTOJson={"ancTitle":"제목","ancContent":"내용","ancDate":"2020-11-11","ancWriter":"김고무","hits":0}'
+POST http://localhost:8080/announce
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="file.txt"
+
+< C:\Users\simko\Desktop\file\th.jpg
+--WebAppBoundary
+Content-Disposition: form-data; name="announceDTO"
+
+{"ancTitle":"인호 ㅎㅇ","ancContent":"ㅂ2","ancDate":"1997-1997","ancWriter":"김인호","hits":999}
+--WebAppBoundary--
+
+
+

@@ -7,3 +7,21 @@ CREATE TABLE NOTE (
                       RECEIVER_ID INT NOT NULL,
                       DELETE_YN VARCHAR(1) NOT NULL
 );
+
+CREATE TABLE ANNOUNCE (
+                          ANC_NO INT AUTO_INCREMENT PRIMARY KEY,
+                          ANC_TITLE VARCHAR(255) NOT NULL,
+                          ANC_CONTENT TEXT NOT NULL,
+                          ANC_DATE VARCHAR(255) NOT NULL,
+                          ANC_WRITER VARCHAR(255) NOT NULL,
+                          HITS INT
+);
+
+CREATE TABLE ANNOUNCE_FILES (
+                                FILE_NO INT AUTO_INCREMENT PRIMARY KEY,
+                                FILE_NAME VARCHAR(255),
+                                FILE_TYPE VARCHAR(255),
+                                FILE_PATH VARCHAR(255),
+                                ANC_NO INT,
+                                FOREIGN KEY (ANC_NO) REFERENCES ANNOUNCE(ANC_NO)
+);

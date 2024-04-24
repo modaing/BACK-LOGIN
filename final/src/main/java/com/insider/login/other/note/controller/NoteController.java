@@ -96,7 +96,7 @@ public class NoteController extends CommonController {
         noteDTO.setSendNoteDate(nowDate());
         noteDTO.setDeleteYn("N");
 
-        return ResponseEntity.ok().body(new ResponseMessage(200, "조회 성공", noteService.insertNote(noteDTO)));
+        return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", noteService.insertNote(noteDTO)));
     }
 
     @PutMapping("/notes/{noteNo}")
@@ -104,7 +104,7 @@ public class NoteController extends CommonController {
                                         @RequestParam (value = "deleteYn", required = false) String deleteYn) {
 
 
-        return ResponseEntity.ok().body(new ResponseMessage(200, "조회 성공", noteService.deleteNote(noteNo, deleteYn)));
+        return ResponseEntity.ok().body(new ResponseMessage(200, "삭제 성공", noteService.deleteNote(noteNo, deleteYn)));
 
     }
 
