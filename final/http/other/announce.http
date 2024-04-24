@@ -7,17 +7,17 @@ POST http://localhost:8080/announce
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="file"; filename="file.txt"
+Content-Disposition: form-data; name="files"; filename="file.txt"
 
 < C:\Users\simko\Desktop\file\th.jpg
 --WebAppBoundary
 Content-Disposition: form-data; name="announceDTO"
 
 {
-"ancTitle":"인호 ㅎㅇ",
-"ancContent":"ㅂ2",
-"ancDate":"1997-1997",
-"ancWriter":"김인호",
+"ancTitle":"not null",
+"ancContent":"낫 널 테스트",
+"ancDate":"1997-19-20",
+"ancWriter":"김낫널",
 "hits":999
 }
 --WebAppBoundary--
@@ -30,10 +30,10 @@ Content-Type: multipart/form-data; boundary=WebAppBoundary
 Content-Disposition: form-data; name="announceDTO"
 
 {
-"ancTitle":"인호 ㅎㅇ",
-"ancContent":"ㅂ2",
-"ancDate":"1997-1997",
-"ancWriter":"김인호",
-"hits":999
+"ancTitle":"null",
+"ancContent":"null test",
+"ancDate":"1997-19-97",
+"ancWriter":"김널판지",
+"hits":1
 }
 --WebAppBoundary--
