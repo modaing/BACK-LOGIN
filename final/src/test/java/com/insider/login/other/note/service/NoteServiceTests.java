@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 @SpringBootTest
@@ -22,8 +23,7 @@ public class NoteServiceTests {
     @Autowired
     private NoteService noteService;
 
-    @Autowired
-    private NoteRepository noteRepository;
+
 
     @Test
     @DisplayName("쪽지 조회 테스트")
@@ -33,7 +33,7 @@ public class NoteServiceTests {
         int memberId = 1000;
         Integer receiverId = 1;
         Integer senderId =2;
-        Pageable pageable = Pageable.unpaged();
+        Pageable pageable = Pageable.ofSize(10);
         String deleteYn = "N";
 
         // when
@@ -43,6 +43,24 @@ public class NoteServiceTests {
         // then
         Assertions.assertNotNull(noteList);
         noteList.forEach(note -> System.out.println("noteList: " + note));
+
+    }
+
+    @Test
+    @DisplayName("쪽지 상세 조회 테스트")
+    public void selectNoteByNoteNo() {
+
+        // given
+        int noteNo = 1;
+
+        // when
+        Optional<Note> note = noteService.findNoteByNoteNo(noteNo);
+
+        // then
+        Assertions.assertNotNull(note);
+        Assertions.assertEquals(note.get().getNoteNo(), 1);
+        System.out.println(note);
+
 
     }
 
