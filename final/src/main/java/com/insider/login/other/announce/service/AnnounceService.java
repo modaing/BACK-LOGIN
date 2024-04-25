@@ -7,10 +7,11 @@ import com.insider.login.other.announce.entity.AncFile;
 import com.insider.login.other.announce.entity.Announce;
 import com.insider.login.other.announce.repository.AnnounceFileRepository;
 import com.insider.login.other.announce.repository.AnnounceRepository;
-import com.insider.login.other.note.entity.Note;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +37,36 @@ public class AnnounceService {
     private final YmlConfig ymlConfig;
 
 
-    /** 파일과 공지사항 모두 있을 때 */
+    /** 공지사항 전체 조회 + 페이징 */
+    public Page<AnnounceDTO> selectAncList(Pageable pageable){
+
+        Page<Announce> announces;
+
+        announces = announceRepository.findAll(pageable);
+
+        if (announces != null) {
+            return announces.map(announce -> modelMapper.map(announce, AnnounceDTO.class));
+        } else {
+            return Page.empty();
+        }
+
+    }
+
+
+    /**
+     * 공지사항 상세 조회
+     */
+    public Announce findAncWithFile(int ancNo) {
+
+        // 공지사항 정보 조회
+        return announceRepository.findAnnounceWithFiles(ancNo);
+
+    }
+
+
+
+
+    /** 파일과 공지사항 모두 있을 때 insert */
     public Map<String, Object> insertAncWithFile(AnnounceDTO ancDTO, List<MultipartFile> files) {
 
         Map<String, Object> result = new HashMap<>();
@@ -84,7 +114,7 @@ public class AnnounceService {
         return result;
     }
 
-    /** 파일 없을 때 */
+    /** 파일 없을 때 insert */
     public Map<String, Object> insertAnc(AnnounceDTO announceDTO) {
 
         Map<String, Object> result = new HashMap<>();

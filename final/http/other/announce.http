@@ -1,9 +1,9 @@
 # curl -X POST
-#  http://localhost:8080/announce
+#  http://localhost:8080/announces
 #  -H 'Content-Type: multipart/form-data'
 #  -F 'file=@/path/to/file.txt'
 #  -F 'announceDTOJson={"ancTitle":"제목","ancContent":"내용","ancDate":"2020-11-11","ancWriter":"김고무","hits":0}'
-POST http://localhost:8080/announce
+POST http://localhost:8080/announces
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
@@ -22,8 +22,8 @@ Content-Disposition: form-data; name="announceDTO"
 }
 --WebAppBoundary--
 
-### 쪽지 발송
-POST http://localhost:8080/announce
+### 공지사항만 등록
+POST http://localhost:8080/announces
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
@@ -37,3 +37,11 @@ Content-Disposition: form-data; name="announceDTO"
 "hits":1
 }
 --WebAppBoundary--
+
+### 공지사항 전체조회 페이징
+GET http://localhost:8080/announces
+
+### 공지사항 상세 조회
+GET http://localhost:8080/announces/{ancNo}
+
+

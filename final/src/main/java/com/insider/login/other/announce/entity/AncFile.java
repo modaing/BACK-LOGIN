@@ -3,11 +3,14 @@ package com.insider.login.other.announce.entity;
 import com.insider.login.other.announce.dto.AnnounceDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Table(name = "ANNOUNCE_FILES")
 @AllArgsConstructor
+@Getter
 public class AncFile {
 
     @Id
@@ -24,10 +27,9 @@ public class AncFile {
     @Column(name = "file_path")
     private String filePath;
 
-    // 파일과 공지사항 간의 다대일 관계 설정
-
-    @Column(name = "anc_no")
+    @JoinColumn(name = "anc_no")
     private int ancNo;
+
 
     protected AncFile() {}
 

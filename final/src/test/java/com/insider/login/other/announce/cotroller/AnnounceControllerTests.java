@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,11 +28,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class AnnounceControllerTests {
 
-
     @Autowired
     private MockMvc mockMvc;
 
-    CommonController controller = new CommonController();
+    @Test
+    @DisplayName("공지사항 전체 조회 테스트")
+    public void testSelectAncList() throws Exception {
+
+        // given
+        Pageable pageable = Pageable.ofSize(10);
+        int page = 0;
+        int size = 10;
+        String sort = "ancNo";
+        String direction = "DESC";
+
+        // when
+        MvcResult result = mockMvc.perform(get("/announces")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .param("sort", sort)
+                        .param("direction", direction))
+        // then
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.httpStatusCode").value(200))
+            .andExpect(jsonPath("$.message").value("조회 성공"))
+            .andExpect(jsonPath("$.results").exists())
+            .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+        System.out.println("Response Content: " + content);
+
+    }
+
+
+
 
     @Test
     @DisplayName("공지사항 + 파일 insert 테스트")
@@ -56,7 +88,7 @@ public class AnnounceControllerTests {
 
         // when
         // mockMvc를 사용하여 요청 전송
-        mockMvc.perform(multipart("/announce")
+        mockMvc.perform(multipart("/announces")
                         .file(jsonFile)
                         .file(files)
                         .contentType(MediaType.MULTIPART_FORM_DATA))

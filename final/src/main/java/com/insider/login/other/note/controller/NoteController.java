@@ -80,7 +80,7 @@ public class NoteController extends CommonController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        Optional<Note> note = noteService.findById(noteNo);
+        Optional<Note> note = noteService.findNoteByNoteNo(noteNo);
         Map<String, Object> result = new HashMap<>();
 
         result.put("note", note);

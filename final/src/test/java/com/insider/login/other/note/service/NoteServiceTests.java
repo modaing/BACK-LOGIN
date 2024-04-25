@@ -33,7 +33,7 @@ public class NoteServiceTests {
         int memberId = 1000;
         Integer receiverId = 1;
         Integer senderId =2;
-        Pageable pageable = Pageable.unpaged();
+        Pageable pageable = Pageable.ofSize(10);
         String deleteYn = "N";
 
         // when
@@ -54,7 +54,7 @@ public class NoteServiceTests {
         int noteNo = 1;
 
         // when
-        Optional<Note> note = noteService.findById(noteNo);
+        Optional<Note> note = noteService.findNoteByNoteNo(noteNo);
 
         // then
         Assertions.assertNotNull(note);

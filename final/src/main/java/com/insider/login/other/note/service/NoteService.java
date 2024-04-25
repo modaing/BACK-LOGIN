@@ -60,7 +60,7 @@ public class NoteService {
     }
 
     /** 상세 조회 */
-    public Optional<Note> findById(int noteNo) {
+    public Optional<Note> findNoteByNoteNo(int noteNo) {
 
         return noteRepository.findById(noteNo);
     }
