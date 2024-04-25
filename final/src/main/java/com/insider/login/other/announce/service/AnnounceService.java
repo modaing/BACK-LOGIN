@@ -58,7 +58,7 @@ public class AnnounceService {
      */
     public Announce findAncWithFile(int ancNo) {
 
-        // 공지사항 정보 조회
+        
         return announceRepository.findAnnounceWithFiles(ancNo);
 
     }
