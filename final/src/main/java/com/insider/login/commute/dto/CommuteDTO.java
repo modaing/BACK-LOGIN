@@ -29,4 +29,11 @@ public class CommuteDTO {
         this.workingStatus = workingStatus;
         this.totalWorkingHours = totalWorkingHours;
     }
+
+    public CommuteDTO(int commuteNo, LocalTime endWork, String workingStatus, Duration totalWorkingHours) {
+        this.commuteNo = commuteNo;
+        this.endWork = endWork;
+        this.workingStatus = workingStatus;
+        this.totalWorkingHours = totalWorkingHours;
+    }
 }

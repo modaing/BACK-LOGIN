@@ -52,4 +52,22 @@ public class Commute {
         this.workingStatus = workingStatus;
         this.totalWorkingHours = totalWorkingHours;
     }
+
+    public Commute(LocalTime endWork, String workingStatus, Duration totalWorkingHours) {
+        this.endWork = endWork;
+        this.workingStatus = workingStatus;
+        this.totalWorkingHours = totalWorkingHours;
+    }
+
+    public void setEndWork(LocalTime endWork) {
+        this.endWork = endWork;
+    }
+
+    public void setWorkingStatus(String workingStatus) {
+        this.workingStatus = workingStatus;
+    }
+
+    public void setTotalWorkingHours(Duration totalWorkingHours) {
+        this.totalWorkingHours = totalWorkingHours;
+    }
 }
