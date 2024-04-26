@@ -61,7 +61,28 @@ public class AnnounceControllerTests {
 
     }
 
+    @Test
+    @DisplayName("공지사항 상세 조회 테스트")
+    public void selectAncWithFile() throws Exception  {
 
+        // given
+        int ancNo = 15;
+
+        // when
+        MvcResult result = mockMvc.perform(get("/announces/{ancNo}", ancNo)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(ancNo)))
+        // then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.httpStatusCode").value(200))
+                .andExpect(jsonPath("$.message").value("조회 성공"))
+                .andExpect(jsonPath("$.results").exists())
+                .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+        System.out.println("Response Content: " + content);
+
+    }
 
 
     @Test
@@ -94,7 +115,32 @@ public class AnnounceControllerTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
 
+    }
 
+    @Test
+    @DisplayName("공지사항 수정 테스트")
+    public void testUpdateAnc() throws Exception{
+
+        //given
+        int ancNo = 1;
+        String ancTitle = "컨트롤러 공지사항 제목 수정";
+        String ancContent = "컨트롤러 공지사항 본문 수정";
+
+        // when
+        MvcResult result = mockMvc.perform(put("/announces/{ancNo}", ancNo)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("ancTitle", ancTitle)
+                .param("ancContent", ancContent))
+        //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.httpStatusCode").value(200))
+                .andExpect(jsonPath("$.message").value("수정 성공"))
+                .andExpect(jsonPath("$.results").exists())
+                .andReturn();
+
+        // then
+        String content = result.getResponse().getContentAsString();
+        System.out.println("Content: " + content);
     }
 
 }

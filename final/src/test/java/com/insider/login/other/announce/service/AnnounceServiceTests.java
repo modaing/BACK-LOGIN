@@ -62,7 +62,6 @@ public class AnnounceServiceTests {
 
     }
 
-
     @Test
     @DisplayName("공지사항 insert 테스트")
     public void insertAnnounce() throws IOException {
@@ -96,5 +95,25 @@ public class AnnounceServiceTests {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(result.get("result"), true);
     }
+
+    @Test
+    @DisplayName("공지사항 수정 테스트")
+    public void updateAnc() {
+
+        // given
+        int ancNo = 2;
+        String ancContent = "공지사항을 수정해보도록 하겠습니다";
+        String ancTitle = "공지사항 제목을 수정해보도록 하겠습니다";
+
+        // when
+        Map <String, Object> result = new HashMap<>();
+        result.put("result", announceService.updateAnc(ancNo, ancTitle,ancContent));
+
+        // then
+        Assertions.assertNotNull(result);
+
+    }
+
+
 
 }

@@ -2,7 +2,7 @@ CREATE TABLE NOTE (
                       NOTE_NO INT AUTO_INCREMENT PRIMARY KEY,
                       SEND_NOTE_DATE VARCHAR(255) NOT NULL,
                       NOTE_TITLE VARCHAR(255) NOT NULL,
-                      NOTE_CONTENT VARCHAR(255) NOT NULL,
+                      NOTE_CONTENT VARCHAR(15000) NOT NULL,
                       SENDER_ID INT NOT NULL,
                       RECEIVER_ID INT NOT NULL,
                       DELETE_YN VARCHAR(1) NOT NULL
