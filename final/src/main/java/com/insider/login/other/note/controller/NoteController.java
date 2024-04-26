@@ -3,6 +3,7 @@ package com.insider.login.other.note.controller;
 import com.insider.login.common.CommonController;
 import com.insider.login.common.ResponseMessage;
 import com.insider.login.other.note.dto.NoteDTO;
+import com.insider.login.other.note.entity.Note;
 import com.insider.login.other.note.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,14 +14,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class NoteController extends CommonController {
 
-    private NoteService noteService;
+    private final NoteService noteService;
 
 
     @Autowired
@@ -51,7 +54,9 @@ public class NoteController extends CommonController {
         Page<NoteDTO> notePage = noteService.selectNoteList(memberNo, receiverId, senderId, pageable, deleteYn);
 
         if (notePage.isEmpty()) {
-            // null 예외처리
+            String errorMessage = "조회된 노트가 없습니다.";
+            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
+            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
         }
 
         Map<String, Object> responseMap = new HashMap<>();
@@ -62,11 +67,27 @@ public class NoteController extends CommonController {
 
 
         // 요청 파라미터와 페이징 정보를 ResponseMessage 객체에 추가
-        ResponseMessage responseMessage = new ResponseMessage(200, "조회성공", responseMap);
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
 
 
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/notes/{noteNo}")
+    public ResponseEntity<ResponseMessage> selectNoteByNoteNo(@PathVariable ("noteNo") int noteNo){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        Optional<Note> note = noteService.findNoteByNoteNo(noteNo);
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("note", note);
+
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
+
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
     @PostMapping("/notes")
@@ -75,7 +96,16 @@ public class NoteController extends CommonController {
         noteDTO.setSendNoteDate(nowDate());
         noteDTO.setDeleteYn("N");
 
-        return ResponseEntity.ok().body(new ResponseMessage(200, "성공", noteService.insertNote(noteDTO)));
+        return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", noteService.insertNote(noteDTO)));
+    }
+
+    @PutMapping("/notes/{noteNo}")
+    public ResponseEntity<?> deleteNote(@PathVariable (value = "noteNo", required = true) int noteNo,
+                                        @RequestParam (value = "deleteYn", required = false) String deleteYn) {
+
+
+        return ResponseEntity.ok().body(new ResponseMessage(200, "삭제 성공", noteService.deleteNote(noteNo, deleteYn)));
+
     }
 
 
