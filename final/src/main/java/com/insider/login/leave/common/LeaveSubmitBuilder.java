@@ -8,14 +8,14 @@ import java.sql.Date;
 public class LeaveSubmitBuilder {
     private int leaveSubNo;
     private int refLeaveSubNo;
-    private String leaveSubApplicant;
-    private String leaveSubApprover;
+    private int leaveSubApplicant;
+    private int leaveSubApprover;
     private Date leaveSubStartDate;
     private Date leaveSubEndDate;
-    private Date leaveSubApplyDate;
+    private String leaveSubApplyDate;
     private String leaveSubType;
     private String leaveSubStatus;
-    private Date leaveSubProcessDate;
+    private String leaveSubProcessDate;
     private String leaveSubReason;
 
     public LeaveSubmitBuilder setLeaveSubNo(int leaveSubNo) {
@@ -28,12 +28,12 @@ public class LeaveSubmitBuilder {
         return this;
     }
 
-    public LeaveSubmitBuilder setLeaveSubApplicant(String leaveSubApplicant) {
+    public LeaveSubmitBuilder setLeaveSubApplicant(int leaveSubApplicant) {
         this.leaveSubApplicant = leaveSubApplicant;
         return this;
     }
 
-    public LeaveSubmitBuilder setLeaveSubApprover(String leaveSubApprover) {
+    public LeaveSubmitBuilder setLeaveSubApprover(int leaveSubApprover) {
         this.leaveSubApprover = leaveSubApprover;
         return this;
     }
@@ -48,7 +48,7 @@ public class LeaveSubmitBuilder {
         return this;
     }
 
-    public LeaveSubmitBuilder setLeaveSubApplyDate(Date leaveSubApplyDate) {
+    public LeaveSubmitBuilder setLeaveSubApplyDate(String leaveSubApplyDate) {
         this.leaveSubApplyDate = leaveSubApplyDate;
         return this;
     }
@@ -63,7 +63,7 @@ public class LeaveSubmitBuilder {
         return this;
     }
 
-    public LeaveSubmitBuilder setLeaveSubProcessDate(Date leaveSubProcessDate) {
+    public LeaveSubmitBuilder setLeaveSubProcessDate(String leaveSubProcessDate) {
         this.leaveSubProcessDate = leaveSubProcessDate;
         return this;
     }

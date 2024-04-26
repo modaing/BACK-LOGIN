@@ -17,11 +17,10 @@ public class LeaveSubmit {
     private int refLeaveSubNo;                  // 상위 신청 번호 (취소 요청 시 사용)
 
     @Column(name = "MEMBER_ID", nullable = false, columnDefinition = "VARCHAR(20)")
-    private String leaveSubApplicant;           // 신청자 사번 (사번으로 사원명 조회에서 DTO에 담기)
-
+    private int leaveSubApplicant;           // 신청자 사번 (사번으로 사원명 조회에서 DTO에 담기)
 
     @Column(name = "LEAVE_SUB_APPROVER", nullable = true, columnDefinition = "VARCHAR(30)")
-    private String leaveSubApprover;            // 승인자 사번 (사번으로 사원명 조회해서 DTO에 담기)
+    private int leaveSubApprover;            // 승인자 사번 (사번으로 사원명 조회해서 DTO에 담기)
 
     @Column(name = "LEAVE_SUB_START_DATE", nullable = false, columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
     private Date leaveSubStartDate;             // 휴가 시작일
@@ -30,7 +29,7 @@ public class LeaveSubmit {
     private Date leaveSubEndDate;               // 휴가 종료일
 
     @Column(name = "LEAVE_SUB_APPLY_DATE", nullable = false, columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
-    private Date leaveSubApplyDate;             // 신청 일자
+    private String leaveSubApplyDate;             // 신청 일자
 
     @Column(name = "LEAVE_SUB_TYPE", nullable = false, columnDefinition = "VARCHAR(12)") // 연차, 오전반차, 오후반차, 특별휴가
     private String leaveSubType;                // 휴가 유형
@@ -39,14 +38,14 @@ public class LeaveSubmit {
     private String leaveSubStatus;              // 처리 상태
 
     @Column(name = "LEAVE_SUB_PROCESS_DATE", nullable = true , columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
-    private Date leaveSubProcessDate;           // 처리 일자
+    private String leaveSubProcessDate;           // 처리 일자
 
     @Column(name = "LEAVE_SUB_REASON", nullable = true, columnDefinition = "VARCHAR(300)")
     private String leaveSubReason;              // 신청 사유
     protected LeaveSubmit() {
     }
 
-    public LeaveSubmit(String leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
+    public LeaveSubmit(int leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
         this.leaveSubApplicant = leaveSubApplicant;
         this.leaveSubStartDate = leaveSubStartDate;
         this.leaveSubEndDate = leaveSubEndDate;
@@ -55,9 +54,17 @@ public class LeaveSubmit {
         this.leaveSubReason = leaveSubReason;
     }
 
+    public LeaveSubmit(int refLeaveSubNo, int leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus) {
+        this.refLeaveSubNo = refLeaveSubNo;
+        this.leaveSubApplicant = leaveSubApplicant;
+        this.leaveSubStartDate = leaveSubStartDate;
+        this.leaveSubEndDate = leaveSubEndDate;
+        this.leaveSubApplyDate = leaveSubApplyDate;
+        this.leaveSubType = leaveSubType;
+        this.leaveSubStatus = leaveSubStatus;
+    }
 
-
-    public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, String leaveSubApplicant, String leaveSubApprover, Date leaveSubStartDate, Date leaveSubEndDate, Date leaveSubApplyDate, String leaveSubType, String leaveSubStatus, Date leaveSubProcessDate, String leaveSubReason) {
+    public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, int leaveSubApplicant, int leaveSubApprover, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus, String leaveSubProcessDate, String leaveSubReason) {
         this.leaveSubNo = leaveSubNo;
         this.refLeaveSubNo = refLeaveSubNo;
         this.leaveSubApplicant = leaveSubApplicant;
@@ -79,11 +86,11 @@ public class LeaveSubmit {
         return refLeaveSubNo;
     }
 
-    public String getLeaveSubApplicant() {
+    public int getLeaveSubApplicant() {
         return leaveSubApplicant;
     }
 
-    public String getLeaveSubApprover() {
+    public int getLeaveSubApprover() {
         return leaveSubApprover;
     }
 
@@ -95,7 +102,7 @@ public class LeaveSubmit {
         return leaveSubEndDate;
     }
 
-    public Date getLeaveSubApplyDate() {
+    public String getLeaveSubApplyDate() {
         return leaveSubApplyDate;
     }
 
@@ -107,7 +114,7 @@ public class LeaveSubmit {
         return leaveSubStatus;
     }
 
-    public Date getLeaveSubProcessDate() {
+    public String getLeaveSubProcessDate() {
         return leaveSubProcessDate;
     }
 

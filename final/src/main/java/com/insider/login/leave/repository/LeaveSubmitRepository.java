@@ -13,6 +13,6 @@ import java.util.List;
 public interface LeaveSubmitRepository extends JpaRepository<LeaveSubmit, Integer> {
 
     @Query("SELECT l FROM LeaveSubmit l WHERE l.leaveSubApplicant = :applicantId")
-    List<LeaveSubmit> findByMemberId(@Param("applicantId") String applicantId);
+    List<LeaveSubmit> findByMemberId(@Param("applicantId") int applicantId);
 
 }
