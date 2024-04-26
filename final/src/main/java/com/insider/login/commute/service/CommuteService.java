@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @Slf4j
 public class CommuteService {
@@ -27,7 +30,7 @@ public class CommuteService {
     public void insertTimeOfCommute(CommuteDTO newCommute) {
 
         /* 방법 1 */
-        /*
+
         log.info("[CommuteService] insertTimeOfCommute");
         log.info("[CommuteService] CommuteDTO : " + newCommute);
         try {
@@ -40,6 +43,8 @@ public class CommuteService {
                     newCommute.getTotalWorkingHours()
             );
 
+            log.info("[CommuteService] startwork :", startWork);
+
             commuteRepository.save(startWork);
 
         } catch (Exception e) {
@@ -47,21 +52,40 @@ public class CommuteService {
         }
 
         log.info("[CommuteService] insertTimeOfCommute End ===========");
-         */
+
 
         /* 방법 2 */
-        commuteRepository.save(modelMapper.map(newCommute, Commute.class));
+//        commuteRepository.save(modelMapper.map(newCommute, Commute.class));
     }
 
 
-    public void updateTimeOfCommuteByCommuteNo(UpdateTimeOfCommuteDTO updateTimeOfCommute) {
+    @Transactional
+    public Map<String, Object> updateTimeOfCommuteByCommuteNo(UpdateTimeOfCommuteDTO updateTimeOfCommute) {
+
+        Map<String, Object> result = new HashMap<>();
 
         int commuteNo = updateTimeOfCommute.getCommuteNo();
         Commute commute = commuteRepository.findByCommuteNo(commuteNo);
 
-//        if(commute != null) {
-//            commute.setEndWork
-//        }
+        log.info("update 전 : " , commute);
 
+        if(commute != null) {
+            CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
+
+            commuteDTO.setEndWork(updateTimeOfCommute.getEndWork());
+            commuteDTO.setWorkingStatus(updateTimeOfCommute.getWorkingStatus());
+            commuteDTO.setTotalWorkingHours(updateTimeOfCommute.getTotalWorkingHours());
+
+            Commute updateCommute = modelMapper.map(commuteDTO, Commute.class);
+            commuteRepository.save(updateCommute);
+
+            log.info("update 후 : ", commuteRepository.save(updateCommute));
+
+            result.put("result", true);
+
+        } else {
+            result.put("result", false);
+        }
+        return result;
     }
 }

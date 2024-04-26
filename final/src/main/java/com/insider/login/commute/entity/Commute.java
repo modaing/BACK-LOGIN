@@ -40,11 +40,11 @@ public class Commute {
     private String workingStatus;                           // 근무 상태
 
     @Column(name = "total_working_hours")
-    private Duration totalWorkingHours;                     // 총 근무 시간
+    private int totalWorkingHours;                          // 총 근무 시간
 
     protected Commute() {}
 
-    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, Duration totalWorkingHours) {
+    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours) {
         this.memberId = memberId;
         this.workingDate = workingDate;
         this.startWork = startWork;
@@ -53,7 +53,7 @@ public class Commute {
         this.totalWorkingHours = totalWorkingHours;
     }
 
-    public Commute(LocalTime endWork, String workingStatus, Duration totalWorkingHours) {
+    public Commute(LocalTime endWork, String workingStatus, int totalWorkingHours) {
         this.endWork = endWork;
         this.workingStatus = workingStatus;
         this.totalWorkingHours = totalWorkingHours;
@@ -67,7 +67,7 @@ public class Commute {
         this.workingStatus = workingStatus;
     }
 
-    public void setTotalWorkingHours(Duration totalWorkingHours) {
+    public void setTotalWorkingHours(int totalWorkingHours) {
         this.totalWorkingHours = totalWorkingHours;
     }
 }
