@@ -14,5 +14,6 @@ spring:
         format_sql: true
 
 file:
-  upload:
-    directory: C:\Users\simko\Desktop\file
+  upload-dir: "C:/login/"
+  file-dir: "upload"
+
