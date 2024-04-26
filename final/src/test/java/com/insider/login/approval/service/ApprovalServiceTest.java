@@ -2,28 +2,25 @@ package com.insider.login.approval.service;
 
 import com.insider.login.approval.dto.ApprovalDTO;
 import com.insider.login.approval.dto.ApproverDTO;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+//@AutoConfigureMockMvc
 public class ApprovalServiceTest {
 
     @Autowired
     private ApprovalService approvalService;
 
-    @Autowired
-    private MockMvc mockMvc;
+//    @Autowired
+//    private MockMvc mockMvc;
 
     private static Stream<Arguments> newForm(){
         return Stream.of(
@@ -62,8 +59,7 @@ public class ApprovalServiceTest {
 */
 
     @Test
-
-    public void testInsertApproval( ){
+    void testInsertApproval(){
         //given
         ApprovalDTO approvalDTO = new ApprovalDTO();
 

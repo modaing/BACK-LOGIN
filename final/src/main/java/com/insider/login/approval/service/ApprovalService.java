@@ -92,12 +92,15 @@ public class ApprovalService {
 
         }*/
 
-        for(AttachmentDTO attachmentDTO : approvalDTO.getAttachment()){
+        if(approvalDTO.getAttachment().size() > 0){
+            for(AttachmentDTO attachmentDTO : approvalDTO.getAttachment()){
 
-            Attachment attachment = modelMapper.map(attachmentDTO, Attachment.class);
+                Attachment attachment = modelMapper.map(attachmentDTO, Attachment.class);
 
-            // 첨부파일 엔티티 저장
-            attachmentRepository.save(attachment);
+                // 첨부파일 엔티티 저장
+                attachmentRepository.save(attachment);
+            }
         }
+
     }
 }
