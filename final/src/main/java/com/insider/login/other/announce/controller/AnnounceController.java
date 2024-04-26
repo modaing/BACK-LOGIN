@@ -6,7 +6,9 @@ import com.insider.login.common.CommonController;
 import com.insider.login.common.ResponseMessage;
 import com.insider.login.other.announce.dto.AncFileDTO;
 import com.insider.login.other.announce.dto.AnnounceDTO;
+import com.insider.login.other.announce.entity.Announce;
 import com.insider.login.other.announce.service.AnnounceService;
+import com.insider.login.other.note.entity.Note;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -59,6 +62,23 @@ public class AnnounceController extends FileController {
 
     }
 
+    @GetMapping("/announces/{ancNo}")
+    public ResponseEntity<ResponseMessage> selectAncWithFile(@PathVariable ("ancNo") int ancNo) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        Announce announce = announceService.findAncWithFile(ancNo);
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("announce", announce);
+
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
+
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+
+    }
+
     @PostMapping(value = "/announces", consumes = {"multipart/form-data"})
     public ResponseEntity<ResponseMessage> insertAnnounce(@RequestPart(value = "files", required = false) List<MultipartFile> files,
                                                           @RequestPart("announceDTO") String announceDTOJson) {
@@ -83,6 +103,15 @@ public class AnnounceController extends FileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseMessage(500, "등록 실패", serviceResult));
         }
+    }
+
+    @PutMapping("/announces/{ancNo}")
+    public ResponseEntity<ResponseMessage> updateAnc(@PathVariable("ancNo") int ancNo,
+                                                    @RequestParam(value = "ancTitle") String ancTitle,
+                                                    @RequestParam(value = "ancContent") String ancContent){
+
+        return ResponseEntity.ok().body(new ResponseMessage(200, "수정 성공", announceService.updateAnc(ancNo, ancTitle, ancContent)));
+
     }
 
 

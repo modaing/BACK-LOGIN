@@ -132,4 +132,29 @@ public class AnnounceService {
         return result;
 
     }
+
+    /** 공지사항 수정 */
+    public Map<String, Object> updateAnc(int ancNo, String ancTitle,String ancContent) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        Announce announce = announceRepository.findByAncNo(ancNo);
+
+        if (announce != null) {
+
+            AnnounceDTO announceDTO = modelMapper.map(announce, AnnounceDTO.class);
+
+            announceDTO.setAncTitle(ancTitle);
+            announceDTO.setAncContent(ancContent);
+
+            Announce updateAnc = modelMapper.map(announceDTO, Announce.class);
+            announceRepository.save(updateAnc);
+
+            result.put("result", true);
+        } else {
+            result.put("result", false);
+
+        }
+        return result;
+    }
 }
