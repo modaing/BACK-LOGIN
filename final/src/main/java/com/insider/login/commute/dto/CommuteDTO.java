@@ -1,5 +1,7 @@
 package com.insider.login.commute.dto;
 
+import com.insider.login.member.entity.Department;
+import com.insider.login.member.entity.Member;
 import lombok.*;
 
 import java.time.Duration;
@@ -20,6 +22,7 @@ public class CommuteDTO {
     private LocalTime endWork;              // 퇴근 시간
     private String workingStatus;           // 근무 상태
     private int totalWorkingHours;          // 총 근무 시간
+    private Member member;                  // 구성원
 
     public CommuteDTO(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours) {
         this.memberId = memberId;
@@ -35,5 +38,15 @@ public class CommuteDTO {
         this.endWork = endWork;
         this.workingStatus = workingStatus;
         this.totalWorkingHours = totalWorkingHours;
+    }
+
+    public CommuteDTO(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours, Member member) {
+        this.memberId = memberId;
+        this.workingDate = workingDate;
+        this.startWork = startWork;
+        this.endWork = endWork;
+        this.workingStatus = workingStatus;
+        this.totalWorkingHours = totalWorkingHours;
+        this.member = member;
     }
 }

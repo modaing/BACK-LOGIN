@@ -10,8 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,31 +35,31 @@ public class CommuteService {
 
         /* 방법 1 */
 
-        log.info("[CommuteService] insertTimeOfCommute");
-        log.info("[CommuteService] CommuteDTO : " + newCommute);
-        try {
-            Commute startWork = new Commute(
-                    newCommute.getMemberId(),
-                    newCommute.getWorkingDate(),
-                    newCommute.getStartWork(),
-                    newCommute.getEndWork(),
-                    newCommute.getWorkingStatus(),
-                    newCommute.getTotalWorkingHours()
-            );
-
-            log.info("[CommuteService] startwork :", startWork);
-
-            commuteRepository.save(startWork);
-
-        } catch (Exception e) {
-            log.info("[insertCommute] Exception");
-        }
-
-        log.info("[CommuteService] insertTimeOfCommute End ===========");
+//        log.info("[CommuteService] insertTimeOfCommute");
+//        log.info("[CommuteService] CommuteDTO : " + newCommute);
+//        try {
+//            Commute startWork = new Commute(
+//                    newCommute.getMemberId(),
+//                    newCommute.getWorkingDate(),
+//                    newCommute.getStartWork(),
+//                    newCommute.getEndWork(),
+//                    newCommute.getWorkingStatus(),
+//                    newCommute.getTotalWorkingHours()
+//            );
+//
+//            log.info("[CommuteService] startwork :", startWork);
+//
+//            commuteRepository.save(startWork);
+//
+//        } catch (Exception e) {
+//            log.info("[insertCommute] Exception");
+//        }
+//
+//        log.info("[CommuteService] insertTimeOfCommute End ===========");
 
 
         /* 방법 2 */
-//        commuteRepository.save(modelMapper.map(newCommute, Commute.class));
+        commuteRepository.save(modelMapper.map(newCommute, Commute.class));
     }
 
 
@@ -87,5 +91,39 @@ public class CommuteService {
             result.put("result", false);
         }
         return result;
+    }
+
+    public List<CommuteDTO> selectCommuteListByDepartNo(int departNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth) {
+
+        log.info("[CommuteService] selectCommuteListByDepartNo");
+        log.info("[CommuteService] departNo : ", departNo);
+
+        List<Commute> commuteListByDepartNo = commuteRepository.findByMemberDepartmentDepartNoAndWorkingDateBetween(departNo, startDayOfMonth, endDayOfMonth);
+
+        List<CommuteDTO> commuteDTOList = commuteListByDepartNo.stream()
+                                            .map(commute -> modelMapper.map(commute, CommuteDTO.class))
+                                            .collect(Collectors.toList());
+
+        log.info("[CommuteService] selectCommuteListByDepartNo End ==================");
+
+        return commuteDTOList;
+//        return null;
+    }
+
+    public List<CommuteDTO> selectCommuteListByMemberId(int memberId, LocalDate startWeek, LocalDate endWeek) {
+
+        log.info("[CommuteService] selectCommuteListByMemberId");
+        log.info("[CommuteService] memberId : " , memberId);
+
+//        List<Commute> commuteListByMemberId = commuteRepository.findByMemberId(memberId);
+        List<Commute> commuteListByMemberId = commuteRepository.findByMemberIdAndWorkingDateBetween(memberId, startWeek, endWeek);
+
+        List<CommuteDTO> commuteDTOList = commuteListByMemberId.stream()
+                                            .map(commute -> modelMapper.map(commute, CommuteDTO.class))
+                                            .collect(Collectors.toList());
+
+        log.info("[CommuteService] selectCommuteListByMemberId End ================");
+
+        return commuteDTOList;
     }
 }

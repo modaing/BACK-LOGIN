@@ -1,0 +1,63 @@
+package com.insider.login.member.entity;
+
+import com.insider.login.commute.entity.Commute;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Entity
+@Table(name = "member_info")
+@AllArgsConstructor
+@Getter
+@ToString
+public class Member {
+
+    @Id
+    @Column(name = "member_id", nullable = false)
+    private int memberId;               // 구성원 번호 (사번)
+
+    @Column(name = "name", nullable = false)
+    private String name;                // 구성원 이름
+
+    @Column(name = "password", nullable = false)
+    private String password;            // 비밀번호
+
+    @Column(name = "depart_no", nullable = false)
+    private int departNo;               // 부서 번호
+
+    @Column(name = "position_name", nullable = false)
+    private String positionName;        // 직급명
+
+    @Column(name = "employed_date", nullable = false)
+    private LocalDate employedDate;     // 입사일
+
+    @Column(name = "address", nullable = false)
+    private String address;             // 주소
+
+//    @Column(name = "transferred_id", nullable = false)
+//    private int transferredId;          // 발령 아이디
+
+    @Column(name = "phone_no", nullable = false)
+    private String phoneNo;             // 전화 번호
+
+    @Column(name = "current_status", nullable = false)
+    private String currentStatus;       // 현재 상태
+
+    @Column(name = "email", nullable = false)
+    private String email;               // 이메일
+
+//    @Column(name = "user_role", nullable = false)
+//    private String userRole;          // 권한
+
+    @OneToMany(mappedBy = "member")
+    private List<Commute> commuteList;  // 출퇴근 리스트
+
+    @ManyToOne
+    @JoinColumn(name = "depart_no", insertable = false, updatable = false)
+    private Department department;      // 부서
+
+    protected Member() {}
+
+}
