@@ -7,14 +7,14 @@ import jakarta.persistence.*;
 public class Leave {
 
     @Id
-    @Column(name = "LEAVE_NO", nullable = false, columnDefinition = "INT")
+    @Column(name = "LEAVE_NO", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int leaveNo;            // 휴가 번호
 
-    @Column(name = "MEMBER_ID", nullable = false, columnDefinition = "VARCHAR(20)")
-    private String memberId;        // 사번
+    @Column(name = "MEMBER_ID", nullable = false)
+    private int memberId;        // 사번
 
-    @Column(name = "LEVAE_DAYS", nullable = false, columnDefinition = "INT")
+    @Column(name = "LEVAE_DAYS", nullable = false)
     private int leaveDays;          // 휴가 일수
 
     @Column(name = "LEAVE=_TYPE", nullable = false, columnDefinition = "VARCHAR(12)")   // 연차, 특별휴가, 공가, 경조사
@@ -23,7 +23,7 @@ public class Leave {
     protected Leave() {
     }
 
-    public Leave(int leaveNo, String memberId, int leaveDays, String leaveType) {
+    public Leave(int leaveNo, int memberId, int leaveDays, String leaveType) {
         this.leaveNo = leaveNo;
         this.memberId = memberId;
         this.leaveDays = leaveDays;
@@ -34,7 +34,7 @@ public class Leave {
         return leaveNo;
     }
 
-    public String getMemberId() {
+    public int getMemberId() {
         return memberId;
     }
 

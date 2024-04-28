@@ -2,10 +2,13 @@ package com.insider.login.leave.service;
 
 
 import com.insider.login.common.CommonController;
+import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -19,48 +22,43 @@ public class LeaveServiceTests extends CommonController {
     @Autowired
     private LeaveService leaveService;
 
-    @BeforeEach
-    public void setUp() {
-        LeaveSubmitDTO leaveSubmitDTO1 = new LeaveSubmitDTO(202312003, Date.valueOf("2024-04-10"), Date.valueOf("2024-04-11"), "연차", "휴가 상신입니다.");
-        LeaveSubmitDTO leaveSubmitDTO2 = new LeaveSubmitDTO(202214001, Date.valueOf("2024-04-15"), Date.valueOf("2024-04-16"), "오전반차", "휴가 상신입니다.");
-        LeaveSubmitDTO leaveSubmitDTO3 = new LeaveSubmitDTO(202130001, Date.valueOf("2024-04-17"), Date.valueOf("2024-04-18"), "오후반차", "휴가 상신입니다.");
-        LeaveSubmitDTO leaveSubmitDTO4 = new LeaveSubmitDTO(201923001, Date.valueOf("2024-04-20"), Date.valueOf("2024-04-21"), "특별휴가", "휴가 상신입니다.");
-        leaveSubmitDTO1.setLeaveSubApplyDate(nowDate());
-        leaveSubmitDTO2.setLeaveSubApplyDate(nowDate());
-        leaveSubmitDTO3.setLeaveSubApplyDate(nowDate());
-        leaveSubmitDTO4.setLeaveSubApplyDate(nowDate());
-        leaveService.insertSubmit(leaveSubmitDTO1);
-        leaveService.insertSubmit(leaveSubmitDTO2);
-        leaveService.insertSubmit(leaveSubmitDTO3);
-        leaveService.insertSubmit(leaveSubmitDTO4);
-    }
-
     @Test
     @DisplayName("휴가 신청 내역 조회")
     void testSelectLeaveSubmitListByMemberId() {
         // given
-        int applicantId = 202312003;
+        int applicantId = 202401001;
 
         // when
-        List<LeaveSubmitDTO> results = leaveService.selectLeaveSubmitListByMemberId(applicantId);
+        Page<LeaveSubmitDTO> results = leaveService.selectLeaveSubmitListByMemberId(applicantId);
 
         //then
+        // 가져온 리스트가 비어있지 않아야 함
         Assertions.assertFalse(results.isEmpty());
-        results.forEach(System.out::println);
+        // 조회된 내역의 신청자 사번이 확인하려한 사번과 일치해야함
+        for (LeaveSubmitDTO dto : results) {
+            System.out.println(dto.toString());
+            Assertions.assertEquals(dto.getLeaveSubApplicant(), applicantId);
+
+        }
     }
 
     @Test
     @DisplayName(("휴가 신청"))
     void testInsertSubmit() {
         // given
-        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(202312003, Date.valueOf("2024-04-10"), Date.valueOf("2024-04-11"), "연차", "휴가 상신입니다.");
-        leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(202312003, Date.valueOf("2024-04-10"), Date.valueOf("2024-04-11"), nowDate(), "연차", "휴가 상신입니다.");
+
         // when
+        Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant());
+
         String result = leaveService.insertSubmit(leaveSubmitDTO);
 
+        Page<LeaveSubmitDTO> after = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant());
+
         //then
-        Assertions.assertFalse(leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant()).isEmpty());
-        leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant()).forEach(System.out::println);
+        // 등록했을 때, 해당 사번으로 조회되는 리스트의 크기가 등록 전보다 증가해야함
+        Assertions.assertTrue(after.getTotalElements() > before.getTotalElements());
+        // 성공 결과 메시지를 반환해야함
         Assertions.assertEquals(result, "신청 등록 성공");
 
     }
@@ -75,7 +73,9 @@ public class LeaveServiceTests extends CommonController {
         String result = leaveService.deleteSubmit(leaveSubNo);
 
         // then
+        // 성공 결과 메시지를 반환해야함
         Assertions.assertEquals(result, "신청 취소 성공");
+        // 해당 신청번호로 조회되는 결과가 없어야함
         Assertions.assertNull(leaveService.selectSubmitByLeaveSubNo(leaveSubNo));
     }
 
@@ -87,9 +87,18 @@ public class LeaveServiceTests extends CommonController {
         leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
 
         //when
+
+        Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant());
+
         String result = leaveService.insertSubmitCancel(leaveSubmitDTO);
 
+        Page<LeaveSubmitDTO> after = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant());
+
+
         //then
+        // 등록했을 때, 해당 사번으로 조회되는 리스트의 크기가 등록 전보다 증가해야함
+        Assertions.assertTrue(after.getTotalElements() > before.getTotalElements());
+        // 성공 결과 메시지를 반환해야함
         Assertions.assertEquals(result, "취소요청 등록 성공");
     }
 
@@ -97,11 +106,33 @@ public class LeaveServiceTests extends CommonController {
     @DisplayName("발생내역조회")
     void testSelectAccrualList() {
 
+        //when
+        Page<LeaveAccrualDTO> results = leaveService.selectAccrualList();
+
+        //then
+
     }
 
     @Test
     @DisplayName("휴가 발생")
     void testInsertAccrual() {
+
+        // given
+        LeaveAccrualDTO accrualDTO = new LeaveAccrualDTO(202312003, 3, "예비군");
+        accrualDTO.setGrantorId(20205001);  // 토큰에서 따로 뽑아서 담아줌
+
+        //when
+        Page<LeaveAccrualDTO> before = leaveService.selectAccrualList();
+
+        String result = leaveService.insertAccrual(accrualDTO);
+
+        Page<LeaveAccrualDTO> after = leaveService.selectAccrualList();
+
+        //then
+        // 등록했을 때, 해당 사번으로 조회되는 리스트의 크기가 등록 전보다 증가해야함
+        Assertions.assertTrue(after.getTotalElements() > before.getTotalElements());
+        // 성공 메시지를 반환해야 함
+        Assertions.assertEquals(result, "휴가발생 등록 성공");
 
     }
 
@@ -109,15 +140,16 @@ public class LeaveServiceTests extends CommonController {
     @DisplayName("상세조회")
     void testSelectSubmitByLeaveSubNo() {
         // given
-        System.out.println(leaveService.selectLeaveSubmitListByMemberId(202312003));
         int leaveSubNo = 3;
 
         // when
         LeaveSubmitDTO result = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
 
         // then
+        // 조회 결과가 있어야 함
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(result.getLeaveSubNo(), 3);
+        // 조회해온 결과의 신청번호가 의도한 것과 같아야 함
+        Assertions.assertEquals(result.getLeaveSubNo(), leaveSubNo);
 
     }
 

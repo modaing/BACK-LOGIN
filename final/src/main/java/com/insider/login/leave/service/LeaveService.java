@@ -1,14 +1,20 @@
 package com.insider.login.leave.service;
 
 import com.insider.login.leave.common.LeaveSubmitBuilder;
+import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import com.insider.login.leave.entity.Leave;
+import com.insider.login.leave.entity.LeaveAccrual;
 import com.insider.login.leave.entity.LeaveSubmit;
 import com.insider.login.leave.repository.LeaveAccrualRepository;
 import com.insider.login.leave.repository.LeaveRepository;
 import com.insider.login.leave.repository.LeaveSubmitRepository;
+import com.insider.login.other.announce.dto.AnnounceDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +38,15 @@ public class LeaveService {
         this.modelMapper = modelMapper;
     }
 
-    public List<LeaveSubmitDTO> selectLeaveSubmitListByMemberId(int applicantId) {
+    public Page<LeaveSubmitDTO> selectLeaveSubmitListByMemberId(int applicantId) {
 
-        log.info("휴가 신청 내역 확인 시작 ======================================================");
+        log.info("[신청내역] 휴가 신청 내역 확인 시작 ======================================================");
+        // 페이징 처리를 위해 pageable 변수 선언
+        Pageable pageable = Pageable.ofSize(10);
 
         // 사번으로 해당 사원의 휴가신청내역을 가져옴
-        List<LeaveSubmit> submitList = leaveSubmitRepository.findByMemberId(applicantId);
+        Page<LeaveSubmit> submitList = leaveSubmitRepository.findByMemberId(applicantId, pageable);
 
-        log.info("엔티티 확인 ==========================", submitList);
         List<LeaveSubmitDTO> DTOList = new ArrayList<>();
 
         for (LeaveSubmit submit : submitList) {
@@ -47,15 +54,12 @@ public class LeaveService {
 
             // 사번으로 사원명 조회해서 DTO에 넣기 ( member 머지되면 추가 예정 )
 //            leaveSubmitDTO.setApplicantName(leaveSubmitRepository.findMemberNameByMemberId(applicantId));
+
             DTOList.add(leaveSubmitDTO);
         }
-        log.info("휴가 내역 조회 =================================");
-        for (LeaveSubmitDTO DTO : DTOList) {
-            log.info("내역", DTO);
 
-        }
-
-        return DTOList;
+        // DTO로 변환된 내역들을 새로운 페이지로 만들어서 반환
+        return new PageImpl<>(DTOList, submitList.getPageable(), submitList.getTotalElements());
 
     }
 
@@ -128,10 +132,55 @@ public class LeaveService {
             result = 1;
         } catch (Exception e) {
 
+            log.info("[취소요청] Exception!");
+
+            result = 0;
+
         }
 
         return (result > 0) ? "취소요청 등록 성공" : "취소요청 등록 실패";
     }
+
+    public Page<LeaveAccrualDTO> selectAccrualList() {
+
+        log.info("[발생내역] 발생내역 조회 시작 ========================================");
+        // 페이징 처리를 위해 pageable 변수 선언
+        Pageable pageable = Pageable.ofSize(10);
+
+        Page<LeaveAccrual> accrualList = leaveAccrualRepository.findAll(pageable);
+        log.info("[발생내역] 엔티티 리스트 확인 ======================\n" + accrualList);
+
+        if (accrualList != null) {
+            return accrualList.map(accrual -> modelMapper.map(accrualList, LeaveAccrualDTO.class));
+        } else {
+            return Page.empty();
+        }
+    }
+
+    @Transactional
+    public String insertAccrual(LeaveAccrualDTO accrualDTO) {
+
+        int result = 0;
+
+        try {
+
+            LeaveAccrual leaveAccrual = modelMapper.map(accrualDTO, LeaveAccrual.class);
+            log.info("[발생등록] 엔티티 확인 ============================\n" + leaveAccrual);
+
+            leaveAccrualRepository.save(leaveAccrual);
+
+            result = 1;
+        } catch (Exception e) {
+
+            log.info("[발생등록] Exception!");
+
+            result = 0;
+
+        }
+
+        return (result > 0) ? "휴가발생 등록 성공" : "휴가발생 등록 실패";
+    }
+
 
     public LeaveSubmitDTO selectSubmitByLeaveSubNo(int leaveSubNo) {
 

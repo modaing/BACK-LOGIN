@@ -36,8 +36,6 @@ public class LeaveSubmitDTO {
     }
 
     //휴가 취소 요청 등록
-
-
     public LeaveSubmitDTO(int refLeaveSubNo, int leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus, String leaveSubReason) {
         this.refLeaveSubNo = refLeaveSubNo;
         this.leaveSubApplicant = leaveSubApplicant;
@@ -63,6 +61,15 @@ public class LeaveSubmitDTO {
         this.leaveSubApplicant = leaveSubApplicant;
         this.leaveSubStartDate = leaveSubStartDate;
         this.leaveSubEndDate = leaveSubEndDate;
+        this.leaveSubType = leaveSubType;
+        this.leaveSubReason = leaveSubReason;
+    }
+
+    public LeaveSubmitDTO(int leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
+        this.leaveSubApplicant = leaveSubApplicant;
+        this.leaveSubStartDate = leaveSubStartDate;
+        this.leaveSubEndDate = leaveSubEndDate;
+        this.leaveSubApplyDate = leaveSubApplyDate;
         this.leaveSubType = leaveSubType;
         this.leaveSubReason = leaveSubReason;
     }
