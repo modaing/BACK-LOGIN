@@ -16,12 +16,10 @@ public class MemberService {
     }
 
     public Optional<Member> findMember(int id) {
-        System.out.println("최종적으로 받아온 id값은: " + id);
+//        System.out.println("최종적으로 받아온 id값은: " + id);
 //        System.out.println("id의 타입: " + id.);
 
-//        Optional<User> user = userRepository.findById(id);
-//        Optional<Member> member = userRepository.findByMemberId(id);
-        Optional<Member> member = memberRepository.findMemberByMemberId(id);
+        Optional<Member> member = memberRepository.findByMemberId(id);
         System.out.println("찾은 member는: " + member);
 
         /*

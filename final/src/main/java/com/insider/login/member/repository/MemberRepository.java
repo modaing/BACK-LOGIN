@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Integer> { // Integer -> memberId 때문에
-    Optional<Member> findMemberByMemberId(int id);
+    Optional<Member> findByMemberId(int id);
 
     /*
     * 반환할 entity type: User

@@ -26,7 +26,7 @@ import java.util.Objects;
 public class MemberController {
 
     @Autowired
-    private MemberRepository userRepository; // 원래 service에 작성을 하는 것인데 test를 하기 위해서
+    private MemberRepository userRepository; // 원래 service에 작성을 하는 것인데 test를 하기 위해서 임시로 사용 하는 것...!
 
     @Autowired
     private MemberService memberService;
@@ -37,23 +37,16 @@ public class MemberController {
     @Transactional
     @PostMapping("/regist")
     public String signup(@RequestBody Member member) {
-        member.setPassword(passwordEncoder.encode(member.getPassword())); // 비밀번호
-        member.setMemberStatus("재직"); // 재직 or 다른 것들... setting 해줘야 한다!!! NOTE 할것!!
+        member.setPassword(passwordEncoder.encode(member.getPassword())); // 구성원을 처음 등록을 할 때 비밀번호 0000을 입력 하는데 그 값을 받기...!
+        // 재직 or 다른 것들... setting 해줘야 한다!!! NOTE 할것!!
+        member.setMemberStatus("재직"); // 처음 등록을 할 때 "재직" 상태로 설정 하는 logic
 
         // JSON형식으로 LocalDate을 저장을 하기 위한 block of code
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         LocalDate localDate = LocalDate.now();
 
-//        try {
-//            String jsonDate = objectMapper.writeValueAsString(localDate);
-//            System.out.println("JSON Date: " + jsonDate);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
         member.setEmployedDate(localDate); // 등록한 날짜 가입
-
 
         Member savedMember = memberService.saveMember(member);
         System.out.println("회원 가입한 구성원 정보: " + savedMember);

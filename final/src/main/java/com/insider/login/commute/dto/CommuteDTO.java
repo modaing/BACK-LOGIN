@@ -1,6 +1,6 @@
 package com.insider.login.commute.dto;
 
-import com.insider.login.member.entity.Department;
+
 import com.insider.login.member.entity.Member;
 import lombok.*;
 
