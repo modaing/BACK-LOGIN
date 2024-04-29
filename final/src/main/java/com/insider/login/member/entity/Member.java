@@ -191,4 +191,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
                 ", image=" + image +
                 '}';
     }
+
+    public void setMemberId(Object memberId, Class<Integer> integerClass) {
+    }
 }

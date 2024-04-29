@@ -85,6 +85,7 @@ public class TokenUtils {
         // 만료시간도 추가해야한다
         Date expireTime = new Date(System.currentTimeMillis() + tokenValidateTime);
         System.out.println("expire time: " + expireTime);
+        System.out.println("generateJwtToken의 member정보: " + member);
 
         // token에 대한 setting
         JwtBuilder builder = Jwts.builder()
@@ -124,7 +125,7 @@ public class TokenUtils {
         claims.put("Role", member.getRole());
         claims.put("memberId", member.getMemberId());
 
-//        System.out.println("claims에 담은 memberId 정보: " + claims.get("memberId")); // 확인용
+        System.out.println("🧥🧥🧥🧥🧥🧥 claims에 담은 memberId 정보: " + claims.get("memberId")); // 확인용
 //        System.out.println("claims의 정보: " + claims);
 //        System.out.println(claims.get("token"));
 //        claims.put("Time", LocalTime.now());
