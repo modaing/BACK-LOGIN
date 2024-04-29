@@ -9,12 +9,12 @@ Content-Type: multipart/form-data; boundary=WebAppBoundary
 --WebAppBoundary
 Content-Disposition: form-data; name="files"; filename="file.txt"
 
-< C:\Users\simko\Desktop\file\th.jpg
+< C:\Users\hi\Desktop\file\jjang.png
 --WebAppBoundary
 Content-Disposition: form-data; name="announceDTO"
 
 {
-"ancTitle":"not null",
+"ancTitle":"제발",
 "ancContent":"낫 널 테스트",
 "ancDate":"1997-19-20",
 "ancWriter":"김낫널",
@@ -39,9 +39,19 @@ Content-Disposition: form-data; name="announceDTO"
 --WebAppBoundary--
 
 ### 공지사항 전체조회 페이징
-GET http://localhost:8080/announces
+GET http://localhost:8080/announces?page=2
 
 ### 공지사항 상세 조회
-GET http://localhost:8080/announces/{ancNo}
+GET http://localhost:8080/announces/34
 
+### 공지사항 수정
+PUT http://localhost:8080/announces/6
+Content-Type: application/json
 
+{
+  "ancTitle" : "",
+  "ancContent" : ""
+}
+
+### 공지사항 삭제
+DELETE http://localhost:8080/announces/3

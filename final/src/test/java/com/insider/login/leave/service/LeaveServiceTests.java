@@ -1,5 +1,6 @@
 package com.insider.login.leave.service;
 
+
 import com.insider.login.common.CommonController;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import org.junit.jupiter.api.*;
@@ -119,6 +120,5 @@ public class LeaveServiceTests extends CommonController {
         Assertions.assertEquals(result.getLeaveSubNo(), 3);
 
     }
-
 
 }

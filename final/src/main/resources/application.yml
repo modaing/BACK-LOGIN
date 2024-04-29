@@ -15,4 +15,9 @@ spring:
 
 file:
   upload:
-    directory: C:\Users\simko\Desktop\file
+    directory: C:\Users\hi\Desktop\file
+
+  websocket:
+    servlet:
+      max-binary-message-buffer-size: 500000
+      max-text-message-buffer-size: 500000
