@@ -132,6 +132,4 @@ public class MemberController {
             return "MemberId not found in token";
         }
     }
-
-
 }
