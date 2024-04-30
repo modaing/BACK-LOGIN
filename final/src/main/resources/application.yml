@@ -16,7 +16,7 @@ spring:
 file:
   upload-dir: "C:/login/"
   file-dir: "upload"
- directory: "C:\\Users\\simko\\Desktop\\file"
+directory: "C:\\Users\\simko\\Desktop\\file"
 
 websocket:
   servlet:

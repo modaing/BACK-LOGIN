@@ -27,8 +27,6 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private String password;                        // 비밀번호
     @Column(name = "depart_no", nullable = false)
     private int departNo;                           // 부서 번호
-    @Column(name = "position_name" ,nullable = false)
-    private String positionName;                    // 직급명
     @Column(name = "employed_date", nullable = false)
     private LocalDate employedDate;                 // 입사일
     @Column(name = "address", nullable = false)
@@ -61,7 +59,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     @Column(name = "transferred_no", nullable = false)
     private int transferredNo;                      // 발령 번호
 
-    protected Member() {
+    public Member() {
     }
 
     public List<String> getRoleList() {

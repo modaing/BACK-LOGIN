@@ -14,16 +14,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class LeaveController extends CommonController{
+public class LeaveController extends CommonController {
 
     private final LeaveService leaveService;
 
@@ -31,9 +29,12 @@ public class LeaveController extends CommonController{
         this.leaveService = leaveService;
     }
 
+    /**
+     * 휴가 신청 내역 조회
+     */
     @GetMapping("/leaveSubmits")
     public ResponseEntity<ResponseMessage> selectSubmitList(@RequestParam(value = "page", defaultValue = "0") int pageNumber,
-                                                            @RequestParam(value = "direction", defaultValue = "DESC" ) String direction,
+                                                            @RequestParam(value = "direction", defaultValue = "DESC") String direction,
                                                             @RequestParam(value = "properties", defaultValue = "leaveSubNo") String properties,
                                                             @RequestParam(value = "memberid", defaultValue = "0") int memberId) {
 
@@ -69,6 +70,19 @@ public class LeaveController extends CommonController{
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
 
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+    }
+
+    /**
+     * 휴가 신청
+     */
+    @PostMapping("/leaveSubmits")
+    public ResponseEntity<String> insertSubmit(@RequestParam("applicantId") int applicantId,
+                                               @ModelAttribute LeaveSubmitDTO leaveSubmitDTO) {
+
+        leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
+
+        return ResponseEntity.ok().body(leaveService.insertSubmit(leaveSubmitDTO));
+
     }
 
 }

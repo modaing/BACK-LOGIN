@@ -5,7 +5,6 @@ import com.insider.login.commute.dto.CorrectionDTO;
 import com.insider.login.commute.dto.UpdateProcessForCorrectionDTO;
 import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
 import com.insider.login.commute.entity.Commute;
-import com.insider.login.member.entity.Department;
 import com.insider.login.member.entity.Member;
 import org.hibernate.sql.Update;
 import org.junit.jupiter.api.Assertions;

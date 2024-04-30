@@ -120,8 +120,8 @@ public class LeavesServiceTests extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
-
         }
+
         // when
         Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitList(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
 
