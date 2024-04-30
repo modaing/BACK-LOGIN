@@ -8,7 +8,7 @@ spring:
   jpa:
     show-sql: true
     database: mysql
-    generate-ddl: true
+    generate-ddl: false
     properties:
       hibernate:
         format_sql: true

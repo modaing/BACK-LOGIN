@@ -3,8 +3,8 @@ package com.insider.login.leave.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "LEAVE")
-public class Leave {
+@Table(name = "LEAVES")
+public class Leaves {
 
     @Id
     @Column(name = "LEAVE_NO", nullable = false)
@@ -20,10 +20,10 @@ public class Leave {
     @Column(name = "LEAVE=_TYPE", nullable = false, columnDefinition = "VARCHAR(12)")   // 연차, 특별휴가, 공가, 경조사
     private String leaveType;       // 휴가 유형
 
-    protected Leave() {
+    protected Leaves() {
     }
 
-    public Leave(int leaveNo, int memberId, int leaveDays, String leaveType) {
+    public Leaves(int leaveNo, int memberId, int leaveDays, String leaveType) {
         this.leaveNo = leaveNo;
         this.memberId = memberId;
         this.leaveDays = leaveDays;

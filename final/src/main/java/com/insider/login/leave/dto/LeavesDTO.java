@@ -1,6 +1,6 @@
 package com.insider.login.leave.dto;
 
-public class LeaveDTO {
+public class LeavesDTO {
 
     private int leaveNo;            // 휴가 번호
 
@@ -10,10 +10,10 @@ public class LeaveDTO {
 
     private String leaveType;       // 휴가 유형
 
-    public LeaveDTO() {
+    public LeavesDTO() {
     }
 
-    public LeaveDTO(int leaveNo, String memberId, int leaveDays, String leaveType) {
+    public LeavesDTO(int leaveNo, String memberId, int leaveDays, String leaveType) {
         this.leaveNo = leaveNo;
         this.memberId = memberId;
         this.leaveDays = leaveDays;

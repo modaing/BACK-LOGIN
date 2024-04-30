@@ -17,4 +17,6 @@ public interface LeaveSubmitRepository extends JpaRepository<LeaveSubmit, Intege
     @Query("SELECT l FROM LeaveSubmit l WHERE l.leaveSubApplicant = :applicantId")
     Page<LeaveSubmit> findByMemberId(@Param("applicantId") int applicantId, Pageable pageable);
 
+    @Query("SELECT l FROM LeaveSubmit l WHERE l.leaveSubApplicant = :applicantId")
+    List<LeaveSubmit> findByMemberId(@Param("applicantId") int applicantId);
 }

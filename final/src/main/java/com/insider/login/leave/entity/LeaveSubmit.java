@@ -2,7 +2,7 @@ package com.insider.login.leave.entity;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "LEAVE_SUBMIT")
@@ -22,11 +22,11 @@ public class LeaveSubmit {
     @Column(name = "LEAVE_SUB_APPROVER", nullable = true)
     private int leaveSubApprover;               // 승인자 사번 (사번으로 사원명 조회해서 DTO에 담기)
 
-    @Column(name = "LEAVE_SUB_START_DATE", nullable = false, columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
-    private Date leaveSubStartDate;             // 휴가 시작일
+    @Column(name = "LEAVE_SUB_START_DATE", nullable = false) // YYYY-MM-DD
+    private LocalDate  leaveSubStartDate;             // 휴가 시작일
 
-    @Column(name = "LEAVE_SUB_END_DATE", nullable = false, columnDefinition = "VARCHAR(10)")  // YYYY-MM-DD
-    private Date leaveSubEndDate;               // 휴가 종료일
+    @Column(name = "LEAVE_SUB_END_DATE", nullable = false)  // YYYY-MM-DD
+    private LocalDate  leaveSubEndDate;               // 휴가 종료일
 
     @Column(name = "LEAVE_SUB_APPLY_DATE", nullable = false, columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
     private String leaveSubApplyDate;           // 신청 일자
@@ -45,7 +45,7 @@ public class LeaveSubmit {
     protected LeaveSubmit() {
     }
 
-    public LeaveSubmit(int leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
+    public LeaveSubmit(int leaveSubApplicant, LocalDate  leaveSubStartDate, LocalDate  leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
         this.leaveSubApplicant = leaveSubApplicant;
         this.leaveSubStartDate = leaveSubStartDate;
         this.leaveSubEndDate = leaveSubEndDate;
@@ -54,7 +54,7 @@ public class LeaveSubmit {
         this.leaveSubReason = leaveSubReason;
     }
 
-    public LeaveSubmit(int refLeaveSubNo, int leaveSubApplicant, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus) {
+    public LeaveSubmit(int refLeaveSubNo, int leaveSubApplicant, LocalDate  leaveSubStartDate, LocalDate  leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus) {
         this.refLeaveSubNo = refLeaveSubNo;
         this.leaveSubApplicant = leaveSubApplicant;
         this.leaveSubStartDate = leaveSubStartDate;
@@ -64,7 +64,7 @@ public class LeaveSubmit {
         this.leaveSubStatus = leaveSubStatus;
     }
 
-    public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, int leaveSubApplicant, int leaveSubApprover, Date leaveSubStartDate, Date leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus, String leaveSubProcessDate, String leaveSubReason) {
+    public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, int leaveSubApplicant, int leaveSubApprover, LocalDate  leaveSubStartDate, LocalDate  leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus, String leaveSubProcessDate, String leaveSubReason) {
         this.leaveSubNo = leaveSubNo;
         this.refLeaveSubNo = refLeaveSubNo;
         this.leaveSubApplicant = leaveSubApplicant;
@@ -94,11 +94,11 @@ public class LeaveSubmit {
         return leaveSubApprover;
     }
 
-    public Date getLeaveSubStartDate() {
+    public LocalDate  getLeaveSubStartDate() {
         return leaveSubStartDate;
     }
 
-    public Date getLeaveSubEndDate() {
+    public LocalDate  getLeaveSubEndDate() {
         return leaveSubEndDate;
     }
 
