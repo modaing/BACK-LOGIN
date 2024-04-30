@@ -1,19 +1,29 @@
-package com.insider.login.leave.dto;
+package com.insider.login.leave.entity;
 
-public class LeaveDTO {
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "LEAVES")
+public class Leaves {
+
+    @Id
+    @Column(name = "LEAVE_NO", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int leaveNo;            // 휴가 번호
 
-    private String memberId;        // 사번
+    @Column(name = "MEMBER_ID", nullable = false)
+    private int memberId;        // 사번
 
+    @Column(name = "LEVAE_DAYS", nullable = false)
     private int leaveDays;          // 휴가 일수
 
+    @Column(name = "LEAVE=_TYPE", nullable = false, columnDefinition = "VARCHAR(12)")   // 연차, 특별휴가, 공가, 경조사
     private String leaveType;       // 휴가 유형
 
-    public LeaveDTO() {
+    protected Leaves() {
     }
 
-    public LeaveDTO(int leaveNo, String memberId, int leaveDays, String leaveType) {
+    public Leaves(int leaveNo, int memberId, int leaveDays, String leaveType) {
         this.leaveNo = leaveNo;
         this.memberId = memberId;
         this.leaveDays = leaveDays;
@@ -24,37 +34,21 @@ public class LeaveDTO {
         return leaveNo;
     }
 
-    public void setLeaveNo(int leaveNo) {
-        this.leaveNo = leaveNo;
-    }
-
-    public String getMemberId() {
+    public int getMemberId() {
         return memberId;
-    }
-
-    public void setMemberId(String memberId) {
-        this.memberId = memberId;
     }
 
     public int getLeaveDays() {
         return leaveDays;
     }
 
-    public void setLeaveDays(int leaveDays) {
-        this.leaveDays = leaveDays;
-    }
-
     public String getLeaveType() {
         return leaveType;
     }
 
-    public void setLeaveType(String leaveType) {
-        this.leaveType = leaveType;
-    }
-
     @Override
     public String toString() {
-        return "LeaveDTO{" +
+        return "Leave{" +
                 "leaveNo=" + leaveNo +
                 ", memberId='" + memberId + '\'' +
                 ", leaveDays=" + leaveDays +

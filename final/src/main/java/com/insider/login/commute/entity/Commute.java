@@ -43,6 +43,9 @@ public class Commute {
     @JoinColumn(name = "member_id", insertable = false, updatable = false)
     private Member member;                                  // 구성원
 
+    @OneToOne
+    @JoinColumn(name = "commute_no")
+    private Correction correction;                          // 출퇴근 정정
 
     protected Commute() {}
 

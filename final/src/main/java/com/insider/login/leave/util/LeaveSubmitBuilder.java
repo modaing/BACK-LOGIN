@@ -1,17 +1,17 @@
-package com.insider.login.leave.common;
+package com.insider.login.leave.util;
 
 
 import com.insider.login.leave.entity.LeaveSubmit;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class LeaveSubmitBuilder {
     private int leaveSubNo;
     private int refLeaveSubNo;
     private int leaveSubApplicant;
     private int leaveSubApprover;
-    private Date leaveSubStartDate;
-    private Date leaveSubEndDate;
+    private LocalDate leaveSubStartDate;
+    private LocalDate  leaveSubEndDate;
     private String leaveSubApplyDate;
     private String leaveSubType;
     private String leaveSubStatus;
@@ -38,12 +38,12 @@ public class LeaveSubmitBuilder {
         return this;
     }
 
-    public LeaveSubmitBuilder setLeaveSubStartDate(Date leaveSubStartDate) {
+    public LeaveSubmitBuilder setLeaveSubStartDate(LocalDate  leaveSubStartDate) {
         this.leaveSubStartDate = leaveSubStartDate;
         return this;
     }
 
-    public LeaveSubmitBuilder setLeaveSubEndDate(Date leaveSubEndDate) {
+    public LeaveSubmitBuilder setLeaveSubEndDate(LocalDate  leaveSubEndDate) {
         this.leaveSubEndDate = leaveSubEndDate;
         return this;
     }

@@ -1,6 +1,8 @@
 package com.insider.login.commute.service;
 
 import com.insider.login.commute.dto.CommuteDTO;
+import com.insider.login.commute.dto.CorrectionDTO;
+import com.insider.login.commute.dto.UpdateProcessForCorrectionDTO;
 import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.member.entity.Department;
@@ -36,7 +38,7 @@ public class CommuteServiceTests {
     private static Stream<Arguments> getStartWork() {
         return Stream.of(
                 Arguments.of(
-                        2024001001,
+                        2024001003,
                         LocalDate.now(),
                         LocalTime.of(8,55),
                         null,
@@ -75,7 +77,7 @@ public class CommuteServiceTests {
 //    @Transactional
     void testUpdateTimeOfCommuteByCommuteNo() {
         //given
-        int commuteNo = 1;
+        int commuteNo = 5;
         LocalTime endWork = LocalTime.of(18,00);
         String workingStatus = "퇴근";
 
@@ -108,12 +110,10 @@ public class CommuteServiceTests {
 
     @DisplayName("부서별 출퇴근 내역 조회 테스트")
     @Test
+//    @Transactional
     void testSelectCommuteListByDepartNo() {
-        /** departNo 가 commute 엔티티에 없어서 다시 작성해야함 !!! => 이거 때문에 모든 test 오류남 */
-
         //given
-        Department department = new Department(1, "인사팀");
-        int departNo = department.getDepartNo();
+        int departNo = 1;
         LocalDate date = LocalDate.now();
 
         /** 전체 출퇴근 내역 조회시 월간 조회에 사용할 변수들 */
@@ -125,18 +125,15 @@ public class CommuteServiceTests {
         LocalDate nextEndDayOfMonth = endDayOfMonth.plusMonths(1);
 
         //when
-        Map<String, Object> departCommute = new HashMap<>();
         List<CommuteDTO> departCommuteList = commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth);
 
-        departCommute.put("departCommuteList", departCommuteList);
-
         //then
-        Assertions.assertNotNull(departCommuteList);
-
+        Assertions.assertTrue(!departCommuteList.isEmpty());
     }
 
     @DisplayName("memberId 별로 출퇴근 내역 조회 테스트")
     @Test
+//    @Transactional
     void testSelectCommuteListByMemberId() {
         //given
         int memberId = 2024001001;
@@ -154,7 +151,103 @@ public class CommuteServiceTests {
         List<CommuteDTO> commuteList = commuteService.selectCommuteListByMemberId(memberId, startWeek, endWeek);
 
         //then
-        Assertions.assertNotNull(commuteList);
+        Assertions.assertTrue(!commuteList.isEmpty());
     }
+
+    private static Stream<Arguments> getCorrectTimeOfCommute() {
+        return Stream.of(
+                Arguments.of(
+                        1,
+                        "09:00"
+                        ,null
+                        ,"엘리베이터 점검으로 인해 지각으로 처리되었습니다."
+                        ,LocalDate.now()
+                        ,"대기"
+                        ,null
+                        ,null
+                )
+        );
+    }
+    @DisplayName("출퇴근 시간 정정 등록 테스트")
+    @ParameterizedTest
+    @MethodSource("getCorrectTimeOfCommute")
+    void testInsertRequestForCorrect(int commuteNo, String reqStartWork, String reqEndWork,
+                                     String reasonForCorr, LocalDate corrRegistrationDate, String corrStatus,
+                                     String reasonForRejection, LocalDate corrProcessingDate) {
+        //given
+        CorrectionDTO newCorrection = new CorrectionDTO(
+                commuteNo,
+                reqStartWork,
+                reqEndWork,
+                reasonForCorr,
+                corrRegistrationDate,
+                corrStatus,
+                reasonForRejection,
+                corrProcessingDate
+        );
+
+        //when
+
+        //then
+        Assertions.assertDoesNotThrow(
+                () -> commuteService.insertRequestForCorrect(newCorrection));
+    }
+
+    @DisplayName("출퇴근 시간 정정 처리 테스트")
+    @Test
+    void testUpdateProcessForCorrectByCorrNo() {
+        /** 출퇴근 정정 요청 내역, 출퇴근 내역 2개를 update 해야 함!! */
+
+        //given
+        int corrNo = 1;             // 정정 요청 번호
+        String corrStatus = "승인";
+        String reasonForRejection = null;
+        LocalDate corrProcessingDate = LocalDate.now();
+
+        UpdateProcessForCorrectionDTO updateProcessForCorrection = new UpdateProcessForCorrectionDTO(
+                corrNo,
+                corrStatus,
+                reasonForRejection,
+                corrProcessingDate
+        );
+
+        //when
+        Map<String, Object> result = new HashMap<>();
+        result = commuteService.updateProcessForCorrectByCorrNo(updateProcessForCorrection);
+
+        //then
+        Assertions.assertTrue((Boolean) result.get("result"));
+    }
+
+//    @DisplayName("전체 출퇴근 시간 정정 내역 조회 테스트")
+//    @Test
+//    void testSelectRequestForCorrect() {
+//        //given
+//        LocalDate date = LocalDate.now();
+//        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+//        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+//
+//        //when
+//        List<CorrectionDTO> correctionlist = commuteService.selectReqeustForCorrectList(startDayOfMonth, endDayOfMonth);
+//
+//        //then
+//        Assertions.assertTrue(!correctionlist.isEmpty());
+//    }
+
+//    @DisplayName("memberId 별로 출퇴근 시간 정정 내역 조회 테스트")
+//    @Test
+//    void testSelectRequestForCorrectByMemberId() {
+//        //given
+//        int memberId = 2024001001;
+//        LocalDate date = LocalDate.now();
+//        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+//        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+//
+//        //when
+//        List<CorrectionDTO> correctionList = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth);
+//
+//        //then
+//        Assertions.assertTrue(!correctionList.isEmpty());
+//    }
 
 }
