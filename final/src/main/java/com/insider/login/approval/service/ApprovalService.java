@@ -1,15 +1,18 @@
 package com.insider.login.approval.service;
 
+import com.insider.login.approval.builder.ApprovalBuilder;
 import com.insider.login.approval.dto.ApprovalDTO;
+import com.insider.login.approval.dto.ApproverDTO;
 import com.insider.login.approval.dto.AttachmentDTO;
+import com.insider.login.approval.dto.ReferencerDTO;
 import com.insider.login.approval.entity.*;
 import com.insider.login.approval.repository.ApprovalRepository;
 import com.insider.login.approval.repository.ApproverRepository;
 import com.insider.login.approval.repository.AttachmentRepository;
 import com.insider.login.approval.repository.ReferencerRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@Slf4j
 public class ApprovalService {
 
     @Value("${file.upload-dir}")
@@ -51,13 +55,7 @@ public class ApprovalService {
         this.modelMapper = modelMapper;
     }
 
-    @Transactional
-    public void insertForm(Form newForm) {
-
-        approvalRepository.insertForm(newForm);
-
-    }
-
+    //전자결재 기안(등록)
     @Transactional
     public void insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
 
@@ -186,5 +184,72 @@ public class ApprovalService {
             }
         }
     }
+
+
+    //한 전자결재 조회
+    public ApprovalDTO selectApproval(String approvalNo){
+        Approval approval = approvalRepository.findById(approvalNo);
+
+        List<ApproverDTO> approver = new ArrayList<>();
+        List<ReferencerDTO> referencer = new ArrayList<>();
+        List<AttachmentDTO> attachment = new ArrayList<>();
+
+
+        List<Approver> approverList = approverRepository.findByApprovalId(approvalNo);
+        for(int i = 0; i < approverList.size(); i++){
+            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverList.get(i).getApproverDate().toString(), approverList.get(i).getMemberId());
+            approver.add(approverDTO);
+        }
+
+        List<Referencer> referencerList = referencerRepository.findByApprovalId(approvalNo);
+        for(int i = 0; i < referencerList.size(); i++){
+            ReferencerDTO referencerDTO = new ReferencerDTO(referencerList.get(i).getRefNo(), referencerList.get(i).getApprovalNo(), referencerList.get(i).getMemberId(), referencerList.get(i).getRefOrder());
+            referencer.add(referencerDTO);
+        }
+
+        List<Attachment> attachmentList = attachmentRepository.findByApprovalId(approvalNo);
+        for(int i = 0; i < attachmentList.size(); i++){
+            AttachmentDTO attachmentDTO = new AttachmentDTO(attachmentList.get(i).getFileNo(), attachmentList.get(i).getFileOriname(), attachmentList.get(i).getFileSavepath(), attachmentList.get(i).getFileSavename(), attachmentList.get(i).getApprovalNo());
+            attachment.add(attachmentDTO);
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = approval.getApprovalDate().format(formatter);
+
+        log.info("***** formattedDateTime ***** " + formattedDateTime);
+
+        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), formattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), attachment, approver, referencer);
+
+        return approvalDTO;
+    }
+
+
+    //전자결재 회수
+    @Transactional
+    public ApprovalDTO updateApproval(String approvalNo) {
+
+        //수정하고자 하는 전자결재 정보 조회
+        ApprovalDTO approvalDTO = selectApproval(approvalNo);
+
+        log.info("***** 날짜 확인 ***** " + approvalDTO.getApprovalDate());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime parsedDateTime = LocalDateTime.parse(approvalDTO.getApprovalDate(), formatter);
+
+        Approval approval = new Approval(approvalDTO.getApprovalNo(), approvalDTO.getMemberId(), approvalDTO.getApprovalTitle(), approvalDTO.getApprovalContent(), parsedDateTime, approvalDTO.getApprovalStatus(), approvalDTO.getRejectReason(), approvalDTO.getFormNo());
+
+        //상태 update
+        approval = new ApprovalBuilder(approval).approvalStatus("회수").builder();
+
+        //db update
+        approvalRepository.update(approval);
+
+        //DTO도 변경
+        approvalDTO.setApprovalStatus(approval.getApprovalStatus());
+
+        return approvalDTO;
+    }
+
+
 
 }

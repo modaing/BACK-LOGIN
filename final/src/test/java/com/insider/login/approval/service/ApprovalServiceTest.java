@@ -5,8 +5,11 @@ import com.insider.login.approval.dto.ApproverDTO;
 import com.insider.login.approval.dto.AttachmentDTO;
 import com.insider.login.approval.dto.ReferencerDTO;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -215,16 +218,24 @@ public class ApprovalServiceTest {
 
 
     //전자결재 결재 테스트
-    @Test
+
+    @DisplayName("전자결재 회수 테스트")
+    @ParameterizedTest
+    @CsvSource("2024-sup00001")
     void testUpdateApproval (String approvalNo){
         //수정 - 회수, 결재처리, 반려
 
         //회수
 
-        // given
         // when
+        ApprovalDTO approvalDTO = approvalService.updateApproval(approvalNo);
+
         // then
+        Assertions.assertEquals(approvalDTO.getApprovalStatus(), "회수");
     }
+
+
+
 
 
 }
