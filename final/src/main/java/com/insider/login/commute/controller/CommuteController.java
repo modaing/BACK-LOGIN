@@ -2,7 +2,10 @@ package com.insider.login.commute.controller;
 
 import com.insider.login.common.ResponseMessage;
 import com.insider.login.commute.dto.CommuteDTO;
+import com.insider.login.commute.dto.CorrectionDTO;
 import com.insider.login.commute.service.CommuteService;
+import com.insider.login.member.entity.Member;
+import com.sun.net.httpserver.Headers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.nio.charset.Charset;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +35,7 @@ public class CommuteController {
         this.commuteService = commuteService;
     }
 
-    /** 출퇴근 내역 조회 (전체, 회원별) */
+    /** 출퇴근 내역 조회 (부서별, 회원별) */
 //    @GetMapping("/commutes")
 //    public ResponseEntity<ResponseMessage> selectCommuteList(@RequestParam(value = "target") String target,
 //                                                             @RequestParam(value = "targetValue") String targetValue,
@@ -68,6 +72,34 @@ public class CommuteController {
 //
 //        Map<String, Object> result = new HashMap<>();
 //        result.put("result", commuteList);
+//        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
+//
+//        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+//    }
+
+    /** 출퇴근 시간 정정 내역 조회 (전체, 멤버별) */
+//    public ResponseEntity<ResponseMessage> selectRequestForCorrectList(@RequestParam(value = "memberId") Integer memberId,
+//                                                                       @RequestParam(value = "date") LocalDate date) {
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+//
+//        List<CorrectionDTO> correctionList;
+//
+//        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+//        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+//
+//        if(memberId != null) {
+//
+//            correctionList = commuteService.selectReqeustForCorrectList(startDayOfMonth, endDayOfMonth);
+//
+//        } else {
+//
+//            correctionList = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth);
+//        }
+//
+//        Map<String, Object> result = new HashMap<>();
+//        result.put("result", correctionList);
 //        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
 //
 //        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
