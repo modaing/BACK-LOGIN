@@ -17,3 +17,6 @@ file:
   upload-dir: "C:/login/"
   file-dir: "upload"
 
+jwt:
+  key: asdkfjlkawdsjfw390r82309rjlkasdfja213498dlkasdfuas8dfas8dfa9s8df89asdf89as98df8asd9fas89df98asd89fas98df89asd89fa98sdfa
+  time: 86400000
