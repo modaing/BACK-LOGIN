@@ -74,53 +74,59 @@ public class ApprovalServiceTest {
         List<MultipartFile> files = new ArrayList<>();
 
 
-        ApproverDTO approverDTO1 = new ApproverDTO("2024-rei00001_apr001", "2024-rei00001", 1, "승인", "2024-04-29 18:50:00", 2024001002);
-        ApproverDTO approverDTO2 = new ApproverDTO("2024-rei00001_apr002", "2024-rei00001", 2, "처리 중", "2024-04-29 18:50:00", 2024001001);
+        ApproverDTO approverDTO1 = new ApproverDTO("2024-abs00001_apr001", "2024-abs00001", 1, "승인", "2024-04-30 12:11:00", 2024001002);
+        ApproverDTO approverDTO2 = new ApproverDTO("2024-abs00001_apr002", "2024-abs00001", 2, "처리 중", "2024-04-30 12:11:00", 2024001003);
 
-        ReferencerDTO referencerDTO = new ReferencerDTO("2024-rei00001_ref001", "2024-rei00001", 2024001003, 1);
+        ReferencerDTO referencerDTO = new ReferencerDTO("2024-abs00001_ref001", "2024-abs00001", 2024001001, 1);
 
         approverList.add(approverDTO1);
         approverList.add(approverDTO2);
 
         referencerList.add(referencerDTO);
 
-        approvalDTO.setApprovalNo("2024-rei00001");
+        approvalDTO.setApprovalNo("2024-abs00001");
         approvalDTO.setMemberId(2024001002);
-        approvalDTO.setApprovalTitle("금일 연장근무 요청드립니다.");
+        approvalDTO.setApprovalTitle("휴직 신청합니다.");
         approvalDTO.setApprovalContent("<form name=\"form\">\n" +
                 "\t\t\t\t\t\t\t<div name=\"wholeForm\"id=\"wholeForm\">\n" +
-                "\t\t\t\t\t\t\t\t<div name=\"titleform\" id=\"titleform\">\n" +
-                "\t\t\t\t\t\t\t\t\t<input type=\"text\" name=\"title\" id=\"title\" placeholder=\"제목\">\n" +
-                "\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t\t<table>\n" +
-                "\t\t\t\t\t\t\t\t\t<tr name=\"rei_content\" id=\"rei_content\"> \n" +
-                "\t\t\t\t\t\t\t\t\t  <td colspan=\"2\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<tr >\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th>휴직 시작일자</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<td>2024-04-30</td>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<tr >\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th>휴직 종료일자</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<td>2024-05-30</td>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<tr >\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th>복직일자</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<td>2024-06-01</td>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<tr name=\"abs_reason\" id=\"abs_reason\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th>복직사유</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<td>개인 질병으로 휴직하였으나 치료가 완료되어 복직하고자 합니다.</td>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t</table>\n" +
+                "\t\t\t\t\t\t\t<div name=\"titleform\" id=\"titleform\">\n" +
+                "\t\t\t\t\t\t\t  \n" +
+                "\t\t\t\t\t\t\t\t<input type=\"text\" name=\"title\" id=\"title\" placeholder=\"제목\">\n" +
                 "\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t<div name=\"date\" id=\"date\">\n" +
-                "\t\t\t\t\t\t\t\t<div>2024-04-29</div>\n" +
+                "\t\t\t\t\t\t\t\t\t<table>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t\t<th>휴직 시작일자</th>\n" +
+                "\t\t\t\t\t\t\t\t\t  <td>2024-05-30</td>\n" +
+                "\t\t\t\t\t\t\t\t  </tr>\n" +
+                "\t\t\t\t\t\t\t\t  <tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t  <th>휴직 종료일자</th>\n" +
+                "\t\t\t\t\t\t\t\t\t<td>2024-06-30</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t  <th>복직 예정일자</th>\n" +
+                "\t\t\t\t\t\t\t\t\t<td>2024-07-01</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t<tr name=\"abs_reason\" id=\"abs_reason\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t  <th>휴직사유</th>\n" +
+                "\t\t\t\t\t\t\t\t\t<td>개인질병으로 치료를 위해 휴직신청합니다.</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t<tr name=\"orders\" id=\"orders\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t  <th>기타사항</th>\n" +
+                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t  <th>연락처</th>\n" +
+                "\t\t\t\t\t\t\t\t\t<td>010-1234-4321</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t   </table>\n" +
+                "\t\t\t\t\t\t\t </div>\n" +
+                "\t\t\t\t\t\t  <div name=\"date\" id=\"date\">\n" +
+                "\t\t\t\t\t\t\t<div>2024-04-30</div>\n" +
                 "\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t</form>");
-        approvalDTO.setApprovalDate("2024-04-29 18:50:00");
+        approvalDTO.setApprovalDate("2024-04-30 12:11:00");
         approvalDTO.setApprovalStatus("처리 중");
-        approvalDTO.setFormNo("ovt");
+        approvalDTO.setFormNo("abs");
 
 
             //파일 처리
@@ -134,20 +140,24 @@ public class ApprovalServiceTest {
             byte[] imageFileContent = "Test Image Content".getBytes();
             imgFile = new MockMultipartFile("testimage.jpg", "testimage.jpg", "image/jpeg", imageFileContent);
 
+            files.add(pdfFile);
+            files.add(imgFile);
+
+
             List<AttachmentDTO> attachmentList = new ArrayList<>();
             AttachmentDTO attachmentDTO1 = new AttachmentDTO();
-            attachmentDTO1.setFileNo("2024-rei00001_f001");
+            attachmentDTO1.setFileNo("2024-abs00001_f001");
             attachmentDTO1.setFileOriname(pdfFile.getOriginalFilename());
             attachmentDTO1.setFileSavename(pdfFile.getName());
             attachmentDTO1.setFileSavepath("C:/login/upload");
-            attachmentDTO1.setApprovalNo("2024-rei00001");
+            attachmentDTO1.setApprovalNo("2024-abs00001");
 
             AttachmentDTO attachmentDTO2 = new AttachmentDTO();
-            attachmentDTO2.setFileNo("2024-rei00001_f002");
+            attachmentDTO2.setFileNo("2024-abs00001_f002");
             attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
             attachmentDTO2.setFileSavename(imgFile.getName());
             attachmentDTO2.setFileSavepath("C:/login/upload");
-            attachmentDTO2.setApprovalNo("2024-rei00001");
+            attachmentDTO2.setApprovalNo("2024-abs00001");
 
             attachmentList.add(attachmentDTO1);
             attachmentList.add(attachmentDTO2);
@@ -164,7 +174,7 @@ public class ApprovalServiceTest {
 
         //then
         Assertions.assertDoesNotThrow(
-                () -> approvalService.insertApproval(approvalDTO)
+                () -> approvalService.insertApproval(approvalDTO, files)
         );
 
     }

@@ -10,17 +10,27 @@ import com.insider.login.approval.repository.ReferencerRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ApprovalService {
+
+    @Value("${file.upload-dir}")
+    private String UPLOAD_DIR;
+
+    @Value("${file.file-dir}")
+    private String FILE_DIR;
 
     private ApprovalRepository approvalRepository;
     private ApproverRepository approverRepository;
@@ -49,7 +59,7 @@ public class ApprovalService {
     }
 
     @Transactional
-    public void insertApproval(ApprovalDTO approvalDTO) {
+    public void insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -97,34 +107,84 @@ public class ApprovalService {
         }
 
         // 파일 꺼내기
-        try {
-            List<AttachmentDTO> attachmentList = approvalDTO.getAttachment();
 
-            if (attachmentList != null || !attachmentList.isEmpty()) {
-                for (AttachmentDTO attachmentDTO : approvalDTO.getAttachment()) {
+        List<AttachmentDTO> attachmentList = approvalDTO.getAttachment();
+
+        String savePath = UPLOAD_DIR + FILE_DIR;
+
+        List<Map<String, String>> fileList = new ArrayList<>();
 
 
-                    Path fileSavePath = Paths.get(attachmentDTO.getFileSavepath(), attachmentDTO.getFileSavename());
+        if(files != null && !files.isEmpty()){
+            try {
+                String savedName = "";
+                String ext = "";
 
-                    //파일 저장 처리
-                    //원본 파일의 경로를 가져옴
-//                    Path originalFile
+                for(int i = 0; i < files.size(); i++)
+                {
+                    MultipartFile file = files.get(i);
 
-                    String ext = attachmentDTO.getFileOriname().substring(attachmentDTO.getFileOriname().lastIndexOf("."));
-                    String savedFileName = UUID.randomUUID().toString().replace("-", "") + ext;
+                    AttachmentDTO attachmentDTO = approvalDTO.getAttachment().get(i);
+                    ext = attachmentDTO.getFileOriname().substring(attachmentDTO.getFileOriname().lastIndexOf("."));
+                    savedName = UUID.randomUUID().toString().replace("-", "") + ext;
+                    //파일저장명 암호화
 
-                    attachmentDTO.setFileSavename(savedFileName);
+                    Map<String, String> fileMap = new HashMap<>();
+
+                    fileMap.put("originFileName", file.getOriginalFilename());
+                    fileMap.put("savedFileName", savedName);
+                    fileMap.put("savePath", savePath);
+
+                    attachmentDTO.setFileSavename(savedName);
+
+                    Path uploadPath = Paths.get(savePath);
+
+                    if(!Files.exists(uploadPath)){
+                        Files.createDirectories(uploadPath);
+                    }
+                    //파일저장경로 없으면 만들어주기
+
+                    Path filePath = uploadPath.resolve(savedName);
+
+                    //**파일 경로에 저장
+                    Files.copy(file.getInputStream(), filePath);
+
+
+                    fileList.add(fileMap);
 
 
                     Attachment attachment = modelMapper.map(attachmentDTO, Attachment.class);
 
-                    // 첨부파일 엔티티 저장
+                    //** 첨부파일정보 DB에 저장
                     attachmentRepository.save(attachment);
+
+                }
+
+            } catch (IOException e) {
+                //무슨 에러가 발생해도 파일 지워주기
+                e.printStackTrace();
+
+                int cnt = 0;
+                for(int i = 0; i < fileList.size(); i++){
+                    Map<String, String> file = fileList.get(i);
+                    String savedFileName  = file.get("savedFileName");
+
+                    File deleteFile = new File(savePath + "/" + savedFileName);
+
+                    boolean isDeleted = deleteFile.delete();
+
+                    if(isDeleted == true){
+                        cnt++;
+                    }
+                }
+                if(cnt == fileList.size()){
+                    e.printStackTrace();
+                }
+                else{
+                    e.printStackTrace();
                 }
             }
-        }catch(NullPointerException e){
-
         }
-
     }
+
 }
