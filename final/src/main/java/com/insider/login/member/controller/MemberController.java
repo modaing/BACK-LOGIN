@@ -29,7 +29,7 @@ import java.util.Random;
 
 @RestController
 public class MemberController {
-`
+
     @Value("${jwt.key}")
     private String jwtSecret;
 
