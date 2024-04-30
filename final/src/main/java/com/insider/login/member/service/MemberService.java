@@ -22,6 +22,7 @@ public class MemberService {
 //        Optional<User> user = userRepository.findById(id);
 //        Optional<Member> member = userRepository.findByMemberId(id);
         Optional<Member> member = memberRepository.findMemberByMemberId(id);
+
         System.out.println("찾은 member는: " + member);
 
         /*

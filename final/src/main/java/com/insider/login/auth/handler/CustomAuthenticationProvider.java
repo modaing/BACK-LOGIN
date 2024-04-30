@@ -38,8 +38,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider { //
 
         DetailsMember detailsMember = (DetailsMember) detailsService.loadUserByUsername(id); // 구성원의 정보를 받고
 
+        System.out.println("detailsMember의 authorities: " + detailsMember.getAuthorities());
+        System.out.println("detailsMember의 member: " + detailsMember.getMember());
+        System.out.println("detailsMember의 password: " + detailsMember.getPassword());
+        System.out.println("detailsMember의 username: " + detailsMember.getUsername());
+
         if(!passwordEncoder.matches(pass, detailsMember.getPassword())) {     // 입력한 비밀번호를 검증을 하는데, 틀릴 시
-            throw new BadCredentialsException(pass + "는 틀린 비밀번회입니다");
+            throw new BadCredentialsException(pass + "는 틀린 비밀번호입니다");
+
         }
         return new UsernamePasswordAuthenticationToken(detailsMember, pass, detailsMember.getAuthorities()); // 비밀번호가 일치할 시 3가지의 인자를 반환을 해준다
     }
