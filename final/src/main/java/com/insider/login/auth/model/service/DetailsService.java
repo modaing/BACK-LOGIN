@@ -27,7 +27,7 @@ public class DetailsService implements UserDetailsService { // 이 class를 사�
     * */
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        System.out.println("id가 잘 넘어왔는지: " + id + " in DetailsService class"); // id가 잘 넘어왔는지 확인용
+//        System.out.println("id가 잘 넘어왔는지: " + id + " in DetailsService class"); // id가 잘 넘어왔는지 확인용
         // 정보를 조회를 해와서 사용 하는 logic을 작성을 해야한다
         // eg) ID를 가지고 사용자의 정보를 불러와야 한다 ((JPA를 사용 하기 때문에 DB에 접근을 하기 위해서 Repository만들 것
 

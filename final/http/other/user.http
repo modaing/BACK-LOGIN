@@ -1,4 +1,4 @@
-##회원 가입
+### 회원 가입 (김지환)
 POST http://localhost:8080/regist
 Content-Type: application/json
 Accept: */*
@@ -8,9 +8,9 @@ Accept: */*
     "departNo": 1,
     "departName": "인사팀"
   },
-  "address": "서울 중구 왕십리동 123123123",
-  "email": "jeehwan98@naver.com",
-  "name": "김지환",
+  "address": "중구",
+  "email": "1111111111@naver.com",
+  "name": "앙리",
   "password": "0000",
   "position": {
     "positionName": "알바",
@@ -24,7 +24,7 @@ Accept: */*
   }
 }
 
-###로그인
+### 로그인 (김지환)
 POST http://localhost:8080/login
 Content-Type: application/json
 Accept: */*
@@ -34,19 +34,58 @@ Accept: */*
   "pass": "0000"
 }
 
-### GET 요청
+### POST 부서등록 인사팀
+POST http://localhost:8080/registDepart
+Content-Type: application/json
+Accept: */*
+
+{
+  "departName": "관리팀"
+}
+
+### POST 직급등록 계약직
+POST http://localhost:8080/registPosition
+Content-Type: application/json
+Accept: */*
+
+{
+  "positionName": "계약직",
+  "positionLevel": "5"
+}
+
+
+
+
+
+
+
+### GET 요청 test
 GET http://localhost:8080/test
 Authorization: BEARER eyJkYXRlIjoxNzE0NDA5NzMyMzQzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NjgiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NjEzMiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1Njh9.rnKxgTrDvGTeRV_m_fS_WkN3bsBQiulgHpFAqP7Mul0
-### POST 요청
+
+### POST 요청 test
 POST http://localhost:8080/test
 Content-Type: application/json
 Accept: */*
 Authorization: BEARER eyJkYXRlIjoxNzE0NDA5NzMyMzQzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NjgiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NjEzMiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1Njh9.rnKxgTrDvGTeRV_m_fS_WkN3bsBQiulgHpFAqP7Mul0
 
-### Get 요청
+### Get 요청 회원 정보 가져오기
 GET http://localhost:8080/getMemberInfo
 Content-Type: application/json
 Authorization: BEARER eyJkYXRlIjoxNzE0NDA5NzMyMzQzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NjgiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NjEzMiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1Njh9.rnKxgTrDvGTeRV_m_fS_WkN3bsBQiulgHpFAqP7Mul0
 
-### Authorization: BEARER eyJkYXRlIjoxNzE0NDA5MzMyNzMwLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NzQiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NTczMiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1NzR9.3FV0eHDY3U4GnL-4HElXPPDoCcq5YOqQq3OfhfP9sdg
-### Authorization: BEARER eyJkYXRlIjoxNzE0NDA5MzQ5Njk3LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NzQiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NTc0OSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1NzR9.odsWFzAqrph-0slRpJDIWdwWQpHebM3tRnyy-kKp-jM
+### GET token 김지환
+GET http://localhost:8080/getToken
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NDA5NzMyMzQzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NjgiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NjEzMiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1Njh9.rnKxgTrDvGTeRV_m_fS_WkN3bsBQiulgHpFAqP7Mul0
+
+### POST password 김지환
+POST http://localhost:8080/updatePassword
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NDA5NzMyMzQzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiaW5zaWRlcidzIHRva2VuOiAyNDA0MDE1NjgiLCJ1c2VyTmFtZSI6Iuq5gOyngO2ZmCIsImV4cCI6MTcxNDQ5NjEzMiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA0MDE1Njh9.rnKxgTrDvGTeRV_m_fS_WkN3bsBQiulgHpFAqP7Mul0
+
+{
+  "currentPassword": "0000",
+  "newPassword123": "123123",
+  "newPassword123123": "12333"
+}

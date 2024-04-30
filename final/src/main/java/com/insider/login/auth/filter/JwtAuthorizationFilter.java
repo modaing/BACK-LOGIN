@@ -1,10 +1,13 @@
 package com.insider.login.auth.filter;
 
 import com.insider.login.auth.DetailsMember;
+import com.insider.login.auth.image.entity.Image;
 import com.insider.login.common.AuthConstants;
 import com.insider.login.common.utils.TokenUtils;
 import com.insider.login.common.utils.MemberRole;
+import com.insider.login.department.entity.Department;
 import com.insider.login.member.entity.Member;
+import com.insider.login.position.entity.Position;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -17,6 +20,7 @@ import org.json.simple.JSONObject;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -47,6 +51,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         System.out.println("===== JwtAuthorizationFilter 도착 =====");
         List<String> roleLessList = Arrays.asList("/regist");
 
+        System.out.println("roleLessList: " + roleLessList);
+
+        System.out.println("request.getRequestURI() 정보: " + request.getRequestURI());
+
         // 인증은 했지만 권한이 필요 없는 resource들은 그냥 다음 동작으로 넘어간다... 하지만 권한이 필요한 resource면 -> SecurityContextHolder에 권한 정보를 같이 줘서, 거기에 접근을 할 수 있게 해줘야 한다
         if (roleLessList.contains((request.getRequestURI()))) {
             chain.doFilter(request, response);
@@ -69,25 +77,58 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
                 // token이 유효하는지
                 if (TokenUtils.isValidToken(token)) {
-                    System.out.println("token은 유효하다.. token의 정보: " + token);
                     Claims claims = TokenUtils.getClaimsFromToken(token); // claims : token에 있는 정보들
-
                     System.out.println("Claims에 대한 정보: " + claims);
+
                     // ContextHolder에 setting해줄 DetailsUser
                     DetailsMember authentication = new DetailsMember();
                     Member member = new Member();
                     System.out.println("😭😭😭😭😭😭😭");
-//                  int memberId = claims.get("memberId", Integer.class); // 로그인할 때 입력한 Id를 가져온다. memberId는 int이기 떼문에 Integer.class 선정
-//                  user.setMemberId(Integer.parseInt(claims.get(memberId).toString())); // ????????
-                    member.setName(claims.get("userName").toString());
-                    member.setRole(MemberRole.valueOf(claims.get("Role").toString()));     // ???????? 02-jwt-security-03.mp4 40분쯤...!
-                    member.setMemberId(claims.get("memberId"), Integer.class);
-                    System.out.println("중간점검.. 여기인가");
-//                    System.out.println("memberId의 정보: " + claims.get("token"));
-//                    member.setMemberId((Integer) claims.get("memberId"));
-                    System.out.println("아니면 여기인가...");
-                    authentication.setMember(member);
+
+                    /* member에다가 setting해줄 값들 */
+                    member.setName(claims.get("userName").toString());                      // name
+                    member.setRole(MemberRole.valueOf(claims.get("Role").toString()));      // Role
+                    /* image경로 설정하는 logic */
+                    Image image = new Image();
+                    image.setMemberImagePath((String) claims.get("image"));
+                    member.setImage(image);
+                    member.setMemberId((Integer) claims.get("memberId"));                   // memberId
+
+                    /* memberStatus 설정해주는 logic */
+                    String memberStatus123 = (String) claims.get("memberStatus");
+                    System.out.println("memberStatus: " + memberStatus123);
+                    member.setMemberStatus(memberStatus123);
+
+
+                    /* member안에 positionName setting하는 logic*/
+                    String positionName123 = (String) claims.get("positionName");
+                    System.out.println("Claims에 들어았는 positionName: " + positionName123);
+
+                    Position position = new Position();
+                    position.setPositionName(positionName123);
+
+                    member.setPosition(position);
+
+                    Department department = new Department();
+//                    department.setDepartName();
+                    String departName123 = (String) claims.get("departName");
+                    department.setDepartName(departName123);
+                    member.setDepartment(department);
+
+//                    member.setPosition();ㄷ
+//                     Object memberIdObject = claims.get("memberId");
+//                     if (memberIdObject instanceof Integer) {
+//                         System.out.println("int");
+//                     } else if (memberIdObject instanceof Long) {
+//                         System.out.println("long");
+//                     } else {
+//                         System.out.println("모름");
+//                     }
+
                     System.out.println("member정보: " + member);
+
+                    authentication.setMember(member);
+                    System.out.println("authentication에 담은 정보들: " + authentication);
 
                     /*
                      * ContextHolder에 setting

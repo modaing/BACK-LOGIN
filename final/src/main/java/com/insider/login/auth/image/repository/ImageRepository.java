@@ -23,5 +23,6 @@ public class ImageRepository {
     }
 
     public void saveImage(Image image) {
+        manager.persist(image);
     }
 }

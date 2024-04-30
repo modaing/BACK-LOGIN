@@ -22,8 +22,8 @@ public class TokenUtils {
 
 
     @Value("${jwt.key}") // Application file에서 설정 정보를 불러와서 setting할 것
-    public void setJwtSecretKey (String jwtSecretKey) { // 정적 변수이기 때문에 class명.field명
-        TokenUtils.jwtSecretKey = jwtSecretKey;
+    public void setJwtSecretKey (String jwtSecretKey) {
+        TokenUtils.jwtSecretKey = jwtSecretKey; // jwt.key에서 값을 받아와서 setting한다
     }
 
     @Value("${jwt.time}")
@@ -31,24 +31,24 @@ public class TokenUtils {
         TokenUtils.tokenValidateTime = tokenValidateTime;
     }
 
-    // 다른 곳에서 사용을 할 것이기 대문에 public static
-    public static String splitHeader(String header) { // BEARER를 떼는 method이다
-        // 만약에 header에 값이 없으면 -> nullPointerException error가 발생할 것이다. 그렇기 대문에 그것에 대한 조건문을 작성을 해야한다..!
-
-        // if(!header.equals("")) {
-        if (header != null) { // 보통 header : "Bearer " + token 이기 때문에
-            return header.split(" ")[1];                // "Bearer "를 split해서 1st index인 token만 반환을 해주면 된다
+    /*
+    * token값만 떼서 사용을 하기 위해서
+    * header는 "Bearer " + token이기 때문에 token만 빼오기 위해서 작성하는 logic
+    * */
+    public static String splitHeader(String header) {
+        if (header != null) {
+            return header.split(" ")[1];
             } else {
                 return null;
         }
     }
 
     public static boolean isValidToken(String token) {
-        // token을 받아서 boolean 값을 반환할 method... 그러기 위해서는 token을 받아서 복호화를 시켜야한다. 왜냐? 복호화를 한다는 것은 token이 존재를 하기 때문이다
-        System.out.println("is valid token: " + token); // 여기까지는 okay..
+        // true or false 반환
+        System.out.println("token만 잘 가져왔는지: " + token); // 확인용
         try {
             Claims claims = getClaimsFromToken(token); // 정상적으로 작동이 되면
-            System.out.println("Things that are stored in Claims: " + claims);
+            System.out.println("Claims에 담은 정보들: " + claims);
             return true;
         } catch (ExpiredJwtException e) {
             e.printStackTrace();
@@ -76,7 +76,7 @@ public class TokenUtils {
                 .setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey)) // secret key를 넣어서 복호화 setting해주고
                 .parseClaimsJws(token) // 값을 제대로 받았으면 -> header, payload, signature로 분리를 한다
                 .getBody();
-//        System.out.println("😭😭😭" + claims);
+        System.out.println("😭😭😭" + claims);
         return claims;
     }
 
@@ -85,14 +85,20 @@ public class TokenUtils {
         // 만료시간도 추가해야한다
         Date expireTime = new Date(System.currentTimeMillis() + tokenValidateTime);
         System.out.println("expire time: " + expireTime);
-        System.out.println("generateJwtToken의 member정보: " + member);
+        System.out.println("로그인한 구성원의 정보 (in Token Utils): " + member);
 
-        // token에 대한 setting
-        JwtBuilder builder = Jwts.builder()
-                .setHeader(createHeader())                              // token은 header, payload, 그리고 signature로 구성이 되어있기 때문에 각 setting을 해줘야 한다
+        /*
+        * token에서는 header, payload, signature가 존재를 하기 때문에 각각 값들을 입력을 해줘야 한다
+        * - header: setHeader
+        * - payload: setSubject
+        * - signature: signWith
+        * */
+        JwtBuilder builder = Jwts.builder()                             // used to construct JWTs
+                .setHeader(createHeader())
                 .setClaims(createClaims(member))                        // payload에다가 user data를 넣어준다
-                .setSubject("insider's token: " + member.getMemberId()) // token의 제목을 넣어준다
-                .signWith(SignatureAlgorithm.HS256, createSignature())  // HS256 형식으로 암호화를 해준다
+//                .setSubject("insider's token: " + member.getMemberId()) // token의 제목을 넣어준다
+                .setSubject("" + member.getMemberId())
+                .signWith(SignatureAlgorithm.HS256, createSignature())  // 반환 받은 key값으로 sign in
                 .setExpiration(expireTime);                             // 만료시간
         System.out.println("builder의 정보: " + builder);
 
@@ -113,7 +119,7 @@ public class TokenUtils {
         return header;
     }
 
-    /* 사용자 정보를 기반으로 claim을 생성하는 method */
+    // putting in informations that will be easy to be taken out
     private static Map<String, Object> createClaims(Member member) {
         Map<String, Object> claims = new HashMap<>();
         System.out.println("member 정보: " + member);
@@ -124,24 +130,32 @@ public class TokenUtils {
         claims.put("userName", member.getName());   // claims에다가 정보를 입력하는 것들...
         claims.put("Role", member.getRole());
         claims.put("memberId", member.getMemberId());
+        String memberStatus123 = member.getMemberStatus();
+        System.out.println("memberStatus: " + memberStatus123);
+        claims.put("memberStatus", memberStatus123);               // 상태 추가
+
+//        claims.put("employedDate", member.getEmployedDate());               // 입사일자 추가
 
         System.out.println("🧥🧥🧥🧥🧥🧥 claims에 담은 memberId 정보: " + claims.get("memberId")); // 확인용
-//        System.out.println("claims의 정보: " + claims);
-//        System.out.println(claims.get("token"));
-//        claims.put("Time", LocalTime.now());
-        /* 꺼내오는 정보들 예시...*/
-//        System.out.println("Claims의 정보: " + claims);
-//        System.out.println("구성원의 사진: " + claims.get("image"));
-//        System.out.println("구성원의 직급명: " + claims.get("positionName"));
+        System.out.println("Claims에 담은 정보들: " + claims);
+        System.out.println("memberStatus: " + claims.get("memberStatus"));
 
         return claims;
     }
 
     /* JWT 서명을 발급하는 method */
     private static Key createSignature() {                                              // key는 signature를 가지고 확인을 한다
-        byte[] secretBytes = DatatypeConverter.parseBase64Binary(jwtSecretKey);         // secret key를 암호화 시켜서
-        return new SecretKeySpec(secretBytes, SignatureAlgorithm.HS256.getJcaName());   // secret key spec을 반환을 해준다
+        byte[] secretBytes = DatatypeConverter.parseBase64Binary(jwtSecretKey);         // secret key -> parsed into byte array, which is used for signing JWTs
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;               // set to HMAC-SHA256, widely used for generating secure cryptographic signatures
+        return new SecretKeySpec(secretBytes, signatureAlgorithm.getJcaName());         // constructs specification for the secret key, which can be used for cryptographic operations
+
+        /* in summary...
+        * - takes Base64-encoded secret key, convert into byte array, select HS256 signature algorithm, and construct a secret key specification using the provided secret key bytes and selected algorithm.
+        * - The resulti ng 'Key' is then used for signing JTWs.
+        * */
     }
+
+
 
     /*
     * 이렇게 method를 분리 시킨 이유:

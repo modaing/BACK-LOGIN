@@ -1,9 +1,6 @@
 package com.insider.login.auth.image.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "member_image")
@@ -11,6 +8,7 @@ public class Image {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "member_image_no", nullable = false)
     private int memberImageNo;
 //    @Column(name = "member_image_name", nullable = false)

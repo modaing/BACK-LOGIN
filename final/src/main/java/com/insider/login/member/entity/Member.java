@@ -22,7 +22,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private String name;
     @Column(name = "password", nullable = false)
     private String password;
-//    @Column(name = "depart_no", nullable = false)
+    //    @Column(name = "depart_no", nullable = false)
 //    private int departNo;
 //    @Column(name = "position_name" ,nullable = false)
 //    private String positionName;
@@ -32,14 +32,14 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private String address;
     @Column(name = "phone_no", nullable = false)
     private String phoneNo;
-    @Column(name = "current_status", nullable = false)
+    @Column(name = "member_status", nullable = false)
     private String memberStatus;
     @Column(name = "email", nullable = false)
     private String email;
     @Column(name = "member_role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
-//    private com.insider.prefinal.common.UserRole userRole;
+    //    private com.insider.prefinal.common.UserRole userRole;
 //    @Column(name = "member_image_no")
 //    private int memberImageNo;
     @ManyToOne(cascade = CascadeType.ALL)

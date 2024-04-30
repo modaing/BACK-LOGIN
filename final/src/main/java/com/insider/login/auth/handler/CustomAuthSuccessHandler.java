@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
+// upon successful login, this is the final step where the token is created
 public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
@@ -24,15 +25,16 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
 
         // 응답을 하는 것을 모두 다 JSON Object로 만들어서 String JSON으로 반환을 해줘야한다
         JSONObject jsonValue = (JSONObject) ConvertUtil.convertObjectToJsonObject(member);
-        HashMap<String, Object> responseMap = new HashMap<>();                                           // 반환값 설정
+        HashMap<String, Object> responseMap = new HashMap<>();                                                   // 반환값 설정
         JSONObject jsonObject;
-        if(member.getMemberStatus().equals("재직")) {                                                         // 구성원이 재직 중이면 -> 로그인 성공
+        if(member.getMemberStatus().equals("재직")) {                                                             // 구성원이 재직 중이면 -> 로그인 성공
             responseMap.put("userInfo", jsonValue);
             responseMap.put("message","로그인 성공입니다.");
             // 로그인이 성공을 했을 때 token 정보도 같이 줘야한다
-            String token = TokenUtils.generateJwtToken(member);                                            // token setting하는 logic
+            String token = TokenUtils.generateJwtToken(member);                                                  // token setting하는 logic
+            System.out.println("token 정보: " + token); // eg) token 정보: eyJkYXRlIjoxNzE0NDU1NTU2OTM3LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiMjQwNDAxNTY4IiwibWVtYmVyU3RhdHVzIjoi7J6s7KeBIiwidXNlck5hbWUiOiLquYDsp4DtmZgiLCJleHAiOjE3MTQ1NDE5NTYsImRlcGFydE5hbWUiOiLsnbjsgqztjIAiLCJtZW1iZXJJZCI6MjQwNDAxNTY4fQ.fsgaqYu7OQGzlsqDd0lINkBIIPWUFpJVwKXBvYaPeeI
 
-            response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + " " + token); // token의 구조가 BEARER token... 이기 때문에 이런 형식으로 추가를 해준다
+            response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + " " + token);         // token의 구조가 BEARER token... 이기 때문에 이런 형식으로 추가를 해준다
         } else {                                             // 그렇지 않으면 -> 휴면 상태라고 뜨게 하고 로그인을 못하겠금 막아준다
             responseMap.put("userInfo", jsonValue);
             responseMap.put("message", "휴면 상태의 계정입니다.");
@@ -45,4 +47,25 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
         printWriter.flush();
         printWriter.close();
     }
+    /*
+        <<< front-end >>>
+        fetch('http://example.com/login', {
+            method: 'POST',
+                    body: JSON.stringify({ username: 'example', password: 'password' }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+                .then(response => {
+        const token = response.headers.get('Authorization');
+            console.log('Token:', token);
+            // Save the token in localStorage or sessionStorage for future requests
+        });
+    */
+
+    /*
+      <<< backend >>>
+    * String token = response.getHeader(AuthConstants.AUTH_HEADER);
+    * */
+
 }
