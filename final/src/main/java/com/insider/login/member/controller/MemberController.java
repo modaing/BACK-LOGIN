@@ -29,7 +29,7 @@ import java.util.Random;
 
 @RestController
 public class MemberController {
-
+`
     @Value("${jwt.key}")
     private String jwtSecret;
 
@@ -76,6 +76,13 @@ public class MemberController {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         LocalDate localDate = LocalDate.now();
+
+//        try {
+//            String jsonDate = objectMapper.writeValueAsString(localDate);
+//            System.out.println("JSON Date: " + jsonDate);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         member.setEmployedDate(localDate); // 등록한 날짜 가입
 

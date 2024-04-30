@@ -51,6 +51,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "position_name")
     private Position position;                      // 직급
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_image_no", referencedColumnName = "member_image_no")
     private Image image;
@@ -61,7 +62,6 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private int transferredNo;                      // 발령 번호
 
     protected Member() {
-
     }
 
     public List<String> getRoleList() {
@@ -202,4 +202,5 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
 
     public void setMemberId(Object memberId, Class<Integer> integerClass) {
     }
+
 }

@@ -37,6 +37,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider { //
         // id는 long이기 때문에 long type으로 반환을 해준다
 
         DetailsMember detailsMember = (DetailsMember) detailsService.loadUserByUsername(id); // 구성원의 정보를 받고
+
         System.out.println("detailsMember의 authorities: " + detailsMember.getAuthorities());
         System.out.println("detailsMember의 member: " + detailsMember.getMember());
         System.out.println("detailsMember의 password: " + detailsMember.getPassword());
@@ -44,6 +45,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider { //
 
         if(!passwordEncoder.matches(pass, detailsMember.getPassword())) {     // 입력한 비밀번호를 검증을 하는데, 틀릴 시
             throw new BadCredentialsException(pass + "는 틀린 비밀번호입니다");
+
         }
         return new UsernamePasswordAuthenticationToken(detailsMember, pass, detailsMember.getAuthorities()); // 비밀번호가 일치할 시 3가지의 인자를 반환을 해준다
     }

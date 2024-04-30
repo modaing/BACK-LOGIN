@@ -29,5 +29,4 @@ public class MemberDTO {
     private PositionDTO position;           // 직급
     private List<CommuteDTO> commuteList;   // 출퇴근 리스트
     private int transferredNo;              // 발령 번호
-
 }

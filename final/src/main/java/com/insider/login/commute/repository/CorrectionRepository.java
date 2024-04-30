@@ -12,3 +12,5 @@ public interface CorrectionRepository extends JpaRepository<Correction, Integer>
 
     List<Correction> findAllBetween(LocalDate startDayOfMonth, LocalDate endDayOfMonth);
 }
+
+
