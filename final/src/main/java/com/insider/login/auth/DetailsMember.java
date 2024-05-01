@@ -2,8 +2,6 @@ package com.insider.login.auth;
 
 import com.insider.login.member.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -33,9 +31,7 @@ public class DetailsMember implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-
-//        member.getRoleList().forEach(role -> authorities.add(() -> role));
-        member.getRoleList().forEach(role -> authorities.add(new SimpleGrantedAuthority(role))); // role을 넣기 위해서 new SimpleGrantedAuthority가 필요..!
+        member.getRoleList().forEach(role -> authorities.add(() -> role));
         return authorities;
     }
 

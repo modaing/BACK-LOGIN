@@ -81,13 +81,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 //                  user.setMemberId(Integer.parseInt(claims.get(memberId).toString())); // ????????
                     member.setName(claims.get("userName").toString());
                     member.setRole(MemberRole.valueOf(claims.get("Role").toString()));     // ???????? 02-jwt-security-03.mp4 40분쯤...!
-
-                    member.setMemberId(claims.get("memberId"), Integer.class);
-                    System.out.println("중간점검.. 여기인가");
-//                    System.out.println("memberId의 정보: " + claims.get("token"));
-//                    member.setMemberId((Integer) claims.get("memberId"));
-                    System.out.println("아니면 여기인가...");
-
                     authentication.setMember(member);
                     System.out.println("member정보: " + member);
 

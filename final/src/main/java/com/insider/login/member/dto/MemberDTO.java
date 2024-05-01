@@ -1,32 +1,56 @@
 package com.insider.login.member.dto;
 
-import com.insider.login.commute.dto.CommuteDTO;
-import com.insider.login.department.dto.DepartmentDTO;
-import com.insider.login.position.dto.PositionDTO;
+import com.insider.login.auth.image.entity.Image;
+import com.insider.login.common.utils.MemberRole;
+import com.insider.login.department.entity.Department;
+import com.insider.login.position.entity.Position;
 import lombok.*;
 
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
 @Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class MemberDTO {
-    private int memberId;                   // 구성원 번호 (사번)
-    private String name;                    // 구성원 이름
-    private String password;                // 비밀번호
-    private int departNo;                   // 부서 번호
-    private String positionName;            // 직급명
-    private LocalDate employedDate;         // 입사일
-    private String address;                 // 주소
-    private String phoneNo;                 // 전화 번호
-    private String memberStatus;            // 현재 상태
-    private String email;                   // 이메일
-    private String memberRole;              // 권한
-    private DepartmentDTO department;       // 부서
-    private PositionDTO position;           // 직급
-    private List<CommuteDTO> commuteList;   // 출퇴근 리스트
-    private int transferredNo;              // 발령 번호
+
+
+        private int memberId;
+        private String name;
+        private String password;
+        //    @Column(name = "depart_no", nullable = false)
+//    private int departNo;
+//    @Column(name = "position_name" ,nullable = false)
+//    private String positionName;
+        private LocalDate employedDate;
+        private String address;
+        private String phoneNo;
+        private String memberStatus;
+        private String email;
+        private MemberRole role;
+        //    private com.insider.prefinal.common.UserRole userRole;
+//    @Column(name = "member_image_no")
+//    private int memberImageNo;
+        private Department department;
+        private Position position;
+        private Image image;
+
+
+        public List<String> getRoleList() {
+            if (this.role.getRole().length() > 0) {
+                return Arrays.asList(this.role.getRole().split(","));
+            }
+            return new ArrayList<>();
+        }
+
+        public int getMemberId() {
+            return memberId;
+        }
+
+
 }

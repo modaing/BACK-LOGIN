@@ -15,5 +15,3 @@ public enum MemberRole {
         return role;
     }
 }
-
-

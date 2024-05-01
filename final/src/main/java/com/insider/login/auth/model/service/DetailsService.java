@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-
-public class DetailsService implements UserDetailsService { // 이 class를 사용을 하기 위해서는
-
+public class  DetailsService implements UserDetailsService { // 이 class를 사용을 하기 위해서는
 
     private final MemberService memberService;
 
