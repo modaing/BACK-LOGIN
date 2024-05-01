@@ -140,7 +140,7 @@ public class LeaveControllerTests {
         LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(1, 202312003, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), "휴가 취소 상신입니다.");
         leaveSubmitDTO.setLeaveSubApplyDate("2024-04-30");
         // when
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("//leaveSubmits/{LeaveSubNo}")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("//leaveSubmits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(leaveSubmitDTO)))
 

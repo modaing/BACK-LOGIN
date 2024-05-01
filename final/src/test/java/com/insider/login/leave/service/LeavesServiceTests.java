@@ -37,7 +37,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -86,7 +86,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -109,14 +109,17 @@ public class LeavesServiceTests extends CommonController {
     void testInsertSubmit() {
         // given
         int applicantId = 241201001;
-        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(applicantId, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), nowDate(), "연차", "휴가 상신입니다.");
+        int leaveSubNo = 5;
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(applicantId, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), "연차", "휴가 상신입니다.");
+        leaveSubmitDTO.setRefLeaveSubNo(leaveSubNo);
+        leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
         //페이징 설정
         int pageNumber = 0;
         String properties = "leaveSubNo";
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -165,7 +168,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -197,7 +200,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -213,6 +216,7 @@ public class LeavesServiceTests extends CommonController {
         Assertions.assertFalse(results.getSize() > 10);
         // 가져온 페이지 중 현재 인덱스가 의도한 페이지와 같아아 함
         Assertions.assertEquals(results.getNumber(), pageNumber);
+        results.forEach(System.out::println);
 
     }
 
@@ -230,7 +234,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -255,7 +259,7 @@ public class LeavesServiceTests extends CommonController {
     @DisplayName("상세조회")
     void testSelectSubmitByLeaveSubNo() {
         // given
-        int leaveSubNo = 3;
+        int leaveSubNo = 7;
 
         // when
         LeaveSubmitDTO result = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
@@ -269,20 +273,13 @@ public class LeavesServiceTests extends CommonController {
     }
 
     @Test
-    @DisplayName("휴가 신청 처리")
-    void testUpdateSubimt() {
+    @DisplayName("휴가 신청 처리 - 승인")
+    void testUpdateSubimtOk() {
         // given
         int leaveSubNo = 6;
-        int approverId = 241201001;
-        // 신청 처리에 관한 결정 여부
-        String decision = "반려";
-        LeaveSubmitDTO leaveSubmitDTO = null;
-        // 신청 처리 결과에 따라 매개변수와 처리 과정의 차이가 있음
-        if (decision.equals("승인")) {
-            leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate());
-        } else if (decision.equals("반려")) {
-            leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate(), "반려했습니다.");
-        }
+        String decision = "승인";
+        int approverId = 200401023;
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate());
 
         // when
         String result = leaveService.updateSubmit(leaveSubmitDTO);
@@ -297,6 +294,31 @@ public class LeavesServiceTests extends CommonController {
         Assertions.assertEquals(test.getLeaveSubStatus(), decision);
 
     }
+
+    @Test
+    @DisplayName("휴가 신청 처리 - 반려")
+    void testUpdateSubimtNo() {
+        // given
+        int leaveSubNo = 9;
+        String decision = "반려";
+        int approverId = 200401023;
+        String reason = "반려사유";
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate(), reason);
+
+        // when
+        String result = leaveService.updateSubmit(leaveSubmitDTO);
+
+        // then
+        // 성공메시지를 반환해야함
+//        Assertions.assertEquals(result, "휴가처리 성공");
+        // 업데이트가 의도한 대로 진행됐는지 확인
+        LeaveSubmitDTO test = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
+        System.out.println(test);
+        Assertions.assertEquals(test.getLeaveSubApprover(), approverId);
+        Assertions.assertEquals(test.getLeaveSubStatus(), decision);
+
+    }
+
 
     @Test
     @DisplayName("휴가 보유 내역 조회")

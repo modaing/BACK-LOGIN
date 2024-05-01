@@ -5,6 +5,7 @@ import com.insider.login.common.ResponseMessage;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeaveInfoDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
+import com.insider.login.leave.entity.LeaveSubmit;
 import com.insider.login.leave.service.LeaveService;
 
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,7 +46,7 @@ public class LeaveController extends CommonController {
 
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -77,12 +79,20 @@ public class LeaveController extends CommonController {
      * 휴가 신청
      */
     @PostMapping("/leaveSubmits")
-    public ResponseEntity<String> insertSubmit(@RequestParam("applicantId") int applicantId,
-                                               @ModelAttribute LeaveSubmitDTO leaveSubmitDTO) {
-
+    public ResponseEntity<String> insertSubmit(@RequestBody LeaveSubmitDTO leaveSubmitDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
 
-        return ResponseEntity.ok().body(leaveService.insertSubmit(leaveSubmitDTO));
+        String result = "";
+
+        if (leaveSubmitDTO.getLeaveSubNo() == 0) {
+            result = leaveService.insertSubmit(leaveSubmitDTO);
+        } else {
+            result = leaveService.insertSubmitCancel(leaveSubmitDTO);
+        }
+
+        return ResponseEntity.ok().headers(headers).body(result);
     }
 
     /**
@@ -90,17 +100,9 @@ public class LeaveController extends CommonController {
      */
     @DeleteMapping("/leaveSubmits/{LeaveSubNo}")
     public ResponseEntity<String> deleteSubmit(@PathVariable("LeaveSubNo") int leaveSubNo) {
-        return ResponseEntity.ok().body(leaveService.deleteSubmit(leaveSubNo));
-    }
-
-    /**
-     * 휴가 취소 요청
-     */
-    @PostMapping("/leaveSubmit/{LeaveSubNo}")
-    public ResponseEntity<String> insertSubmitCancel(@PathVariable("LeaveSubNo") int leaveSubNo,
-                                                     @ModelAttribute LeaveSubmitDTO leaveSubmitDTO) {
-        leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
-        return ResponseEntity.ok().body(leaveService.insertSubmitCancel(leaveSubmitDTO));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return ResponseEntity.ok().headers(headers).body(leaveService.deleteSubmit(leaveSubNo));
     }
 
     /**
@@ -109,14 +111,14 @@ public class LeaveController extends CommonController {
     @GetMapping("/leaveAccruals")
     public ResponseEntity<ResponseMessage> selectAccrualList(@RequestParam(value = "page", defaultValue = "0") int pageNumber,
                                                              @RequestParam(value = "direction", defaultValue = "DESC") String direction,
-                                                             @RequestParam(value = "properties", defaultValue = "leaveSubNo") String properties) {
+                                                             @RequestParam(value = "properties", defaultValue = "leaveAccrualNo") String properties) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -126,11 +128,10 @@ public class LeaveController extends CommonController {
 
 
         if (accrualPage.isEmpty()) {
-            String errorMessage = "발생된 내역이 없습니다.";
+            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
             ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
         }
-
 
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("accrualPage", accrualPage);
@@ -144,15 +145,17 @@ public class LeaveController extends CommonController {
      * 휴가 발생
      */
     @PostMapping("/leaveAccruals")
-    public ResponseEntity<String> insertAccrual(@ModelAttribute LeaveAccrualDTO leaveAccrualDTO) {
+    public ResponseEntity<String> insertAccrual(@RequestBody LeaveAccrualDTO leaveAccrualDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         // TODO:시큐리티 안정화되면 토큰에서 처리자 사번 뽑아서 DTO에 담기
-        return ResponseEntity.ok().body(leaveService.insertAccrual(leaveAccrualDTO));
+        return ResponseEntity.ok().headers(headers).body(leaveService.insertAccrual(leaveAccrualDTO));
     }
 
     /**
      * 상세 조회
      */
-    @GetMapping("/leaveSubmits/{LeaveSubNo}")
+    @GetMapping("/leaveSubmits/{leaveSubNo}")
     public ResponseEntity<ResponseMessage> selectSubmitByLeaveSubNo(@PathVariable("leaveSubNo") int leaveSubNo) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -161,7 +164,7 @@ public class LeaveController extends CommonController {
         LeaveSubmitDTO submit = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
 
         if (submit == null) {
-            String errorMessage = "처리 과정에서 문제가 발생했습니다.";
+            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
             ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
         }
@@ -177,12 +180,53 @@ public class LeaveController extends CommonController {
     /**
      * 휴가 신청 처리
      */
-    @PutMapping("/leaveSubmits/{LeaveSubNo}")
+    @PutMapping("/leaveSubmits/{leaveSubNo}")
     public ResponseEntity<String> updateSubimt(@PathVariable("leaveSubNo") int leaveSubNo,
-                                               @ModelAttribute LeaveSubmitDTO leaveSubmitDTO) {
-        // TODO:시큐리티 안정화되면 토큰에서 승인자 사번 뽑아서 DTO에 담기
+                                               @RequestBody LeaveSubmitDTO leaveSubmitDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        // TODO:시큐리티 안정화되면 토큰에서 승인자 사번 뽑아서 DTO에 담기 현재는 임시
+        leaveSubmitDTO.setLeaveSubApprover(200401023);
+
         leaveSubmitDTO.setLeaveSubNo(leaveSubNo);
-        return ResponseEntity.ok().body(leaveService.updateSubmit(leaveSubmitDTO));
+        leaveSubmitDTO.setLeaveSubProcessDate(nowDate());
+        return ResponseEntity.ok().headers(headers).body(leaveService.updateSubmit(leaveSubmitDTO));
 
     }
+
+    /**
+     * 휴가 보유 내역 조회
+     */
+    @PostMapping("/leaves")
+    public ResponseEntity<ResponseMessage> selectLeavesList(@RequestParam(value = "page", defaultValue = "0") int pageNumber,
+                                                            @RequestParam(value = "direction", defaultValue = "DESC") String direction,
+                                                            @RequestParam(value = "properties", defaultValue = "leaveSubNo") String properties) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        Pageable pageable;
+
+        if (!direction.equals("DESC")) {
+            pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
+        } else {
+            pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
+        }
+
+        Page<LeaveInfoDTO> leavesList = leaveService.selectLeavesList(pageable);
+
+        if (leavesList.isEmpty()) {
+            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
+            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
+            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
+        }
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("leavesList", leavesList);
+
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
+
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+    }
+
 }

@@ -124,7 +124,6 @@ public class LeaveService extends LeaveUtil {
 
     public String insertSubmitCancel(LeaveSubmitDTO DTO) {
         log.info("[취소요청] 시작 ====================================");
-        DTO.setLeaveSubType("취소");
 
         // 화면에서 받아온 정보를 취소 요청 등록 폼으로 수정
         LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(DTO.getLeaveSubNo(), DTO.getLeaveSubApplicant(), DTO.getLeaveSubStartDate(), DTO.getLeaveSubEndDate(), DTO.getLeaveSubApplyDate(), "취소", "대기", DTO.getLeaveSubReason());
@@ -160,8 +159,16 @@ public class LeaveService extends LeaveUtil {
         log.info("[발생내역] 엔티티 리스트 확인 ==============================");
         accrualList.forEach(System.out::println);
 
+        List<LeaveAccrualDTO> DTOList = new ArrayList<>();
+
         if (accrualList != null) {
-            return accrualList.map(accrual -> modelMapper.map(accrualList, LeaveAccrualDTO.class));
+
+            for (LeaveAccrual accrual : accrualList) {
+                DTOList.add(modelMapper.map(accrual, LeaveAccrualDTO.class));
+            }
+
+            return new PageImpl<>(DTOList, accrualList.getPageable(), accrualList.getTotalElements());
+
         } else {
             return Page.empty();
         }
@@ -220,54 +227,33 @@ public class LeaveService extends LeaveUtil {
         log.info("[휴가처리] 시작 ===============================");
         int result = 0;
 
-        if (leaveSubmitDTO.getLeaveSubStatus().equals("승인")) {
-            try {
-                // 업데이트할 사번으로 현재 등록된 정보 조회
-                Optional<LeaveSubmit> leaveSubmit = leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo());
+        try {
+            // 업데이트할 신청 번호로 해당 휴가 신청 정보 조회
+            Optional<LeaveSubmit> leaveSubmit = leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo());
 
-                // 엔티티를 dto로 변환 후 변경할 정보 삽입
-                LeaveSubmitDTO tempDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
-                tempDTO.setLeaveSubApprover(leaveSubmitDTO.getLeaveSubApprover());
-                tempDTO.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
-                tempDTO.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
+            // 엔티티를 dto로 변환 후 변경할 정보 삽입
+            LeaveSubmitDTO tempDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
+            tempDTO.setLeaveSubApprover(leaveSubmitDTO.getLeaveSubApprover());
+            tempDTO.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
+            tempDTO.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
 
-                // 다시 dto를 엔티티로 전환 후 save
-                LeaveSubmit newSubmit = modelMapper.map(tempDTO, LeaveSubmit.class);
-                leaveSubmitRepository.save(newSubmit);
-
-                log.info("[휴가처리] 엔티티 확인 =========================================\n" + newSubmit);
-
-            } catch (Exception e) {
-                log.info("[휴가처리] 예외발생 =============================");
-                result = 0;
-            }
-
-        } else if (leaveSubmitDTO.getLeaveSubStatus().equals("반려")) {
-            try {
-                // 업데이트할 사번으로 현재 등록된 정보 조회
-                Optional<LeaveSubmit> leaveSubmit = leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo());
-
-                // 엔티티를 dto로 변환 후 변경할 정보 삽입
-                LeaveSubmitDTO tempDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
-                tempDTO.setLeaveSubApprover(leaveSubmitDTO.getLeaveSubApprover());
-                tempDTO.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
-                tempDTO.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
+            // 반려시 반려 사유 세팅
+            if (leaveSubmitDTO.getLeaveSubStatus().equals("반려")) {
                 tempDTO.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
-
-                // 다시 dto를 엔티티로 전환 후 save
-                LeaveSubmit newSubmit = modelMapper.map(tempDTO, LeaveSubmit.class);
-                leaveSubmitRepository.save(newSubmit);
-
-                log.info("[휴가처리] 엔티티 확인 =========================================\n" + newSubmit);
-
-            } catch (Exception e) {
-                log.info("[휴가처리] 예외발생 =============================");
-                result = 0;
             }
 
-        } else {
+            // 다시 dto를 엔티티로 전환 후 save
+            LeaveSubmit newSubmit = modelMapper.map(tempDTO, LeaveSubmit.class);
+            leaveSubmitRepository.save(newSubmit);
+
+            result = 1;
+
+        } catch (Exception e) {
+            log.info("[휴가처리] 예외발생 =============================");
             result = 0;
+
         }
+
         return (result > 0) ? "휴가처리 성공" : "휴가처리 실패";
     }
 
@@ -310,7 +296,7 @@ public class LeaveService extends LeaveUtil {
         List<Leaves> leavesList = leaveRepository.findByMemberId(memberId);
 
         LeaveInfoDTO info = leaveInfoCalc(leavesList);
-        log.info("휴가 보유 조회 ===========\n"  + info);
+        log.info("휴가 보유 조회 ===========\n" + info);
 
         return addLeaveInfo(info);
     }
