@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LeaveService extends LeaveUtil {
 
-    private LeaveAccrualRepository leaveAccrualRepository;
-    private LeaveRepository leaveRepository;
-    private LeaveSubmitRepository leaveSubmitRepository;
-    private ModelMapper modelMapper;
+    private final LeaveAccrualRepository leaveAccrualRepository;
+    private final LeaveRepository leaveRepository;
+    private final LeaveSubmitRepository leaveSubmitRepository;
+    private final ModelMapper modelMapper;
 
     public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper) {
         this.leaveAccrualRepository = leaveAccrualRepository;
