@@ -18,7 +18,9 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @SpringBootTest
@@ -237,9 +239,14 @@ public class ApprovalServiceTest {
     void testUpdateApprover (String approverNo){
         //when
         //결재처리 / 반려
-        ApproverDTO approverDTO = approvalService.updateApprover(approverNo);
+        Map<String, String> statusMap = new HashMap<>();
+        statusMap.put("approverStatus", "반려");
+        statusMap.put("rejectReason","이러한 사유로 반려합니다.");
+
+        ApproverDTO approverDTO = approvalService.updateApprover(approverNo, statusMap);
 
         //then
+        Assertions.assertEquals(approverDTO.getApproverStatus(), "반려");
     }
 
 

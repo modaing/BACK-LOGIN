@@ -21,10 +21,15 @@ public class ApproverRepository {
     }
 
     public List<Approver> findByApprovalId(String approvalNo) {
-        List<Approver> approverList = manager.createQuery("SELECT a FROM Approver a WHERE a.approverNo = :approvalNo", Approver.class)
+        List<Approver> approverList = manager.createQuery("SELECT a FROM Approver a WHERE a.approvalNo = :approvalNo", Approver.class)
                 .setParameter("approvalNo", approvalNo)
                 .getResultList();
 
         return approverList;
+    }
+
+    public void update(Approver approver) {
+
+        manager.merge(approver);
     }
 }

@@ -1,6 +1,7 @@
 package com.insider.login.approval.service;
 
 import com.insider.login.approval.builder.ApprovalBuilder;
+import com.insider.login.approval.builder.ApproverBuilder;
 import com.insider.login.approval.dto.*;
 import com.insider.login.approval.entity.*;
 import com.insider.login.approval.repository.*;
@@ -19,6 +20,8 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static java.time.LocalDateTime.now;
 
 @Service
 @Slf4j
@@ -206,6 +209,8 @@ public class ApprovalService {
 
 
         List<Approver> approverList = approverRepository.findByApprovalId(approvalNo);
+        log.info("*****selectApprovel -- approverList " + approverList);
+
         for(int i = 0; i < approverList.size(); i++){
 
             //결재자 정보 가져오기
@@ -215,7 +220,10 @@ public class ApprovalService {
 
             ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverList.get(i).getApproverDate().toString(), approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
             approver.add(approverDTO);
+
+
         }
+        log.info("*****selectApproval -- Approver List " + approver );
 
         List<Referencer> referencerList = referencerRepository.findByApprovalId(approvalNo);
         for(int i = 0; i < referencerList.size(); i++){
@@ -276,15 +284,71 @@ public class ApprovalService {
 
     //전자결재 처리(결재)
     @Transactional
-    public ApproverDTO updateApprover(String approverNo){
+    public ApproverDTO updateApprover(String approverNo, Map<String, String> statusMap){
+        // DTO -> 엔티티 -> DTO
 
-        //수정하고자 하는 전자결재자 정보 조회
-        ApproverDTO approverDTO = selectApprover(approverNo);
+        //전자결재 번호 가져오기
+        String approvalNo = approverNo.substring(0, approverNo.indexOf("_"));
 
         //전자결재 번호 받아서 해당 전자결재 정보 조회
-        ApprovalDTO approvalDTO = selectApproval(approverDTO.getApprovalNo());
+        ApprovalDTO approvalDTO = selectApproval(approvalNo);
 
-        return null;
+        //해당 전자결재에서 수정하고자 하는 전자결재자 정보 조회
+        List<ApproverDTO> approverList = approvalDTO.getApprover();
+        log.info("***** Service : approverList : " + approverList);
+
+        ApproverDTO approverDTO = null;
+
+        for(int i = 0; i < approverList.size(); i++)
+        {
+            approverDTO = approverList.get(i);
+
+            if(approverDTO.getApproverNo().equals(approverNo) || approverDTO.getApproverNo() == approverNo){
+                //가져온 결재자 번호가 존재한다면
+
+                //날짜 변경
+                Approver approver = new Approver(approverDTO.getApproverNo(), approverDTO.getApprovalNo(), approverDTO.getApproverOrder(), approverDTO.getApproverStatus(), now(), approverDTO.getMemberId());
+
+                //승인 시 : 결재자 처리상태 변경 -> 결재자 처리 날짜 변경 -> (마지막 번호일경우) 전자결재 처리상태 변경 (승인)
+                //반려 시 : 결재자 처리상태 변경 -> 결재자 처리 날짜 변경 -> 전자결재 처리상태 변경(반려) -> 전자결재 처리상태 변경(반려사유)
+                String status = statusMap.get("approverStatus");
+
+                String rejectReason = statusMap.get("rejectReason");
+
+                //결재자 처리 상태 update
+                approver = new ApproverBuilder(approver).approverStatus(status).builder();
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime parsedDateTime = LocalDateTime.parse(approvalDTO.getApprovalDate(), formatter);
+                Approval approval = new Approval(approvalDTO.getApprovalNo(),approvalDTO.getMemberId(),approvalDTO.getApprovalTitle(),approvalDTO.getApprovalContent(), parsedDateTime, approvalDTO.getApprovalStatus(), approvalDTO.getRejectReason(), approvalDTO.getFormNo());
+
+                switch(status){
+                    case "승인" :
+                        if(i == approverList.size() -1 ){
+                            //마지막 순서일 경우
+
+                            //전자결재 처리상태 변경 (승인)
+                            approval = new ApprovalBuilder(approval).approvalStatus(status).builder();
+                        }
+                        break;
+
+                    case "반려" :
+                        approval = new ApprovalBuilder(approval).approvalStatus(status).rejectReason(rejectReason).builder();
+
+                        break;
+                }
+                //db 결재자 update
+                approverRepository.update(approver);
+                approverDTO.setApproverStatus(status);
+
+                //db 결재정보 update
+                approvalRepository.update(approval);
+                approvalDTO.setApprovalStatus(status);
+
+            }
+        }
+
+        return approverDTO;
 
     }
 
