@@ -217,14 +217,11 @@ public class ApprovalServiceTest {
     }
 
 
-    //전자결재 결재 테스트
-
+    //전자결재 회수 테스트
     @DisplayName("전자결재 회수 테스트")
     @ParameterizedTest
-    @CsvSource("2024-sup00001")
+    @CsvSource("2024-abs00001")
     void testUpdateApproval (String approvalNo){
-        //수정 - 회수, 결재처리, 반려
-
         //회수
 
         // when
@@ -234,7 +231,16 @@ public class ApprovalServiceTest {
         Assertions.assertEquals(approvalDTO.getApprovalStatus(), "회수");
     }
 
+    @DisplayName("전자결재 결재 테스트")
+    @ParameterizedTest
+    @CsvSource("2024-sup00001_apr002")
+    void testUpdateApprover (String approverNo){
+        //when
+        //결재처리 / 반려
+        ApproverDTO approverDTO = approvalService.updateApprover(approverNo);
 
+        //then
+    }
 
 
 

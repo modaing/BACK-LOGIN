@@ -1,15 +1,9 @@
 package com.insider.login.approval.service;
 
 import com.insider.login.approval.builder.ApprovalBuilder;
-import com.insider.login.approval.dto.ApprovalDTO;
-import com.insider.login.approval.dto.ApproverDTO;
-import com.insider.login.approval.dto.AttachmentDTO;
-import com.insider.login.approval.dto.ReferencerDTO;
+import com.insider.login.approval.dto.*;
 import com.insider.login.approval.entity.*;
-import com.insider.login.approval.repository.ApprovalRepository;
-import com.insider.login.approval.repository.ApproverRepository;
-import com.insider.login.approval.repository.AttachmentRepository;
-import com.insider.login.approval.repository.ReferencerRepository;
+import com.insider.login.approval.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -40,6 +34,9 @@ public class ApprovalService {
     private ApproverRepository approverRepository;
     private AttachmentRepository attachmentRepository;
     private ReferencerRepository referencerRepository;
+    private MemberRepository memberRepository;
+    private DepartmentRepository departmentRepository;
+    private FormRepository formRepository;
 
     private final ModelMapper modelMapper;
 
@@ -47,11 +44,17 @@ public class ApprovalService {
                            ApproverRepository approverRepository,
                            AttachmentRepository attachmentRepository,
                            ReferencerRepository referencerRepository,
+                           MemberRepository memberRepository,
+                           DepartmentRepository departmentRepository,
+                           FormRepository formRepository,
                            ModelMapper modelMapper){
         this.approvalRepository = approvalRepository;
         this.approverRepository = approverRepository;
         this.attachmentRepository = attachmentRepository;
         this.referencerRepository = referencerRepository;
+        this.memberRepository = memberRepository;
+        this.departmentRepository = departmentRepository;
+        this.formRepository = formRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -190,6 +193,13 @@ public class ApprovalService {
     public ApprovalDTO selectApproval(String approvalNo){
         Approval approval = approvalRepository.findById(approvalNo);
 
+        //기안자 정보 가져오기
+        Member senderMember = memberRepository.findById(approval.getMemberId());
+        //기안자의 부서 정보 가져오기
+        Department senderDepart = departmentRepository.findById(senderMember.getDepartNo());
+        //양식 정보 가져오기
+        Form approvalForm = formRepository.findById(approval.getFormNo());
+
         List<ApproverDTO> approver = new ArrayList<>();
         List<ReferencerDTO> referencer = new ArrayList<>();
         List<AttachmentDTO> attachment = new ArrayList<>();
@@ -197,13 +207,25 @@ public class ApprovalService {
 
         List<Approver> approverList = approverRepository.findByApprovalId(approvalNo);
         for(int i = 0; i < approverList.size(); i++){
-            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverList.get(i).getApproverDate().toString(), approverList.get(i).getMemberId());
+
+            //결재자 정보 가져오기
+            Member receiverMember = memberRepository.findById(approverList.get(i).getMemberId());
+            //결재자 부서 정보 가져오기
+            Department receiverDepart = departmentRepository.findById(receiverMember.getDepartNo());
+
+            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverList.get(i).getApproverDate().toString(), approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
             approver.add(approverDTO);
         }
 
         List<Referencer> referencerList = referencerRepository.findByApprovalId(approvalNo);
         for(int i = 0; i < referencerList.size(); i++){
-            ReferencerDTO referencerDTO = new ReferencerDTO(referencerList.get(i).getRefNo(), referencerList.get(i).getApprovalNo(), referencerList.get(i).getMemberId(), referencerList.get(i).getRefOrder());
+
+            //참조자 정보 가져오기
+            Member referencerMember = memberRepository.findById(referencerList.get(i).getMemberId());
+            //참조자 부서 정보 가져오기
+            Department referencerDepart = departmentRepository.findById(referencerMember.getDepartNo());
+
+            ReferencerDTO referencerDTO = new ReferencerDTO(referencerList.get(i).getRefNo(), referencerList.get(i).getApprovalNo(), referencerList.get(i).getMemberId(), referencerList.get(i).getRefOrder(), referencerMember.getName(), referencerMember.getPositionName(), referencerDepart.getDepartName());
             referencer.add(referencerDTO);
         }
 
@@ -218,7 +240,7 @@ public class ApprovalService {
 
         log.info("***** formattedDateTime ***** " + formattedDateTime);
 
-        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), formattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), attachment, approver, referencer);
+        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), formattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer);
 
         return approvalDTO;
     }
@@ -251,5 +273,19 @@ public class ApprovalService {
     }
 
 
+
+    //전자결재 처리(결재)
+    @Transactional
+    public ApproverDTO updateApprover(String approverNo){
+
+        //수정하고자 하는 전자결재자 정보 조회
+        ApproverDTO approverDTO = selectApprover(approverNo);
+
+        //전자결재 번호 받아서 해당 전자결재 정보 조회
+        ApprovalDTO approvalDTO = selectApproval(approverDTO.getApprovalNo());
+
+        return null;
+
+    }
 
 }

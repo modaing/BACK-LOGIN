@@ -19,13 +19,23 @@ public class ApprovalDTO {
     private String approvalStatus;              //상태
     private String rejectReason;                //반려사유
     private String formNo;                      //양식번호
+
+    private String formName;                    //양식이름
+
+    private String departName;                  //기안자 부서
+    private String name;                        //기안자 이름
+    private String positionName;                //기안자 직급명
+
+
     private List<AttachmentDTO> attachment;     //첨부파일
     private List<ApproverDTO> approver;         //결재선
     private List<ReferencerDTO> referencer;     //참조선
 
+
+
     public ApprovalDTO(){}
 
-    public ApprovalDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, List<AttachmentDTO> attachment, List<ApproverDTO> approver, List<ReferencerDTO> referencer) {
+    public ApprovalDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, String formName, String departName, String name, String positionName, List<AttachmentDTO> attachment, List<ApproverDTO> approver, List<ReferencerDTO> referencer) {
         this.approvalNo = approvalNo;
         this.memberId = memberId;
         this.approvalTitle = approvalTitle;
@@ -34,6 +44,10 @@ public class ApprovalDTO {
         this.approvalStatus = approvalStatus;
         this.rejectReason = rejectReason;
         this.formNo = formNo;
+        this.formName = formName;
+        this.departName = departName;
+        this.name = name;
+        this.positionName = positionName;
         this.attachment = attachment;
         this.approver = approver;
         this.referencer = referencer;
@@ -103,6 +117,14 @@ public class ApprovalDTO {
         this.formNo = formNo;
     }
 
+    public String getFormName() {
+        return formName;
+    }
+
+    public void setFormName(String formName) {
+        this.formName = formName;
+    }
+
     public List<AttachmentDTO> getAttachment() {
         return attachment;
     }
@@ -127,6 +149,30 @@ public class ApprovalDTO {
         this.referencer = referencer;
     }
 
+    public String getDepartName() {
+        return departName;
+    }
+
+    public void setDepartName(String departName) {
+        this.departName = departName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
     @Override
     public String toString() {
         return "ApprovalDTO{" +
@@ -138,6 +184,10 @@ public class ApprovalDTO {
                 ", approvalStatus='" + approvalStatus + '\'' +
                 ", rejectReason='" + rejectReason + '\'' +
                 ", formNo='" + formNo + '\'' +
+                ", formName='" + formName + '\'' +
+                ", departName='" + departName + '\'' +
+                ", name='" + name + '\'' +
+                ", positionName='" + positionName + '\'' +
                 ", attachment=" + attachment +
                 ", approver=" + approver +
                 ", referencer=" + referencer +
