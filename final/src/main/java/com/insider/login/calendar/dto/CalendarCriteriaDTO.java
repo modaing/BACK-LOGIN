@@ -6,16 +6,14 @@ public class CalendarCriteriaDTO {
     private int month;
     private int week;
     private int day;
+    private String department;
 
-    public CalendarCriteriaDTO() {
-    }
-
-    public CalendarCriteriaDTO(String type, int year, int month) {
+    public CalendarCriteriaDTO(String type, int year, int month, String department) {
         this.type = type;
         this.year = year;
         this.month = month;
+        this.department = department;
     }
-
 
     public String getType() {
         return type;
@@ -57,14 +55,23 @@ public class CalendarCriteriaDTO {
         this.day = day;
     }
 
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
-        return "CalendarCriteria{" +
+        return "CalendarCriteriaDTO{" +
                 "type='" + type + '\'' +
                 ", year=" + year +
                 ", month=" + month +
                 ", week=" + week +
                 ", day=" + day +
+                ", department='" + department + '\'' +
                 '}';
     }
 }

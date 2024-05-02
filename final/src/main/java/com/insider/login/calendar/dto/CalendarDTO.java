@@ -5,11 +5,19 @@ import java.time.LocalDateTime;
 public class CalendarDTO {
 
     private int calendarNo;
+
     private String calendarName;
+
     private LocalDateTime calendarStart;
+
     private LocalDateTime calendarEnd;
+
     private String color;
+
+    private String department;
+
     private int registrantId;
+
 
     public CalendarDTO() {
     }
@@ -71,6 +79,14 @@ public class CalendarDTO {
         this.color = color;
     }
 
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     public int getRegistrantId() {
         return registrantId;
     }
@@ -87,6 +103,7 @@ public class CalendarDTO {
                 ", calendarStart=" + calendarStart +
                 ", calendarEnd=" + calendarEnd +
                 ", color='" + color + '\'' +
+                ", department='" + department + '\'' +
                 ", registrantId=" + registrantId +
                 '}';
     }

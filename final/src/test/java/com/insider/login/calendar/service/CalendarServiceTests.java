@@ -26,7 +26,8 @@ public class CalendarServiceTests {
         String type = "monthly";
         int year = 2024;
         int month = 4;
-        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month);
+        String department = "개발팀";
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, department);
 
         // when
         List<CalendarDTO> calendarList = calendarService.selectCalendar(criteriaDTO);
@@ -45,7 +46,8 @@ public class CalendarServiceTests {
         int month = 4;
         // 1년을 기준으로 몇 번째 주차인지
         int week = 15;
-        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month);
+        String department = "개발팀";
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, department);
         criteriaDTO.setWeek(week);
 
         // when
@@ -64,7 +66,8 @@ public class CalendarServiceTests {
         int year = 2024;
         int month = 4;
         int day = 12;
-        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month);
+        String department = "개발팀";
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, department);
         criteriaDTO.setDay(day);
 
         // when

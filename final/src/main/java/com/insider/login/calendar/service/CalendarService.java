@@ -35,13 +35,13 @@ public class CalendarService {
 
         switch (criteriaDTO.getType()) {
             case "monthly":
-                calendars = calendarRepository.findByMonth(criteriaDTO.getYear(), criteriaDTO.getMonth());
+                calendars = calendarRepository.findByMonth(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getDepartment());
                 break;
             case "weekly":
-                calendars = calendarRepository.findByWeek(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getWeek());
+                calendars = calendarRepository.findByWeek(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getWeek(), criteriaDTO.getDepartment());
                 break;
             case "daily":
-                calendars = calendarRepository.findByDay(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getDay());
+                calendars = calendarRepository.findByDay(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getDay(), criteriaDTO.getDepartment());
                 break;
             default:
                 return new ArrayList<>();

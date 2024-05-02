@@ -25,6 +25,9 @@ public class Calendar {
     @Column(name = "COLOR", nullable = false)
     private String color;
 
+    @Column(name = "DEPARTMENT", nullable = false)
+    private String department;
+
     @Column(name = "REGISTRANT_ID", nullable = false)
     private int registrantId;
 
@@ -48,6 +51,10 @@ public class Calendar {
         return color;
     }
 
+    public String getDepartment() {
+        return department;
+    }
+
     public int getRegistrantId() {
         return registrantId;
     }
@@ -60,6 +67,7 @@ public class Calendar {
                 ", calendarStart=" + calendarStart +
                 ", calendarEnd=" + calendarEnd +
                 ", color='" + color + '\'' +
+                ", department='" + department + '\'' +
                 ", registrantId=" + registrantId +
                 '}';
     }
