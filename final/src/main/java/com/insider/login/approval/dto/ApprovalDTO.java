@@ -176,21 +176,21 @@ public class ApprovalDTO {
     @Override
     public String toString() {
         return "ApprovalDTO{" +
-                "approvalNo='" + approvalNo + '\'' +
-                ", memberId=" + memberId +
-                ", approvalTitle='" + approvalTitle + '\'' +
-                ", approvalContent='" + approvalContent + '\'' +
-                ", approvalDate='" + approvalDate + '\'' +
-                ", approvalStatus='" + approvalStatus + '\'' +
-                ", rejectReason='" + rejectReason + '\'' +
-                ", formNo='" + formNo + '\'' +
-                ", formName='" + formName + '\'' +
-                ", departName='" + departName + '\'' +
-                ", name='" + name + '\'' +
-                ", positionName='" + positionName + '\'' +
-                ", attachment=" + attachment +
-                ", approver=" + approver +
-                ", referencer=" + referencer +
-                '}';
+                "\n[approvalNo='" + approvalNo + "']" +
+                "\n[memberId=" + memberId + "']" +
+                "\n[approvalTitle='" + approvalTitle + "']" +
+                "\n[approvalContent='" + approvalContent + "']" +
+                "\n[approvalDate='" + approvalDate + "']" +
+                "\n[approvalStatus='" + approvalStatus + "']" +
+                "\n[rejectReason='" + rejectReason + "']" +
+                "\n[formNo='" + formNo + "']" +
+                "\n[formName='" + formName + "']" +
+                "\n[departName='" + departName + "']" +
+                "\n[name='" + name + "']" +
+                "\n[positionName='" + positionName + "']" +
+                "\n[attachment=" + attachment + "']" +
+                "\n[approver=" + approver + "']" +
+                "\n[referencer=" + referencer + "']" +
+                '\n'+'}';
     }
 }

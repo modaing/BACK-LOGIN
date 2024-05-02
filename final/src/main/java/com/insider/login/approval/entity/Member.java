@@ -45,12 +45,12 @@ public class Member {
     @Column(name="member_role")
     private String memberRole;          //자격
 
-    @Column(name="member_image_no")
-    private int memberImageNo;          //이미지번호
+    @Column(name="image_url")
+    private String image_url;          //이미지번호
 
     protected Member(){}
 
-    public Member(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, int memberImageNo) {
+    public Member(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String image_url) {
         this.name = name;
         this.memberId = memberId;
         this.password = password;
@@ -62,7 +62,7 @@ public class Member {
         this.memberStatus = memberStatus;
         this.email = email;
         this.memberRole = memberRole;
-        this.memberImageNo = memberImageNo;
+        this.image_url = image_url;
     }
 
     public String getName() {
@@ -109,8 +109,8 @@ public class Member {
         return memberRole;
     }
 
-    public int getMemberImageNo() {
-        return memberImageNo;
+    public String getImage_url() {
+        return image_url;
     }
 
     @Override
@@ -127,7 +127,7 @@ public class Member {
                 ", memberStatus='" + memberStatus + '\'' +
                 ", email='" + email + '\'' +
                 ", memberRole='" + memberRole + '\'' +
-                ", memberImageNo=" + memberImageNo +
+                ", image_url='" + image_url + '\'' +
                 '}';
     }
 }

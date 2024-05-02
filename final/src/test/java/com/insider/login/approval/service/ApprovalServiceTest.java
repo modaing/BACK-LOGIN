@@ -80,92 +80,60 @@ public class ApprovalServiceTest {
         List<ReferencerDTO> referencerList = new ArrayList<>();
         List<MultipartFile> files = new ArrayList<>();
 
+        //결재번호 : 현재 날짜(연도) - form번호 0000순번(해당 연도-form의 순번)
+        //결재자번호 : 결재번호_apr00순번
+        //참조자번호 : 결재번호_ref00순번
+        //첨부파일번호: 결재번호_f00순번
+        ApproverDTO approverDTO1 = new ApproverDTO("2024-con00001_apr001", "2024-con00001", 1, "처리 중", "2024-05-02 15:23:23", 2024001003);
+        ApproverDTO approverDTO2 = new ApproverDTO("2024-con00001_apr002", "2024-con00001", 2, "처리 중", "2024-05-02 15:23:23", 240401004);
 
-        ApproverDTO approverDTO1 = new ApproverDTO("2024-sup00002_apr001", "2024-sup00002", 1, "처리 중", "2024-04-30 13:11:00", 2024001002);
-        ApproverDTO approverDTO2 = new ApproverDTO("2024-sup00002_apr002", "2024-sup00002", 2, "처리 중", "2024-04-30 13:11:00", 240401004);
-
-        ReferencerDTO referencerDTO = new ReferencerDTO("2024-sup00002_ref001", "2024-sup00002", 2024001003, 1);
+        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-con00001_ref001", "2024-con00001", 2024001001, 1);
+        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-con00001_ref002", "2024-con00001", 241811, 2);
 
         approverList.add(approverDTO1);
         approverList.add(approverDTO2);
 
-        referencerList.add(referencerDTO);
+        referencerList.add(referencerDTO1);
+        referencerList.add(referencerDTO2);
 
-        approvalDTO.setApprovalNo("2024-sup00002");
+        approvalDTO.setApprovalNo("2024-con00001");
         approvalDTO.setMemberId(2024001002);
-        approvalDTO.setApprovalTitle("비품 신청합니다.");
+        approvalDTO.setApprovalTitle("경조금 지급 신청합니다.");
         approvalDTO.setApprovalContent("<form name=\"form\">\n" +
-                "\t\t\t\t\t\t\t<div name=\"wholeForm\" id=\"wholeForm\">\n" +
-                "\t\t\t\t\t\t\t\t<div name=\"titleform\" id=\"titleform\">\n" +
-                "\n" +
-                "\t\t\t\t\t\t\t\t\t<input type=\"text\" name=\"title\" id=\"title\" placeholder=\"제목\">\n" +
-                "\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t\t<table name=\"sup_table\" id=\"sup_table\" >\n" +
-                "\t\t\t\t\t\t\t\t\t<tr name=\"sup_header\" id=\"sup_header\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th rowspan=\"2\">품명</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th rowspan=\"2\">규격</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th rowspan=\"2\">수량</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th name=\"purchasePrice\" class=\"purchasePrice\" colspan=\"2\">구매예정가격</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th rowspan=\"2\">용도</th>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<tr name=\"purchasePricetr\" id=\"purchasePricetr\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th name=\"purchasePrice\" class=\"purchasePrice\">단가</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<th name=\"purchasePrice\" class=\"purchasePrice\">금액</th>\n" +
-                "\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemname\">삼성 노트북 S1200 49</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td>17인치</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemAmount\">1</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\">1400000</td> \n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\">업무 보조</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemname\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemAmount\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td> \n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemname\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemAmount\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td> \n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemname\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemAmount\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td> \n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemname\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_itemAmount\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td> \n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td class=\"sup_price\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<th colspan=\"3\" name=\"\">합계</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<td colspan=\"3\" class=\"sup_price\">1400000</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\n" +
-                "\t\t\t\t\t\t\t\t</table>\n" +
-                "\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t<div name=\"date\" id=\"date\">\n" +
-                "\t\t\t\t\t\t\t\t<div>2024-04-30</div>\n" +
-                "\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t</form>");
-        approvalDTO.setApprovalDate("2024-04-30 13:11:00");
-        approvalDTO.setApprovalStatus("임시저장");
-        approvalDTO.setFormNo("sup");
+                "\t\t\t\t\t\t\t\t\t<div name=\"wholeForm\"id=\"wholeForm\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t<div name=\"titleform\" id=\"titleform\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" name=\"title\" id=\"title\" placeholder=\"제목\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t</div>\n" +
+                "\t\t\t\t\t\t\t\t\t\t<table>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>경조사항</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>조부 장례식</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>본인과의 관계</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>조부</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>발생일자</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>2024-04-28</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>장소</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>OO장례식장</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>휴가기간</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>2024-04-28 ~ 2024-05-01</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t   </table>\n" +
+                "\t\t\t\t\t\t\t\t\t </div>\n" +
+                "\t\t\t\t\t\t\t\t  <div name=\"date\" id=\"date\">\n" +
+                "\t\t\t\t\t\t\t\t\t<div>2024-05-02</div>\n" +
+                "\t\t\t\t\t\t\t\t  </div>\n" +
+                "\t\t\t\t\t\t\t\t</form>");
+        approvalDTO.setApprovalDate("2024-05-02 15:23:23");
+        approvalDTO.setApprovalStatus("처리 중");
+        approvalDTO.setFormNo("con");
 
 
             //파일 처리
@@ -185,18 +153,18 @@ public class ApprovalServiceTest {
 
             List<AttachmentDTO> attachmentList = new ArrayList<>();
             AttachmentDTO attachmentDTO1 = new AttachmentDTO();
-            attachmentDTO1.setFileNo("2024-sup00002_f001");
+            attachmentDTO1.setFileNo("2024-con00001_f001");
             attachmentDTO1.setFileOriname(pdfFile.getOriginalFilename());
             attachmentDTO1.setFileSavename(pdfFile.getName());
             attachmentDTO1.setFileSavepath("C:/login/upload");
-            attachmentDTO1.setApprovalNo("2024-sup00002");
+            attachmentDTO1.setApprovalNo("2024-con00001");
 
             AttachmentDTO attachmentDTO2 = new AttachmentDTO();
-            attachmentDTO2.setFileNo("2024-sup00002_f002");
+            attachmentDTO2.setFileNo("2024-con00001_f002");
             attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
             attachmentDTO2.setFileSavename(imgFile.getName());
             attachmentDTO2.setFileSavepath("C:/login/upload");
-            attachmentDTO2.setApprovalNo("2024-sup00002");
+            attachmentDTO2.setApprovalNo("2024-con00001");
 
             attachmentList.add(attachmentDTO1);
             attachmentList.add(attachmentDTO2);
@@ -216,6 +184,21 @@ public class ApprovalServiceTest {
                 () -> approvalService.insertApproval(approvalDTO, files)
         );
 
+    }
+
+    //전자결재 상세조회 테스트
+    @DisplayName("전자결재 상세조회 테스트")
+    @ParameterizedTest
+    @CsvSource("2024-con00001")
+    void testSelectApprovalList(String approvalNo){
+        //given
+
+        //when
+        ApprovalDTO approvalDTO = approvalService.selectApproval(approvalNo);
+
+        //then
+        Assertions.assertNotNull(approvalDTO);
+        System.out.println(approvalDTO);
     }
 
 

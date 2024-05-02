@@ -81,10 +81,23 @@ public class ApprovalService {
         // Approval 엔티티 저장
         approvalRepository.save(approval);
 
+        //추가한 결재자 이외 기안자도 결재자에 넣기 => 첫 결재자(기안자)는 결재처리 상태를 '승인' 으로 바꾸기
+        Approver senderApprover = new Approver(
+                approvalDTO.getApprovalNo().concat("_apr000"),
+                approvalDTO.getApprovalNo(),
+                0,
+                "승인",
+                LocalDateTime.parse(approvalDTO.getApprovalDate(), formatter),
+                approvalDTO.getMemberId()
+        );
+
+        approverRepository.save(senderApprover);
+
         //결재선 꺼내기
         for(int i = 0; i < approvalDTO.getApprover().size(); i++){
 
-            Approver approver = new Approver(
+
+            Approver approvers = new Approver(
                     approvalDTO.getApprover().get(i).getApproverNo(),
                     approvalDTO.getApprover().get(i).getApprovalNo(),
                     approvalDTO.getApprover().get(i).getApproverOrder(),
@@ -94,7 +107,7 @@ public class ApprovalService {
             );
 
             //Approver 엔티티 저장
-            approverRepository.save(approver);
+            approverRepository.save(approvers);
         }
 
         //참조선 꺼내기
@@ -207,9 +220,14 @@ public class ApprovalService {
         List<ReferencerDTO> referencer = new ArrayList<>();
         List<AttachmentDTO> attachment = new ArrayList<>();
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        //날짜 포맷
+        String approvalFormattedDateTime = approval.getApprovalDate().format(formatter);
+
 
         List<Approver> approverList = approverRepository.findByApprovalId(approvalNo);
-        log.info("*****selectApprovel -- approverList " + approverList);
+        log.info("*****selectApprover -- approverList " + approverList);
 
         for(int i = 0; i < approverList.size(); i++){
 
@@ -218,7 +236,10 @@ public class ApprovalService {
             //결재자 부서 정보 가져오기
             Department receiverDepart = departmentRepository.findById(receiverMember.getDepartNo());
 
-            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverList.get(i).getApproverDate().toString(), approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
+            //날짜 포맷
+            String approverFormattedDateTime = approverList.get(i).getApproverDate().format(formatter);
+
+            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
             approver.add(approverDTO);
 
 
@@ -243,12 +264,10 @@ public class ApprovalService {
             attachment.add(attachmentDTO);
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = approval.getApprovalDate().format(formatter);
 
-        log.info("***** formattedDateTime ***** " + formattedDateTime);
+        log.info("***** formattedDateTime ***** " + approvalFormattedDateTime);
 
-        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), formattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer);
+        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer);
 
         return approvalDTO;
     }
