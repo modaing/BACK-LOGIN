@@ -91,9 +91,10 @@ public class SurveyService {
     }
 
     @Transactional
-    public String insertResponse(int surveyAnswer, int memberId) {
+    public String insertResponse(int surveyAnswerNo, int memberId) {
         try {
-            surveyResponseRepository.save(modelMapper.map(new SurveyResponseDTO(surveyAnswer, memberId), SurveyResponse.class));
+            SurveyResponse surveyResponse = modelMapper.map(new SurveyResponseDTO(memberId, surveyAnswerNo), SurveyResponse.class);
+
             return "수요조사 응답 등록 성공";
         } catch (Exception e) {
             return "수요조사 응답 등록 실패";

@@ -114,7 +114,7 @@ public class SurveyServiceTests extends CommonController {
     @DisplayName("수요조사 삭제")
     void testDeleteSurvey() {
         // given
-        int surveyNo = 1;
+        int surveyNo = 5;
         //페이징 설정
         int pageNumber = 0;
         String properties = "surveyNo";
@@ -146,11 +146,11 @@ public class SurveyServiceTests extends CommonController {
     @DisplayName("수요조사 응답 등록")
     void testInsertResponse() {
         // given
-        int surveyAnswer = 3;
+        int surveyAnswerNo = 10;
         int memberId = 241201001;
 
         // when
-        String result = surveyService.insertResponse(surveyAnswer, memberId);
+        String result = surveyService.insertResponse(surveyAnswerNo, memberId);
 
         // then
         // 성공 메시지를 반환해야 함

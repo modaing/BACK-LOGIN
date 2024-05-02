@@ -148,7 +148,7 @@ public class LeaveController extends CommonController {
     public ResponseEntity<String> insertAccrual(@RequestBody LeaveAccrualDTO leaveAccrualDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        // TODO:시큐리티 안정화되면 토큰에서 처리자 사번 뽑아서 DTO에 담기
+        // TODO: 처리자 사번 뽑아서 DTO에 담기
         return ResponseEntity.ok().headers(headers).body(leaveService.insertAccrual(leaveAccrualDTO));
     }
 

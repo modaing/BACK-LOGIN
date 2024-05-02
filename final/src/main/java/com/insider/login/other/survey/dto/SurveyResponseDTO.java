@@ -6,18 +6,17 @@ public class SurveyResponseDTO {
 
     private int surveyResponseNo;    // 응답 번호
 
-    private int surveyAnswer;        // 답변 번호
-
     private int memberId;            // 응답 제출자
+
+    private int surveyAnswer;        // 답변 번호
 
     public SurveyResponseDTO() {
     }
 
-    public SurveyResponseDTO(int surveyAnswer, int memberId) {
-        this.surveyAnswer = surveyAnswer;
+    public SurveyResponseDTO(int memberId, int surveyAnswer) {
         this.memberId = memberId;
+        this.surveyAnswer = surveyAnswer;
     }
-
 
     public int getSurveyResponseNo() {
         return surveyResponseNo;

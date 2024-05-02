@@ -1,9 +1,6 @@
 package com.insider.login.other.survey.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table
@@ -11,33 +8,45 @@ public class SurveyResponse {
 
     @Id
     @Column(name = "SURVEY_RESPONSE_NO", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int surveyResponseNo;       // 응답 번호
 
     @Column(name = "MEMBER_ID", nullable = false)
     private int memberId;               // 응답 제출자
 
     @Column(name = "ANSWER_NO", nullable = false)
-    private int answerNo;               // 답변 번호
+    private int surveyAnswer;               // 답변 번호
 
     protected SurveyResponse() {
     }
 
-    public SurveyResponse(int surveyResponseNo, int memberId, int answerNo) {
-        this.surveyResponseNo = surveyResponseNo;
+    public SurveyResponse(int memberId, int surveyAnswer) {
         this.memberId = memberId;
-        this.answerNo = answerNo;
+        this.surveyAnswer = surveyAnswer;
     }
 
     public int getSurveyResponseNo() {
         return surveyResponseNo;
     }
 
+    public void setSurveyResponseNo(int surveyResponseNo) {
+        this.surveyResponseNo = surveyResponseNo;
+    }
+
     public int getMemberId() {
         return memberId;
     }
 
-    public int getAnswerNo() {
-        return answerNo;
+    public void setMemberId(int memberId) {
+        this.memberId = memberId;
+    }
+
+    public int getSurveyAnswer() {
+        return surveyAnswer;
+    }
+
+    public void setSurveyAnswer(int surveyAnswer) {
+        this.surveyAnswer = surveyAnswer;
     }
 
     @Override
@@ -45,7 +54,7 @@ public class SurveyResponse {
         return "SurveyResponse{" +
                 "surveyResponseNo=" + surveyResponseNo +
                 ", memberId=" + memberId +
-                ", answerNo=" + answerNo +
+                ", surveyAnswer=" + surveyAnswer +
                 '}';
     }
 }
