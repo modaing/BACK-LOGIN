@@ -44,9 +44,9 @@ public class CalendarServiceTests {
         String type = "weekly";
         int year = 2024;
         int month = 4;
-        // 1년을 기준으로 몇 번째 주차인지
+        // 1년을 기준으로 몇 번째 주차인지 15 = 4월의 둘째주
         int week = 15;
-        String department = "개발팀";
+        String department = "회계팀";
         CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, department);
         criteriaDTO.setWeek(week);
 
@@ -66,7 +66,7 @@ public class CalendarServiceTests {
         int year = 2024;
         int month = 4;
         int day = 12;
-        String department = "개발팀";
+        String department = "인사팀";
         CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, department);
         criteriaDTO.setDay(day);
 
@@ -87,8 +87,9 @@ public class CalendarServiceTests {
         LocalDateTime calendarEnd = LocalDateTime.of(2024, 4, 11, 12, 30, 0);
         String color = "red";
         int registrantId = 200401023;
+        String department = "all";
 
-        CalendarDTO calendarDTO = new CalendarDTO(calendarName, calendarStart, calendarEnd, color, registrantId);
+        CalendarDTO calendarDTO = new CalendarDTO(calendarName, calendarStart, calendarEnd, color, department, registrantId);
 
         // when
         String result = calendarService.insertCalendar(calendarDTO);
@@ -107,8 +108,9 @@ public class CalendarServiceTests {
         LocalDateTime calendarStart = LocalDateTime.of(2024, 7, 11, 12, 30, 0);
         LocalDateTime calendarEnd = LocalDateTime.of(2024, 7, 12, 12, 30, 0);
         String color = "red";
+        String department = "all";
         int registrantId = 200401023;
-        CalendarDTO calendarDTO = new CalendarDTO(calendarNo, calendarName, calendarStart, calendarEnd, color, registrantId);
+        CalendarDTO calendarDTO = new CalendarDTO(calendarNo, calendarName, calendarStart, calendarEnd, color, department, registrantId);
 
         // when
         String result = calendarService.updateCalendar(calendarDTO);

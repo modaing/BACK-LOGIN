@@ -22,22 +22,26 @@ public class CalendarDTO {
     public CalendarDTO() {
     }
 
-    public CalendarDTO(String calendarName, LocalDateTime calendarStart, LocalDateTime calendarEnd, String color, int registrantId) {
-        this.calendarName = calendarName;
-        this.calendarStart = calendarStart;
-        this.calendarEnd = calendarEnd;
-        this.color = color;
-        this.registrantId = registrantId;
-    }
-
-    public CalendarDTO(int calendarNo, String calendarName, LocalDateTime calendarStart, LocalDateTime calendarEnd, String color, int registrantId) {
+    public CalendarDTO(int calendarNo, String calendarName, LocalDateTime calendarStart, LocalDateTime calendarEnd, String color, String department, int registrantId) {
         this.calendarNo = calendarNo;
         this.calendarName = calendarName;
         this.calendarStart = calendarStart;
         this.calendarEnd = calendarEnd;
         this.color = color;
+        this.department = department;
         this.registrantId = registrantId;
     }
+
+    public CalendarDTO(String calendarName, LocalDateTime calendarStart, LocalDateTime calendarEnd, String color, String department, int registrantId) {
+        this.calendarName = calendarName;
+        this.calendarStart = calendarStart;
+        this.calendarEnd = calendarEnd;
+        this.color = color;
+        this.department = department;
+        this.registrantId = registrantId;
+    }
+
+
 
     public int getCalendarNo() {
         return calendarNo;

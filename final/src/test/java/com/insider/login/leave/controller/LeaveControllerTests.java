@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.sql.Date;
 import java.time.LocalDate;
 
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -103,7 +102,7 @@ public class LeaveControllerTests {
         LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(applicantId, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), "2024-04-30", "연차", "휴가 상신입니다.");
 
         // when
-        MvcResult result = mockMvc.perform(get("/leaveSubmits")
+        MvcResult result = mockMvc.perform(post("/leaveSubmits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(leaveSubmitDTO)))
 
@@ -140,7 +139,7 @@ public class LeaveControllerTests {
         LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(1, 202312003, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), "휴가 취소 상신입니다.");
         leaveSubmitDTO.setLeaveSubApplyDate("2024-04-30");
         // when
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("//leaveSubmits")
+        MvcResult result = mockMvc.perform(post("//leaveSubmits")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(leaveSubmitDTO)))
 
