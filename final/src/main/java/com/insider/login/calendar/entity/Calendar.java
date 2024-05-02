@@ -32,6 +32,19 @@ public class Calendar {
     @Column(name = "REGISTRANT_ID", nullable = false)
     private int registrantId;
 
+    protected Calendar() {
+    }
+
+    public Calendar(int calendarNo, String calendarName, LocalDateTime calendarStart, LocalDateTime calendarEnd, String color, String department, int registrantId) {
+        this.calendarNo = calendarNo;
+        this.calendarName = calendarName;
+        this.calendarStart = calendarStart;
+        this.calendarEnd = calendarEnd;
+        this.color = color;
+        this.department = department;
+        this.registrantId = registrantId;
+    }
+
     public int getCalendarNo() {
         return calendarNo;
     }
