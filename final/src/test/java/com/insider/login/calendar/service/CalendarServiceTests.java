@@ -1,5 +1,6 @@
 package com.insider.login.calendar.service;
 
+import com.insider.login.calendar.dto.CalendarCriteriaDTO;
 import com.insider.login.calendar.dto.CalendarDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SpringBootTest
 @Transactional
@@ -16,6 +18,62 @@ public class CalendarServiceTests {
 
     @Autowired
     private CalendarService calendarService;
+
+    @Test
+    @DisplayName("월간 일정 조회")
+    void testSelectCalendarMonthly() {
+        // given
+        String type = "monthly";
+        int year = 2024;
+        int month = 4;
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month);
+
+        // when
+        List<CalendarDTO> calendarList = calendarService.selectCalendar(criteriaDTO);
+
+        // then
+        Assertions.assertFalse(calendarList.isEmpty());
+        calendarList.forEach(System.out::println);
+    }
+
+    @Test
+    @DisplayName("주간 일정 조회")
+    void testSelectCalendarWeekly() {
+        // given
+        String type = "weekly";
+        int year = 2024;
+        int month = 4;
+        // 1년을 기준으로 몇 번째 주차인지
+        int week = 15;
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month);
+        criteriaDTO.setWeek(week);
+
+        // when
+        List<CalendarDTO> calendarList = calendarService.selectCalendar(criteriaDTO);
+
+        // then
+        Assertions.assertFalse(calendarList.isEmpty());
+        calendarList.forEach(System.out::println);
+    }
+
+    @Test
+    @DisplayName("일간 일정 조회")
+    void testSelectCalendarDaily() {
+        // given
+        String type = "daily";
+        int year = 2024;
+        int month = 4;
+        int day = 12;
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month);
+        criteriaDTO.setDay(day);
+
+        // when
+        List<CalendarDTO> calendarList = calendarService.selectCalendar(criteriaDTO);
+
+        // then
+        Assertions.assertFalse(calendarList.isEmpty());
+        calendarList.forEach(System.out::println);
+    }
 
     @Test
     @DisplayName("일정 등록")

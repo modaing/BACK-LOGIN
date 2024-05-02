@@ -1,5 +1,6 @@
 package com.insider.login.calendar.service;
 
+import com.insider.login.calendar.dto.CalendarCriteriaDTO;
 import com.insider.login.calendar.dto.CalendarDTO;
 import com.insider.login.calendar.entity.Calendar;
 import com.insider.login.calendar.repository.CalendarRepository;
@@ -8,7 +9,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,6 +24,32 @@ public class CalendarService {
     public CalendarService(CalendarRepository calendarRepository, ModelMapper modelMapper) {
         this.calendarRepository = calendarRepository;
         this.modelMapper = modelMapper;
+    }
+
+
+    public List<CalendarDTO> selectCalendar(CalendarCriteriaDTO criteriaDTO) {
+
+        log.info("[일정조회] 시작 ======================================================");
+        log.info("[일정조회] 매개변수 확인 =========================================\n" + criteriaDTO);
+        List<Calendar> calendars = new ArrayList<>();
+
+        switch (criteriaDTO.getType()) {
+            case "monthly":
+                calendars = calendarRepository.findByMonth(criteriaDTO.getYear(), criteriaDTO.getMonth());
+                break;
+            case "weekly":
+                calendars = calendarRepository.findByWeek(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getWeek());
+                break;
+            case "daily":
+                calendars = calendarRepository.findByDay(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getDay());
+                break;
+            default:
+                return new ArrayList<>();
+        }
+
+        return calendars.stream()
+                .map(calendar -> modelMapper.map(calendar, CalendarDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -69,6 +99,7 @@ public class CalendarService {
         return (result > 0) ? "일정 수정 성공" : "일정 수정 실패";
     }
 
+    @Transactional
     public String deleteCalendar(int calendarNo) {
         log.info("[일정삭제] 시작 =========================================================");
         int result = 0;
@@ -85,4 +116,5 @@ public class CalendarService {
 
         return (result > 0) ? "일정 삭제 성공" : "일정 삭제 실패";
     }
+
 }
