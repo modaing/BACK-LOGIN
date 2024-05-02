@@ -82,8 +82,8 @@ public class CalendarContorller {
     /**
      * 일정 삭제
      */
-    @DeleteMapping("/calendars")
-    public ResponseEntity<String> deleteCalendar(@RequestParam("calendarNo") int calendarNo) {
+    @DeleteMapping("/calendars/{calendarNo}")
+    public ResponseEntity<String> deleteCalendar(@PathVariable("calendarNo") int calendarNo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 

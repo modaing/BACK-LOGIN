@@ -22,7 +22,8 @@ public class Calendar {
     @Column(name = "CALENDAR_END", nullable = false)
     private LocalDateTime calendarEnd;
 
-    @Column(name = "COLOR", nullable = false)
+    @Column(name = "COLOR", nullable = false
+    )
     private String color;
 
     @Column(name = "DEPARTMENT", nullable = false)
