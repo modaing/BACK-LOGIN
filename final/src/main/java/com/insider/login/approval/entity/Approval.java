@@ -35,11 +35,11 @@ public class Approval {
     private String rejectReason;        //반려사유
 
     @Column(name="FORM_NO")
-    private String form_no;             //양식번호
+    private String formNo;             //양식번호
 
     protected Approval(){}
 
-    public Approval(String approvalNo, int memberId, String approvalTitle, String approvalContent, LocalDateTime approvalDate, String approvalStatus, String rejectReason, String form_no) {
+    public Approval(String approvalNo, int memberId, String approvalTitle, String approvalContent, LocalDateTime approvalDate, String approvalStatus, String rejectReason, String formNo) {
         this.approvalNo = approvalNo;
         this.memberId = memberId;
         this.approvalTitle = approvalTitle;
@@ -47,7 +47,7 @@ public class Approval {
         this.approvalDate = approvalDate;
         this.approvalStatus = approvalStatus;
         this.rejectReason = rejectReason;
-        this.form_no = form_no;
+        this.formNo = formNo;
     }
 
     public String getApprovalNo() {
@@ -78,8 +78,8 @@ public class Approval {
         return rejectReason;
     }
 
-    public String getForm_no() {
-        return form_no;
+    public String getFormNo() {
+        return formNo;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class Approval {
                 ", approvalDate=" + approvalDate +
                 ", approvalStatus='" + approvalStatus + '\'' +
                 ", rejectReason='" + rejectReason + '\'' +
-                ", form_no='" + form_no + '\'' +
+                ", formNo='" + formNo + '\'' +
                 '}';
     }
 }

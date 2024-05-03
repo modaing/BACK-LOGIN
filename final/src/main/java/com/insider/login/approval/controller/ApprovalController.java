@@ -2,14 +2,20 @@ package com.insider.login.approval.controller;
 
 import com.insider.login.approval.dto.ApprovalDTO;
 import com.insider.login.approval.dto.AttachmentDTO;
+import com.insider.login.approval.dto.ResponseDTO;
 import com.insider.login.approval.service.ApprovalService;
+import com.insider.login.common.ResponseMessage;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 
 import static java.time.LocalDateTime.now;
@@ -17,6 +23,7 @@ import static java.time.LocalDateTime.now;
 @RestController
 @RequestMapping("/approvals")
 public class ApprovalController {
+
 
     @Value("${file.upload-dir}")
     private String UPLOAD_DIR;
@@ -37,6 +44,15 @@ public class ApprovalController {
     public void goInsertApproval() {
 
     }
+
+    @Tag(name = "전자결재 회수", description = "회수")
+    @PutMapping(value = "/{approvalNo}")
+    public ResponseEntity<ResponseDTO> updateApproval(@PathVariable String approvalNo){
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자 결재 회수 성공", approvalService.updateApproval(approvalNo)));
+
+    }
+
 
     //전자결재 기안
   /*  @PostMapping("/")

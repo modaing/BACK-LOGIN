@@ -9,6 +9,10 @@ public class ReferencerDTO {
     private int memberId;               //참조자 사번
     private int refOrder;               //참조 순번
 
+    private String name;                //참조자 이름
+    private String positionName;        //참조자 직급
+    private String departName;          //참조자 부서명
+
     public ReferencerDTO () {}
 
     public ReferencerDTO(String refNo, String approvalNo, int memberId, int refOrder) {
@@ -16,6 +20,16 @@ public class ReferencerDTO {
         this.approvalNo = approvalNo;
         this.memberId = memberId;
         this.refOrder = refOrder;
+    }
+
+    public ReferencerDTO(String refNo, String approvalNo, int memberId, int refOrder, String name, String positionName, String departName) {
+        this.refNo = refNo;
+        this.approvalNo = approvalNo;
+        this.memberId = memberId;
+        this.refOrder = refOrder;
+        this.name = name;
+        this.positionName = positionName;
+        this.departName = departName;
     }
 
     public String getRefNo() {
@@ -50,6 +64,30 @@ public class ReferencerDTO {
         this.refOrder = refOrder;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
+    public String getDepartName() {
+        return departName;
+    }
+
+    public void setDepartName(String departName) {
+        this.departName = departName;
+    }
+
     @Override
     public String toString() {
         return "ReferencerDTO{" +
@@ -57,6 +95,9 @@ public class ReferencerDTO {
                 ", approvalNo='" + approvalNo + '\'' +
                 ", memberId=" + memberId +
                 ", refOrder=" + refOrder +
+                ", name='" + name + '\'' +
+                ", positionName='" + positionName + '\'' +
+                ", departName='" + departName + '\'' +
                 '}';
     }
 }

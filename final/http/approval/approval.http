@@ -1,0 +1,4 @@
+
+### 전자결재 회수(update)
+PUT http://localhost:8080/approvals/2024-con00001
+Content-Type: application/json

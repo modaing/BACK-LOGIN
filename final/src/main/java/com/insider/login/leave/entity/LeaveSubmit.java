@@ -45,25 +45,6 @@ public class LeaveSubmit {
     protected LeaveSubmit() {
     }
 
-    public LeaveSubmit(int leaveSubApplicant, LocalDate  leaveSubStartDate, LocalDate  leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubReason) {
-        this.leaveSubApplicant = leaveSubApplicant;
-        this.leaveSubStartDate = leaveSubStartDate;
-        this.leaveSubEndDate = leaveSubEndDate;
-        this.leaveSubApplyDate = leaveSubApplyDate;
-        this.leaveSubType = leaveSubType;
-        this.leaveSubReason = leaveSubReason;
-    }
-
-    public LeaveSubmit(int refLeaveSubNo, int leaveSubApplicant, LocalDate  leaveSubStartDate, LocalDate  leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus) {
-        this.refLeaveSubNo = refLeaveSubNo;
-        this.leaveSubApplicant = leaveSubApplicant;
-        this.leaveSubStartDate = leaveSubStartDate;
-        this.leaveSubEndDate = leaveSubEndDate;
-        this.leaveSubApplyDate = leaveSubApplyDate;
-        this.leaveSubType = leaveSubType;
-        this.leaveSubStatus = leaveSubStatus;
-    }
-
     public LeaveSubmit(int leaveSubNo, int refLeaveSubNo, int leaveSubApplicant, int leaveSubApprover, LocalDate  leaveSubStartDate, LocalDate  leaveSubEndDate, String leaveSubApplyDate, String leaveSubType, String leaveSubStatus, String leaveSubProcessDate, String leaveSubReason) {
         this.leaveSubNo = leaveSubNo;
         this.refLeaveSubNo = refLeaveSubNo;
