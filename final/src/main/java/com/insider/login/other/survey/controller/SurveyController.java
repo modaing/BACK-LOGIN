@@ -93,7 +93,7 @@ public class SurveyController extends CommonController {
     /**
      * 수요조사 등록
      */
-    @PostMapping("/survey")
+    @PostMapping("/surveys")
     public ResponseEntity<String> insertSurvey(@RequestBody SurveyDTO surveyDTO,
                                                @RequestBody List<String> answers) {
 
@@ -111,6 +111,7 @@ public class SurveyController extends CommonController {
     public ResponseEntity<String> deleteSurvey(@PathVariable("surveyNo") int surveyNo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
         return ResponseEntity.ok().headers(headers).body(surveyService.deleteSurvey(surveyNo));
     }
 
@@ -122,8 +123,8 @@ public class SurveyController extends CommonController {
     public ResponseEntity<String> insertResponse(@RequestParam("surveyAnswerNo") int surveyAnswerNo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        // TODO: 응답 제출자 사번 받아서 DTO에 담기 아래는 임시
-        int memberId = 241201001;
+        int memberId = 241201001; // TODO: 응답 제출자 사번 받아서 DTO에 담기 이건 임시
+
         return ResponseEntity.ok().headers(headers).body(surveyService.insertResponse(surveyAnswerNo, memberId));
     }
 }
