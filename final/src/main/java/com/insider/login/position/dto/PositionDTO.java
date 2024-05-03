@@ -1,23 +1,24 @@
 package com.insider.login.position.dto;
+import com.insider.login.position.entity.Position;
 
-import com.insider.login.member.entity.Member;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-import java.util.List;
-
-public  class PositionDTO {
+public class PositionDTO {
 
     private String positionName;
     private String positionLevel;
+
     public PositionDTO() {
     }
 
-    public PositionDTO (String positionName, String positionLevel) {
+    public PositionDTO(String positionName, String positionLevel) {
         this.positionName = positionName;
         this.positionLevel = positionLevel;
+    }
+
+    public static PositionDTO mapToDTO (Position position) {
+        PositionDTO positionDTO = new PositionDTO();
+        positionDTO.setPositionName(position.getPositionName());
+        positionDTO.setPositionLevel(position.getPositionLevel());
+        return positionDTO;
     }
 
     public String getPositionName() {
@@ -36,20 +37,11 @@ public  class PositionDTO {
         this.positionLevel = positionLevel;
     }
 
-//    public List<Member> getMembers() {
-//        return members;
-//    }
-//
-//    public void setMembers(List<Member> members) {
-//        this.members = members;
-//    }
-
     @Override
     public String toString() {
-        return "Position{" +
+        return "PositionDTO{" +
                 "positionName='" + positionName + '\'' +
                 ", positionLevel='" + positionLevel + '\'' +
-//                ", members=" + members +
                 '}';
     }
 }

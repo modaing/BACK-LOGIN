@@ -1,5 +1,7 @@
 package com.insider.login.department.dto;
 
+import com.insider.login.department.entity.Department;
+
 public class DepartmentDTO {
 
     private int departNo;
@@ -11,6 +13,13 @@ public class DepartmentDTO {
     public DepartmentDTO(int departNo, String departName) {
         this.departNo = departNo;
         this.departName = departName;
+    }
+
+    public static DepartmentDTO mapToDTO(Department department) {
+        DepartmentDTO departmentDTO = new DepartmentDTO();
+        departmentDTO.setDepartNo(department.getDepartNo());
+        departmentDTO.setDepartName(department.getDepartName());
+        return departmentDTO;
     }
 
     public int getDepartNo() {
@@ -28,7 +37,6 @@ public class DepartmentDTO {
     public void setDepartName(String departName) {
         this.departName = departName;
     }
-
     @Override
     public String toString() {
         return "DepartmentDTO{" +
@@ -37,3 +45,4 @@ public class DepartmentDTO {
                 '}';
     }
 }
+

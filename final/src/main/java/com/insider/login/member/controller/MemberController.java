@@ -3,65 +3,59 @@ package com.insider.login.member.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.insider.login.auth.DetailsMember;
-import com.insider.login.auth.image.entity.Image;
-import com.insider.login.auth.image.service.ImageService;
-import com.insider.login.auth.interceptor.JwtTokenInterceptor;
-import com.insider.login.auth.model.dto.LoginDTO;
-import com.insider.login.common.AuthConstants;
-import com.insider.login.common.AuthenticationFacade;
 import com.insider.login.common.utils.TokenUtils;
 import com.insider.login.department.dto.DepartmentDTO;
+import com.insider.login.department.service.DepartmentService;
 import com.insider.login.member.dto.MemberDTO;
+import com.insider.login.member.dto.UpdatePasswordRequestDTO;
 import com.insider.login.member.entity.Member;
-import com.insider.login.member.repository.MemberRepository;
 import com.insider.login.member.service.MemberService;
 import com.insider.login.position.dto.PositionDTO;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.impl.DefaultClaims;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.antlr.v4.runtime.Token;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.insider.login.position.service.PositionService;
+import com.insider.login.transferredHistory.service.TransferredHistoryService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
+import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
 
 @RestController
+@RequestMapping
 public class MemberController {
 
     @Value("${jwt.key}")
     private String jwtSecret;
-    private final MemberRepository memberRepository; // 원래 service에 작성을 하는 것인데 test를 하기 위해서 임시로 사용 하는 것...!
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final ImageService imageService;
+    private final TransferredHistoryService transferredHistoryService;
+    private final PositionService positionService;
+    private final DepartmentService departmentService;
+    private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoders;
 
-    public MemberController(MemberRepository memberRepository, MemberService memberService, BCryptPasswordEncoder passwordEncoder, ImageService imageService) {
-        this.memberRepository = memberRepository;
+    public MemberController(MemberService memberService, BCryptPasswordEncoder passwordEncoder, TransferredHistoryService transferredHistoryService, PositionService positionService, DepartmentService departmentService, ModelMapper modelMapper, PasswordEncoder passwordEncoders) {
         this.memberService = memberService;
         this.passwordEncoder = passwordEncoder;
-        this.imageService = imageService;
+        this.transferredHistoryService = transferredHistoryService;
+        this.positionService = positionService;
+        this.departmentService = departmentService;
+        this.modelMapper = modelMapper;
+        this.passwordEncoders = passwordEncoders;
     }
 
-    @PostMapping("/regist")
-    public String signup(@RequestBody MemberDTO memberDTO) {
+    /** 구성원 등록 */
+    @PostMapping("/signUp")
+    public String signUp(@RequestBody MemberDTO memberDTO) {
 
         // 2자릿수 년도
         String twoDigitYear = Year.now().format(DateTimeFormatter.ofPattern("yy"));
@@ -72,36 +66,39 @@ public class MemberController {
         System.out.println("2자릿수 월: " + twoDigitMonth);
 
         // 2자릿수 부서번호
-        String departNo = String.valueOf(memberDTO.getDepartment().getDepartNo());
-
+        String departNo = String.valueOf(memberDTO.getDepartmentDTO().getDepartNo());
         if (departNo.length() == 1) {
             departNo = "0" + departNo;
         }
 
-        // Random 번호 (뒷 3자리)
-        Random random = new Random();
-        int randomNumber = random.nextInt(900) + 100;
-        int setMemberId = Integer.parseInt(twoDigitYear + twoDigitMonth + departNo + randomNumber);
+        // unique memberId 생성 (중복 X)
+        int setMemberId;
+        boolean existingId;
+        do {
+            Random random = new Random();
+            int randomNumber = random.nextInt(900) + 100;
+            setMemberId = Integer.parseInt(twoDigitYear + twoDigitMonth + departNo + randomNumber);
 
-        // 기본적인 정보들을 member에다가 값들을 setting 해준다
-        memberDTO.setMemberId(setMemberId); // 사번 생성
-        memberDTO.setPassword("0000");      // 수동적으로 비밀번호는 0000이다
+            existingId = memberService.findExistingMemberId(setMemberId);
+        } while (existingId);
+
+        memberDTO.setMemberId(setMemberId);
+        memberDTO.setPassword("0000");
         String encodedPassword = passwordEncoder.encode(memberDTO.getPassword());
         memberDTO.setPassword(encodedPassword);
-        memberDTO.setMemberStatus("재직");   // 처음 등록을 할 때 "재직" 상태로 설정 하는 logic
+        memberDTO.setMemberStatus("재직");
 
-
-        // JSON형식으로 LocalDate을 저장을 하기 위한 block of code
+        // JSON형식으로 LocalDate을 저장을 하기 위한 logic
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         LocalDate localDate = LocalDate.now();
+        memberDTO.setEmployedDate(localDate);               // 입사일
 
-        memberDTO.setEmployedDate(localDate); // 등록한 날짜 가입
-
-        imageService.saveImage(memberDTO.getImage());
-        MemberDTO savedMember = memberService.saveMember(memberDTO);
-
+        Member savedMember = memberService.saveMember(memberDTO);
         System.out.println("회원 가입한 구성원 정보: " + savedMember);
+
+        // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
+        transferredHistoryService.saveHistory(savedMember);
 
         if(Objects.isNull(savedMember)) { // 비어있으면 실패
             System.out.println("회원가입 실패 🥲");
@@ -112,82 +109,118 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/login")
-    public String login(@RequestBody LoginDTO loginDTO) {
-        System.out.println("login controller 도착");
-        int memberIdInfo = loginDTO.getId();
-        String memberPasswordInfo = loginDTO.getPass();
 
-        System.out.println("아이디 정보: " + memberIdInfo);
-        System.out.println("비밀번호 정보: " + memberPasswordInfo);
+    /** 특정 구성원 정보 조회 */
+    @GetMapping("/members/{memberId}")
+    public String getSpecificMemberById(@PathVariable("memberId") int memberId) {
+        System.out.println("받은 memberId: " + memberId);
+        MemberDTO foundMember = memberService.findSpecificMember(memberId);
+        System.out.println("특정 구성원 정보 조회: " + foundMember);
 
-        return null;
-    }
-
-    @PostMapping("/registDepart")
-    public String registDepartment(@RequestBody DepartmentDTO departmentDTO) {
-        memberService.insertDepart(departmentDTO);
-
-        return "registered Department";
-    }
-
-    @PostMapping("/registPosition")
-    public String registPosition(@RequestBody PositionDTO positionDTO) {
-        memberService.insertPosition(positionDTO);
-
-        return "registered position";
-    }
-
-
-    /* 1번째 방법 */
-    @GetMapping("/getMemberInfo")
-    public String getMemberInfo(@RequestHeader(AuthConstants.AUTH_HEADER) String token) {
-        System.out.println("token: " + token); // 확인용
-        String jwtToken = token.substring(7);
-        Claims claims = TokenUtils.getClaimsFromToken(jwtToken);
-        Object memberIdObject = claims.get("memberId");
-
-        // memberId가 존재하고 integer일 경우에는
-        if (memberIdObject != null && memberIdObject instanceof Integer) {
-            int memberId = (Integer) memberIdObject;
-            System.out.println("memberId: " + memberId);
-            return "memberID: " + memberId;
+        if (foundMember != null) {
+            return "foundMember: " + foundMember;
         } else {
-            return "MemberId not found in token";
+            return "memberNotFound";
         }
     }
 
-    /* 2번째 방법 */
-    @GetMapping("/getToken")
-    public String tokenInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        DetailsMember detailsMember = (DetailsMember) authentication.getPrincipal();
-        Member member = detailsMember.getMember();
-        System.out.println("member 정보들: " + member);
-        return ("member의 정보들: " + member);
-//        return ("token 정보: " + token);
+    /** 구성원 정보 등록 */
+    @PutMapping("/members/updateProfile/{memberId}")
+    public String updateSpecificMemberById(@PathVariable("memberId") int memberId, @RequestBody MemberDTO inputtedMemberInfo) {
+        /* 특정 구성원의 정보를 전부 가져온다 */
+        MemberDTO specificMember = memberService.findSpecificMember(memberId);
+        System.out.println("specificMember: " + specificMember); // 확인용
+
+        inputtedMemberInfo.setMemberId(memberId);
+        inputtedMemberInfo.setPassword(specificMember.getPassword());
+        inputtedMemberInfo.setEmployedDate(specificMember.getEmployedDate());
+        inputtedMemberInfo.setAddress(specificMember.getAddress());
+        inputtedMemberInfo.setRole(specificMember.getRole());
+        inputtedMemberInfo.setImageUrl(specificMember.getImageUrl());
+        System.out.println("수정을 하기전 구성원의 정보: " + specificMember);
+        System.out.println("입력 받은 값: " + inputtedMemberInfo);
+
+        /* 입력 받은 것을 덮어 쓴다 */
+        String updatedMember = memberService.updateMember(inputtedMemberInfo);
+
+        return "찾은 구성원의 정보: " + updatedMember;
     }
 
-    // 본인 비밀번호 변경
-    @PostMapping("/updatePassword")
-    public String updateOwnPassword(@RequestHeader(AuthConstants.AUTH_HEADER) String token,
-                                    @RequestBody Map<String, String> passwords) {
-        String jwtToken = token.substring(7);
-        Claims claims = TokenUtils.getClaimsFromToken(jwtToken);
-        Object memberIdObject = claims.get("memberId");
-        int memberId = (Integer) memberIdObject;
+    /** 구성원 본인 비밀번호 */
+    @PostMapping("/updateOwnPassword")
+    public String updateOwnPassword(@RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO) {
 
-        // 현재 인증된 구성원의 정보들
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        MemberDTO foundMember = memberService.findPasswordByMemberId(getTokenInfo().getMemberId());
+        String existingPassword = foundMember.getPassword();
+        System.out.println("기존에 있는 비밀번호: " + existingPassword);
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            String memberName = authentication.getName();
-            System.out.println("구성원 이름: " + memberName);
-
-            String currentPassword = passwords.get("currentPassword");
-            String newPassword1 = passwords.get("newPassword123");
-            String newPassword2 = passwords.get("newPassword123123");
+        /* 입력한 현재 비밀번호가 일치하는지 확인하는 logic */
+        if (!passwordEncoder.matches(updatePasswordRequestDTO.getCurrentPassword(), existingPassword)) {
+            System.out.println("비밀번호가 틀렸습니다");
+            return "wrong password";
+        } else if (!updatePasswordRequestDTO.getNewPassword1().equals(updatePasswordRequestDTO.getNewPassword2())) {
+            System.out.println("비밀번호가 일치하지 않습니다.");
+            return "password doesn't match";
+        } else {
+            String hashedNewPassword = passwordEncoder.encode(updatePasswordRequestDTO.getNewPassword2());
+            String result = memberService.changePassword(hashedNewPassword, getTokenInfo123().getMemberId());
+            return "successfully changed the password" + result;
         }
+    }
+
+    /** Claims에 구성원 정보를 받아오는 방법 */
+    /**
+     * getTokenInfo()에서 받아올 수 있는 정보들
+     * 1. memberID -> getMemberId
+     * 2. name -> getName
+     * 3. memberStatus -> getMemberStatus
+     * 4. role -> getRole.getRole()
+     * 5. departmentName ->getDepartmentDTO.getDepartName
+     * 6. positionName ->getPositionDTO.getPositionName
+     * 6. imageUrl -> getImageUrl
+     * */
+    @GetMapping("/getTokenInfo")
+    public MemberDTO getTokenInfo123() {
+        System.out.println("회원의 비밀번호: " + getTokenInfo().getMemberId());
+        System.out.println("memberId: " + getTokenInfo().getMemberId());
+        System.out.println("name: " + getTokenInfo().getName());
+        System.out.println("member status: " + getTokenInfo().getMemberStatus());
+        System.out.println("role: " + getTokenInfo().getRole().getRole());
+        System.out.println("positionName: " + getTokenInfo().getDepartmentDTO().getDepartName());
+        System.out.println("department name: " + getTokenInfo().getPositionDTO().getPositionName());
+        System.out.println("image url: " + getTokenInfo().getImageUrl());
+        return getTokenInfo();
+    }
+
+    @GetMapping("/showAllMembersInfoPage")
+    public List<MemberDTO> showAllMemberInfosInPage() {
+        System.out.println("show all member infos in the page");
+        List<MemberDTO> memberLists = memberService.showAllMembers();
+        System.out.println("memberList: " + memberLists);
+
+        for (MemberDTO member : memberLists) {
+            member.getName();
+            member.getMemberId();
+            member.getEmployedDate();
+            member.getPositionDTO().getPositionName();
+            member.getDepartmentDTO().getDepartName();
+            member.getMemberStatus();
+        }
+
+        // 근속년수 작성할 것
+        return memberLists;
+    }
+
+    @PutMapping("/resetMemberPassword")
+    public String resetMemberPassword() {
+        MemberDTO memberInfo = memberService.findSpecificMember(getTokenInfo().getMemberId());
+        memberInfo.setPassword("0000");
+
+        memberInfo.setPassword("0000");
+        memberInfo.setPassword(passwordEncoder.encode(memberInfo.getPassword()));
+        memberService.resetPassword(memberInfo);
+
+        /* 아직 ing */
         return null;
     }
 }
