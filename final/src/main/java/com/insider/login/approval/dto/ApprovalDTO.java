@@ -19,13 +19,25 @@ public class ApprovalDTO {
     private String approvalStatus;              //상태
     private String rejectReason;                //반려사유
     private String formNo;                      //양식번호
+
+    private String formName;                    //양식이름
+
+    private String departName;                  //기안자 부서
+    private String name;                        //기안자 이름
+    private String positionName;                //기안자 직급명
+
+
     private List<AttachmentDTO> attachment;     //첨부파일
     private List<ApproverDTO> approver;         //결재선
     private List<ReferencerDTO> referencer;     //참조선
 
+    private String finalApproverDate;                //최종승인날짜
+    private String standByApprover;             //진행중(대기)인 사람
+
     public ApprovalDTO(){}
 
-    public ApprovalDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, List<AttachmentDTO> attachment, List<ApproverDTO> approver, List<ReferencerDTO> referencer) {
+
+    public ApprovalDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, String formName, String departName, String name, String positionName, List<AttachmentDTO> attachment, List<ApproverDTO> approver, List<ReferencerDTO> referencer, String approverDate, String standByApprover) {
         this.approvalNo = approvalNo;
         this.memberId = memberId;
         this.approvalTitle = approvalTitle;
@@ -34,9 +46,15 @@ public class ApprovalDTO {
         this.approvalStatus = approvalStatus;
         this.rejectReason = rejectReason;
         this.formNo = formNo;
+        this.formName = formName;
+        this.departName = departName;
+        this.name = name;
+        this.positionName = positionName;
         this.attachment = attachment;
         this.approver = approver;
         this.referencer = referencer;
+        this.finalApproverDate = approverDate;
+        this.standByApprover = standByApprover;
     }
 
     public String getApprovalNo() {
@@ -103,6 +121,14 @@ public class ApprovalDTO {
         this.formNo = formNo;
     }
 
+    public String getFormName() {
+        return formName;
+    }
+
+    public void setFormName(String formName) {
+        this.formName = formName;
+    }
+
     public List<AttachmentDTO> getAttachment() {
         return attachment;
     }
@@ -127,20 +153,68 @@ public class ApprovalDTO {
         this.referencer = referencer;
     }
 
+    public String getDepartName() {
+        return departName;
+    }
+
+    public void setDepartName(String departName) {
+        this.departName = departName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
+    public String getFinalApproverDate() {
+        return finalApproverDate;
+    }
+
+    public void setFinalApproverDate(String finalApproverDate) {
+        this.finalApproverDate = finalApproverDate;
+    }
+
+    public String getStandByApprover() {
+        return standByApprover;
+    }
+
+    public void setStandByApprover(String standByApprover) {
+        this.standByApprover = standByApprover;
+    }
+
+
+
     @Override
     public String toString() {
         return "ApprovalDTO{" +
-                "approvalNo='" + approvalNo + '\'' +
-                ", memberId=" + memberId +
-                ", approvalTitle='" + approvalTitle + '\'' +
-                ", approvalContent='" + approvalContent + '\'' +
-                ", approvalDate='" + approvalDate + '\'' +
-                ", approvalStatus='" + approvalStatus + '\'' +
-                ", rejectReason='" + rejectReason + '\'' +
-                ", formNo='" + formNo + '\'' +
-                ", attachment=" + attachment +
-                ", approver=" + approver +
-                ", referencer=" + referencer +
-                '}';
+                "\n[approvalNo='" + approvalNo + "']" +
+                "\n[memberId=" + memberId + "']" +
+                "\n[approvalTitle='" + approvalTitle + "']" +
+                "\n[approvalContent='" + approvalContent + "']" +
+                "\n[approvalDate='" + approvalDate + "']" +
+                "\n[approvalStatus='" + approvalStatus + "']" +
+                "\n[rejectReason='" + rejectReason + "']" +
+                "\n[formNo='" + formNo + "']" +
+                "\n[formName='" + formName + "']" +
+                "\n[departName='" + departName + "']" +
+                "\n[name='" + name + "']" +
+                "\n[positionName='" + positionName + "']" +
+                "\n[attachment=" + attachment + "']" +
+                "\n[approver=" + approver + "']" +
+                "\n[referencer=" + referencer + "']" +
+                "\n[approverDate=" + finalApproverDate + "']" +
+                "\n[standByApprover=" + standByApprover + "']" +
+                '\n'+'}';
     }
 }

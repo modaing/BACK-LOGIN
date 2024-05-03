@@ -1,6 +1,5 @@
 package com.insider.login.commute.entity;
 
-import com.insider.login.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
+@Entity(name = "Commute")
 @Table(name = "commute")
 @AllArgsConstructor
 @Getter
@@ -41,7 +40,7 @@ public class Commute {
 
     @ManyToOne
     @JoinColumn(name = "member_id", insertable = false, updatable = false)
-    private Member member;                                  // 구성원
+    private CommuteMember commuteMember;                    // 구성원
 
     @OneToOne
     @JoinColumn(name = "commute_no")
@@ -64,14 +63,14 @@ public class Commute {
         this.totalWorkingHours = totalWorkingHours;
     }
 
-    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours, Member member) {
+    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours, CommuteMember commuteMember) {
         this.memberId = memberId;
         this.workingDate = workingDate;
         this.startWork = startWork;
         this.endWork = endWork;
         this.workingStatus = workingStatus;
         this.totalWorkingHours = totalWorkingHours;
-        this.member = member;
+        this.commuteMember = commuteMember;
     }
 
     public void setEndWork(LocalTime endWork) {

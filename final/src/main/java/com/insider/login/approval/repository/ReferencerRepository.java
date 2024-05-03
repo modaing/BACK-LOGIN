@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ReferencerRepository {
 
@@ -13,5 +15,13 @@ public class ReferencerRepository {
 
     public void save (Referencer referencer){
         manager.persist(referencer);
+    }
+
+    public List<Referencer> findByApprovalId(String approvalNo) {
+        List<Referencer> referencerList = manager.createQuery("SELECT r FROM Referencer r WHERE r.approvalNo= :approvalNo", Referencer.class)
+                .setParameter("approvalNo", approvalNo)
+                .getResultList();
+
+        return referencerList;
     }
 }

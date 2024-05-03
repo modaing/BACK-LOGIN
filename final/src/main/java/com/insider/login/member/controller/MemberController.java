@@ -1,6 +1,5 @@
 package com.insider.login.member.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.insider.login.auth.DetailsMember;
@@ -20,6 +19,7 @@ import com.insider.login.position.dto.PositionDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.antlr.v4.runtime.Token;
@@ -28,17 +28,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 
 @RestController
 public class MemberController {
@@ -87,6 +90,7 @@ public class MemberController {
         memberDTO.setPassword(encodedPassword);
         memberDTO.setMemberStatus("재직");   // 처음 등록을 할 때 "재직" 상태로 설정 하는 logic
 
+
         // JSON형식으로 LocalDate을 저장을 하기 위한 block of code
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -96,6 +100,7 @@ public class MemberController {
 
         imageService.saveImage(memberDTO.getImage());
         MemberDTO savedMember = memberService.saveMember(memberDTO);
+
         System.out.println("회원 가입한 구성원 정보: " + savedMember);
 
         if(Objects.isNull(savedMember)) { // 비어있으면 실패

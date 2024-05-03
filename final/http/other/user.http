@@ -30,7 +30,7 @@ Content-Type: application/json
 Accept: */*
 
 {
-  "id": 240401568,
+  "id": 240501116,
   "pass": "0000"
 }
 
@@ -52,11 +52,6 @@ Accept: */*
   "positionName": "계약직",
   "positionLevel": "5"
 }
-
-
-
-
-
 
 
 ### GET 요청 test

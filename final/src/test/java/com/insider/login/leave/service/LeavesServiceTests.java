@@ -3,6 +3,7 @@ package com.insider.login.leave.service;
 
 import com.insider.login.common.CommonController;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
+import com.insider.login.leave.dto.LeaveInfoDTO;
 import com.insider.login.leave.dto.LeavesDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import org.junit.jupiter.api.*;
@@ -26,7 +27,7 @@ public class LeavesServiceTests extends CommonController {
     private LeaveService leaveService;
 
     @Test
-    @DisplayName("나의 휴가 내역 조회")
+    @DisplayName("나의 휴가 신청 내역 조회")
     void testSelectLeaveSubmitListByMemberId() {
         // given
         int applicantId = 241201001;
@@ -36,14 +37,14 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
         // when
-        Page<LeaveSubmitDTO> results = leaveService.selectLeaveSubmitListByMemberId(applicantId, pageable);
+        Page<LeaveSubmitDTO> results = leaveService.selectLeaveSubmitList(applicantId, pageable);
 
         //then
         // 해당 사번으로 조회된 결과가 있을 경우 조회된 내역의 사번이 의도한 사번과 일치해야함
@@ -60,29 +61,76 @@ public class LeavesServiceTests extends CommonController {
     }
 
     @Test
+    @DisplayName("개인 휴가 보유내역 조회")
+    void testGetLeaveInfoById() {
+        // given
+        int memberId = 241201001;
+
+        // when
+        LeaveInfoDTO info = leaveService.getLeaveInfoById(memberId);
+
+        // then
+        // 의도한 사번 아이디와 조회된 DTO의 사번 아이디가 같아야 함
+        Assertions.assertEquals(info.getMemberId(), memberId);
+        System.out.println(info);
+    }
+
+    @Test
+    @DisplayName("휴가 신청 내역 조회")
+    void testSelectSubmitList() {
+        // given
+        int applicantId = 0;
+        // 페이징 설정
+        int pageNumber = 0;
+        String properties = "leaveSubNo";
+        String direction = "DESC";
+        Pageable pageable;
+
+        if (!direction.equals("DESC")) {
+            pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
+        } else {
+            pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
+        }
+
+        // then
+        Page<LeaveSubmitDTO> results = leaveService.selectLeaveSubmitList(applicantId, pageable);
+
+        // when
+        // 해당 페이지에 표시될 요소의 개수가 10개를 넘으면 안 됨
+        Assertions.assertFalse(results.getSize() > 10);
+        // 가져온 페이지 중 현재 인덱스가 의도한 페이지와 같아아 함
+        Assertions.assertEquals(results.getNumber(), pageNumber);
+        System.out.println(results.getTotalElements());
+        results.forEach(System.out::println);
+    }
+
+    @Test
     @DisplayName(("휴가 신청"))
     void testInsertSubmit() {
         // given
         int applicantId = 241201001;
-        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(applicantId, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), nowDate(), "연차", "휴가 상신입니다.");
+        int leaveSubNo = 5;
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(applicantId, LocalDate.parse("2024-04-10"), LocalDate.parse("2024-04-11"), "연차", "휴가 상신입니다.");
+        leaveSubmitDTO.setRefLeaveSubNo(leaveSubNo);
+        leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
         //페이징 설정
         int pageNumber = 0;
         String properties = "leaveSubNo";
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
-
         }
+
         // when
-        Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
+        Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitList(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
 
         String result = leaveService.insertSubmit(leaveSubmitDTO);
 
-        Page<LeaveSubmitDTO> after = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
+        Page<LeaveSubmitDTO> after = leaveService.selectLeaveSubmitList(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
 
         //then
         // 등록했을 때, 해당 사번으로 조회되는 요소의 개수가 등록 전보다 증가해야함
@@ -120,7 +168,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -129,12 +177,11 @@ public class LeavesServiceTests extends CommonController {
 
         //when
 
-        Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
+        Page<LeaveSubmitDTO> before = leaveService.selectLeaveSubmitList(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
 
         String result = leaveService.insertSubmitCancel(leaveSubmitDTO);
 
-        Page<LeaveSubmitDTO> after = leaveService.selectLeaveSubmitListByMemberId(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
-
+        Page<LeaveSubmitDTO> after = leaveService.selectLeaveSubmitList(leaveSubmitDTO.getLeaveSubApplicant(), pageable);
 
         //then
         // 등록했을 때, 해당 사번으로 조회되는 요소의 개수가 등록 전보다 증가해야함
@@ -153,7 +200,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -169,6 +216,7 @@ public class LeavesServiceTests extends CommonController {
         Assertions.assertFalse(results.getSize() > 10);
         // 가져온 페이지 중 현재 인덱스가 의도한 페이지와 같아아 함
         Assertions.assertEquals(results.getNumber(), pageNumber);
+        results.forEach(System.out::println);
 
     }
 
@@ -186,7 +234,7 @@ public class LeavesServiceTests extends CommonController {
         String direction = "DESC";
         Pageable pageable;
 
-        if (direction != "DESC") {
+        if (!direction.equals("DESC")) {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
         } else {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
@@ -211,7 +259,7 @@ public class LeavesServiceTests extends CommonController {
     @DisplayName("상세조회")
     void testSelectSubmitByLeaveSubNo() {
         // given
-        int leaveSubNo = 3;
+        int leaveSubNo = 7;
 
         // when
         LeaveSubmitDTO result = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
@@ -225,48 +273,13 @@ public class LeavesServiceTests extends CommonController {
     }
 
     @Test
-    @DisplayName("휴가 신청 내역 조회")
-    void testSelectSubmitList() {
-        // given
-        // 페이징 설정
-        int pageNumber = 0;
-        String properties = "leaveSubNo";
-        String direction = "DESC";
-        Pageable pageable;
-
-        if (direction != "DESC") {
-            pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.ASC, properties));
-        } else {
-            pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
-        }
-
-        // then
-        Page<LeaveSubmitDTO> results = leaveService.selectLeaveSubmitList(pageable);
-
-        // when
-        // 해당 페이지에 표시될 요소의 개수가 10개를 넘으면 안 됨
-        Assertions.assertFalse(results.getSize() > 10);
-        // 가져온 페이지 중 현재 인덱스가 의도한 페이지와 같아아 함
-        Assertions.assertEquals(results.getNumber(), pageNumber);
-        System.out.println(results.getTotalElements());
-        results.forEach(System.out::println);
-    }
-
-    @Test
-    @DisplayName("휴가 신청 처리")
-    void testUpdateSubimt() {
+    @DisplayName("휴가 신청 처리 - 승인")
+    void testUpdateSubimtOk() {
         // given
         int leaveSubNo = 6;
-        int approverId = 241201001;
-        // 신청 처리에 관한 결정 여부
-        String decision = "반려";
-        LeaveSubmitDTO leaveSubmitDTO = null;
-        // 신청 처리 결과에 따라 매개변수와 처리 과정의 차이가 있음
-        if (decision.equals("승인")) {
-            leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate());
-        } else if (decision.equals("반려")) {
-            leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate(), "반려했습니다.");
-        }
+        String decision = "승인";
+        int approverId = 200401023;
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate());
 
         // when
         String result = leaveService.updateSubmit(leaveSubmitDTO);
@@ -281,6 +294,31 @@ public class LeavesServiceTests extends CommonController {
         Assertions.assertEquals(test.getLeaveSubStatus(), decision);
 
     }
+
+    @Test
+    @DisplayName("휴가 신청 처리 - 반려")
+    void testUpdateSubimtNo() {
+        // given
+        int leaveSubNo = 9;
+        String decision = "반려";
+        int approverId = 200401023;
+        String reason = "반려사유";
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate(), reason);
+
+        // when
+        String result = leaveService.updateSubmit(leaveSubmitDTO);
+
+        // then
+        // 성공메시지를 반환해야함
+//        Assertions.assertEquals(result, "휴가처리 성공");
+        // 업데이트가 의도한 대로 진행됐는지 확인
+        LeaveSubmitDTO test = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
+        System.out.println(test);
+        Assertions.assertEquals(test.getLeaveSubApprover(), approverId);
+        Assertions.assertEquals(test.getLeaveSubStatus(), decision);
+
+    }
+
 
     @Test
     @DisplayName("휴가 보유 내역 조회")
@@ -299,10 +337,14 @@ public class LeavesServiceTests extends CommonController {
         }
 
         // when
-        Page<LeavesDTO> results = leaveService.selectLeavesList(pageable);
+        Page<LeaveInfoDTO> results = leaveService.selectLeavesList(pageable);
 
         // then
-
+        // 해당 페이지에 표시될 요소의 개수가 10개를 넘으면 안 됨
+        Assertions.assertFalse(results.getSize() > 10);
+        // 가져온 페이지 중 현재 인덱스가 의도한 페이지와 같아아 함
+        Assertions.assertEquals(results.getNumber(), pageNumber);
+        results.forEach(System.out::println);
 
     }
 

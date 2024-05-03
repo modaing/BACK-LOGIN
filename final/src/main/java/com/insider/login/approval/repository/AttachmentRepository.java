@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class AttachmentRepository {
 
@@ -14,5 +16,13 @@ public class AttachmentRepository {
 
     public void save(Attachment attachment){
         manager.persist(attachment);
+    }
+
+    public List<Attachment> findByApprovalId(String approvalNo) {
+        List<Attachment> attachmentList = manager.createQuery("SELECT a FROM Apr_attachment a WHERE a.approvalNo = :approvalNo", Attachment.class)
+                .setParameter("approvalNo", approvalNo)
+                .getResultList();
+
+        return attachmentList;
     }
 }

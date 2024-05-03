@@ -4,10 +4,6 @@ import com.insider.login.commute.dto.CommuteDTO;
 import com.insider.login.commute.dto.CorrectionDTO;
 import com.insider.login.commute.dto.UpdateProcessForCorrectionDTO;
 import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
-import com.insider.login.commute.entity.Commute;
-import com.insider.login.member.entity.Department;
-import com.insider.login.member.entity.Member;
-import org.hibernate.sql.Update;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +12,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -26,7 +23,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @SpringBootTest
@@ -41,7 +37,6 @@ public class CommuteServiceTests {
                         2024001003,
                         LocalDate.now(),
                         LocalTime.of(8,55),
-                        null,
                         "근무중",
                         0
                 )
@@ -52,14 +47,13 @@ public class CommuteServiceTests {
     @ParameterizedTest
     @MethodSource("getStartWork")
 //    @Transactional
-    void testInsertTimeOfCommute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork,
+    void testInsertTimeOfCommute(int memberId, LocalDate workingDate, LocalTime startWork,
                                  String workingStatus, Integer totalWorkingHours) {
         //given
         CommuteDTO newCommute = new CommuteDTO(
                 memberId,
                 workingDate,
                 startWork,
-                endWork,
                 workingStatus,
                 totalWorkingHours
         );
@@ -77,7 +71,7 @@ public class CommuteServiceTests {
 //    @Transactional
     void testUpdateTimeOfCommuteByCommuteNo() {
         //given
-        int commuteNo = 5;
+        int commuteNo = 18;
         LocalTime endWork = LocalTime.of(18,00);
         String workingStatus = "퇴근";
 
@@ -94,7 +88,6 @@ public class CommuteServiceTests {
 //        System.out.println(totalWorkingTimeString);
 
         UpdateTimeOfCommuteDTO updateTimeOfCommute = new UpdateTimeOfCommuteDTO(
-                commuteNo,
                 endWork,
                 workingStatus,
                 totalWorkingHours
@@ -102,7 +95,7 @@ public class CommuteServiceTests {
 
         //when
         Map<String, Object> result = new HashMap<>();
-        result = commuteService.updateTimeOfCommuteByCommuteNo(updateTimeOfCommute);
+        result = commuteService.updateTimeOfCommuteByCommuteNo(commuteNo, updateTimeOfCommute);
 
         //then
         Assertions.assertTrue((Boolean) result.get("result"));
@@ -128,10 +121,11 @@ public class CommuteServiceTests {
         List<CommuteDTO> departCommuteList = commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth);
 
         //then
-        Assertions.assertTrue(!departCommuteList.isEmpty());
+        Assertions.assertNotNull(departCommuteList);
+        departCommuteList.forEach(commute -> System.out.println("commute : " + commute));
     }
 
-    @DisplayName("memberId 별로 출퇴근 내역 조회 테스트")
+    @DisplayName("멤버별 출퇴근 내역 조회 테스트")
     @Test
 //    @Transactional
     void testSelectCommuteListByMemberId() {
@@ -151,20 +145,19 @@ public class CommuteServiceTests {
         List<CommuteDTO> commuteList = commuteService.selectCommuteListByMemberId(memberId, startWeek, endWeek);
 
         //then
-        Assertions.assertTrue(!commuteList.isEmpty());
+        Assertions.assertNotNull(commuteList);
+        commuteList.forEach(commute -> System.out.println("commute : " + commute));
     }
 
     private static Stream<Arguments> getCorrectTimeOfCommute() {
         return Stream.of(
                 Arguments.of(
-                        1,
-                        "09:00"
+                        1
                         ,null
-                        ,"엘리베이터 점검으로 인해 지각으로 처리되었습니다."
+                        ,"20:00"
+                        ,"시스템 에러로 인해 야근 시 퇴근시간에 오류가 있습니다."
                         ,LocalDate.now()
                         ,"대기"
-                        ,null
-                        ,null
                 )
         );
     }
@@ -172,8 +165,7 @@ public class CommuteServiceTests {
     @ParameterizedTest
     @MethodSource("getCorrectTimeOfCommute")
     void testInsertRequestForCorrect(int commuteNo, String reqStartWork, String reqEndWork,
-                                     String reasonForCorr, LocalDate corrRegistrationDate, String corrStatus,
-                                     String reasonForRejection, LocalDate corrProcessingDate) {
+                                     String reasonForCorr, LocalDate corrRegistrationDate, String corrStatus) {
         //given
         CorrectionDTO newCorrection = new CorrectionDTO(
                 commuteNo,
@@ -181,9 +173,7 @@ public class CommuteServiceTests {
                 reqEndWork,
                 reasonForCorr,
                 corrRegistrationDate,
-                corrStatus,
-                reasonForRejection,
-                corrProcessingDate
+                corrStatus
         );
 
         //when
@@ -196,58 +186,85 @@ public class CommuteServiceTests {
     @DisplayName("출퇴근 시간 정정 처리 테스트")
     @Test
     void testUpdateProcessForCorrectByCorrNo() {
-        /** 출퇴근 정정 요청 내역, 출퇴근 내역 2개를 update 해야 함!! */
-
         //given
-        int corrNo = 1;             // 정정 요청 번호
+        /** 정정 처리 - 승인 */
+        int corrNo = 30;
         String corrStatus = "승인";
-        String reasonForRejection = null;
         LocalDate corrProcessingDate = LocalDate.now();
 
         UpdateProcessForCorrectionDTO updateProcessForCorrection = new UpdateProcessForCorrectionDTO(
-                corrNo,
                 corrStatus,
-                reasonForRejection,
                 corrProcessingDate
         );
 
+        /** 정정 처리 - 반려 */
+//        int corrNo = 30;
+//        String corrStatus = "반려";
+//        String reasonForRejection = "적절한 정정 사유에 해당하지 않습니다.";
+//        LocalDate corrProcessingDate = LocalDate.now();
+//
+//        UpdateProcessForCorrectionDTO updateProcessForCorrection = new UpdateProcessForCorrectionDTO(
+//                corrStatus,
+//                reasonForRejection,
+//                corrProcessingDate
+//        );
+
         //when
         Map<String, Object> result = new HashMap<>();
-        result = commuteService.updateProcessForCorrectByCorrNo(updateProcessForCorrection);
+        result = commuteService.updateProcessForCorrectByCorrNo(corrNo, updateProcessForCorrection);
 
         //then
         Assertions.assertTrue((Boolean) result.get("result"));
     }
 
-//    @DisplayName("전체 출퇴근 시간 정정 내역 조회 테스트")
-//    @Test
-//    void testSelectRequestForCorrect() {
-//        //given
-//        LocalDate date = LocalDate.now();
-//        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
-//        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-//
-//        //when
-//        List<CorrectionDTO> correctionlist = commuteService.selectReqeustForCorrectList(startDayOfMonth, endDayOfMonth);
-//
-//        //then
-//        Assertions.assertTrue(!correctionlist.isEmpty());
-//    }
+    @DisplayName("전체 출퇴근 시간 정정 내역 조회 테스트")
+    @Test
+    void testSelectRequestForCorrectList() {
+        //given
+        LocalDate date = LocalDate.now();
+        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+        Pageable pageable = Pageable.ofSize(10);
 
-//    @DisplayName("memberId 별로 출퇴근 시간 정정 내역 조회 테스트")
-//    @Test
-//    void testSelectRequestForCorrectByMemberId() {
-//        //given
-//        int memberId = 2024001001;
-//        LocalDate date = LocalDate.now();
-//        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
-//        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-//
-//        //when
-//        List<CorrectionDTO> correctionList = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth);
-//
-//        //then
-//        Assertions.assertTrue(!correctionList.isEmpty());
-//    }
+        //when
+        Page<CorrectionDTO> correctionList = commuteService.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
+
+        //then
+        Assertions.assertNotNull(correctionList);
+        correctionList.forEach(correction -> System.out.println("correction : " + correction));
+    }
+
+    @DisplayName("멤버별 출퇴근 시간 정정 내역 조회 테스트")
+    @Test
+    void testSelectRequestForCorrectByMemberId() {
+        //given
+        int memberId = 2024001001;
+        LocalDate date = LocalDate.now();
+        LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+        Pageable pageable = Pageable.ofSize(10);
+
+        //when
+        Page<CorrectionDTO> correctionList = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
+
+        //then
+        Assertions.assertTrue(!correctionList.isEmpty());
+        Assertions.assertNotNull(correctionList);
+        correctionList.forEach(correction -> System.out.println("correction : " + correction));
+    }
+
+    @DisplayName("출퇴근 시간 정정 요청 상세 조회 테스트")
+    @Test
+    void testSelectRequestForCorrectByCorrNo() {
+        //given
+        int corrNo = 3;
+
+        //when
+        CorrectionDTO correction = commuteService.selectRequestForCorrectByCorrNo(corrNo);
+
+        //then
+        Assertions.assertNotNull(correction);
+        System.out.println("correction : " + correction);
+    }
 
 }

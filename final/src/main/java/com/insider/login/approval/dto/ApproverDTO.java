@@ -11,6 +11,10 @@ public class ApproverDTO {
     private String approverDate;            //결재처리일시
     private int memberId;                   //결재자 사번
 
+    private String name;                    //결재자 이름
+    private String positionName;            //결재자 직급명
+    private String departName;              //결재자 부서명
+
     public ApproverDTO () {}
 
     public ApproverDTO(String approverNo, String approvalNo, int approverOrder, String approverStatus, String approverDate, int memberId) {
@@ -20,6 +24,18 @@ public class ApproverDTO {
         this.approverStatus = approverStatus;
         this.approverDate = approverDate;
         this.memberId = memberId;
+    }
+
+    public ApproverDTO(String approverNo, String approvalNo, int approverOrder, String approverStatus, String approverDate, int memberId, String name, String positionName, String departName) {
+        this.approverNo = approverNo;
+        this.approvalNo = approvalNo;
+        this.approverOrder = approverOrder;
+        this.approverStatus = approverStatus;
+        this.approverDate = approverDate;
+        this.memberId = memberId;
+        this.name = name;
+        this.positionName = positionName;
+        this.departName = departName;
     }
 
     public String getApproverNo() {
@@ -70,6 +86,30 @@ public class ApproverDTO {
         this.memberId = memberId;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
+    public String getDepartName() {
+        return departName;
+    }
+
+    public void setDepartName(String departName) {
+        this.departName = departName;
+    }
+
     @Override
     public String toString() {
         return "ApproverDTO{" +
@@ -79,6 +119,9 @@ public class ApproverDTO {
                 ", approverStatus='" + approverStatus + '\'' +
                 ", approverDate='" + approverDate + '\'' +
                 ", memberId=" + memberId +
+                ", name='" + name + '\'' +
+                ", positionName='" + positionName + '\'' +
+                ", departName='" + departName + '\'' +
                 '}';
     }
 }
