@@ -1,9 +1,8 @@
 package com.insider.login.auth;
 
 
-import com.insider.login.member.entity.Member;
+import com.insider.login.member.dto.MemberDTO;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -12,46 +11,39 @@ import java.util.Optional;
 
 public class DetailsMember implements UserDetails {
 
-    private com.insider.login.member.entity.Member member;
+    private MemberDTO memberDTO;
 
     public DetailsMember() {}
 
-    public DetailsMember(Optional<Member> member) {
-        this.member = member.get();
+    public DetailsMember(Optional<MemberDTO> memberDTO) {
+        this.memberDTO = memberDTO.get();
     }
 
-    public Member getMember() {
-        return member;
+    public MemberDTO getMember() {
+        return memberDTO;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
+    public void setMember(MemberDTO memberDTO) {
+        this.memberDTO = memberDTO;
     }
-
 
     /* 권한 정보 */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-//        member.getRoleList().forEach(role -> authorities.add(() -> role));
-        member.getRoleList().forEach(role -> authorities.add(new SimpleGrantedAuthority(role))); // role을 넣기 위해서 new SimpleGrantedAuthority가 필요..!
+        memberDTO.getRoleList().forEach(role -> authorities.add(() ->role));
         return authorities;
     }
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return memberDTO.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return String.valueOf(member.getMemberId()); // 아이디는 int이기 때문에 String값으로 변경을 해줘야 한다
+        return String.valueOf(memberDTO.getMemberId());
     }
-
-//    @Override
-//    public long getUsername() {
-//        return member.getMemberId(); // 아이디는 int이기 때문에 String값으로 변경을 해줘야 한다
-//    }
 
     @Override
     public boolean isAccountNonExpired() {

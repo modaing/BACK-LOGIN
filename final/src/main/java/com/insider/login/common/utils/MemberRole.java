@@ -15,9 +15,6 @@ public enum MemberRole {
         return role;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     @Override
     public String toString() {

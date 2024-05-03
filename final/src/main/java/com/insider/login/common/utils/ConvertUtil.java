@@ -22,7 +22,6 @@ public class ConvertUtil {
         try {
             convertJsonString = mapper.writeValueAsString(obj); // converts Java object into a JSON String (해석: object -> JSON String으로 형변환 시켜줌)
             convertObj = parser.parse(convertJsonString);       //  converts JSON String into structured JSON object (해석: 받은 JSON String -> JSON Object로 형변환을 시켜줌)
-//            String jsonDate = mapper.writeValueAsString(localDate);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {
