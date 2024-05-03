@@ -31,11 +31,13 @@ public class ApprovalDTO {
     private List<ApproverDTO> approver;         //결재선
     private List<ReferencerDTO> referencer;     //참조선
 
-
+    private String finalApproverDate;                //최종승인날짜
+    private String standByApprover;             //진행중(대기)인 사람
 
     public ApprovalDTO(){}
 
-    public ApprovalDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, String formName, String departName, String name, String positionName, List<AttachmentDTO> attachment, List<ApproverDTO> approver, List<ReferencerDTO> referencer) {
+
+    public ApprovalDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, String formName, String departName, String name, String positionName, List<AttachmentDTO> attachment, List<ApproverDTO> approver, List<ReferencerDTO> referencer, String approverDate, String standByApprover) {
         this.approvalNo = approvalNo;
         this.memberId = memberId;
         this.approvalTitle = approvalTitle;
@@ -51,6 +53,8 @@ public class ApprovalDTO {
         this.attachment = attachment;
         this.approver = approver;
         this.referencer = referencer;
+        this.finalApproverDate = approverDate;
+        this.standByApprover = standByApprover;
     }
 
     public String getApprovalNo() {
@@ -173,6 +177,24 @@ public class ApprovalDTO {
         this.positionName = positionName;
     }
 
+    public String getFinalApproverDate() {
+        return finalApproverDate;
+    }
+
+    public void setFinalApproverDate(String finalApproverDate) {
+        this.finalApproverDate = finalApproverDate;
+    }
+
+    public String getStandByApprover() {
+        return standByApprover;
+    }
+
+    public void setStandByApprover(String standByApprover) {
+        this.standByApprover = standByApprover;
+    }
+
+
+
     @Override
     public String toString() {
         return "ApprovalDTO{" +
@@ -191,6 +213,8 @@ public class ApprovalDTO {
                 "\n[attachment=" + attachment + "']" +
                 "\n[approver=" + approver + "']" +
                 "\n[referencer=" + referencer + "']" +
+                "\n[approverDate=" + finalApproverDate + "']" +
+                "\n[standByApprover=" + standByApprover + "']" +
                 '\n'+'}';
     }
 }

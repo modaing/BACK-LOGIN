@@ -84,11 +84,11 @@ public class ApprovalServiceTest {
         //결재자번호 : 결재번호_apr00순번
         //참조자번호 : 결재번호_ref00순번
         //첨부파일번호: 결재번호_f00순번
-        ApproverDTO approverDTO1 = new ApproverDTO("2024-con00001_apr001", "2024-con00001", 1, "처리 중", "2024-05-02 15:23:23", 2024001003);
-        ApproverDTO approverDTO2 = new ApproverDTO("2024-con00001_apr002", "2024-con00001", 2, "처리 중", "2024-05-02 15:23:23", 240401004);
+        ApproverDTO approverDTO1 = new ApproverDTO("2024-con00003_apr001", "2024-con00003", 1, "대기", null, 240401004);
+        ApproverDTO approverDTO2 = new ApproverDTO("2024-con00003_apr002", "2024-con00003", 2, "대기", null, 2024001003);
 
-        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-con00001_ref001", "2024-con00001", 2024001001, 1);
-        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-con00001_ref002", "2024-con00001", 241811, 2);
+        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-con00003_ref001", "2024-con00003", 2024001001, 1);
+        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-con00003_ref002", "2024-con00003", 241811, 2);
 
         approverList.add(approverDTO1);
         approverList.add(approverDTO2);
@@ -96,7 +96,7 @@ public class ApprovalServiceTest {
         referencerList.add(referencerDTO1);
         referencerList.add(referencerDTO2);
 
-        approvalDTO.setApprovalNo("2024-con00001");
+        approvalDTO.setApprovalNo("2024-con00003");
         approvalDTO.setMemberId(2024001002);
         approvalDTO.setApprovalTitle("경조금 지급 신청합니다.");
         approvalDTO.setApprovalContent("<form name=\"form\">\n" +
@@ -128,10 +128,10 @@ public class ApprovalServiceTest {
                 "\t\t\t\t\t\t\t\t\t   </table>\n" +
                 "\t\t\t\t\t\t\t\t\t </div>\n" +
                 "\t\t\t\t\t\t\t\t  <div name=\"date\" id=\"date\">\n" +
-                "\t\t\t\t\t\t\t\t\t<div>2024-05-02</div>\n" +
+                "\t\t\t\t\t\t\t\t\t<div>2024-05-03</div>\n" +
                 "\t\t\t\t\t\t\t\t  </div>\n" +
                 "\t\t\t\t\t\t\t\t</form>");
-        approvalDTO.setApprovalDate("2024-05-02 15:23:23");
+        approvalDTO.setApprovalDate("2024-05-03 10:02:02");
         approvalDTO.setApprovalStatus("처리 중");
         approvalDTO.setFormNo("con");
 
@@ -153,18 +153,18 @@ public class ApprovalServiceTest {
 
             List<AttachmentDTO> attachmentList = new ArrayList<>();
             AttachmentDTO attachmentDTO1 = new AttachmentDTO();
-            attachmentDTO1.setFileNo("2024-con00001_f001");
+            attachmentDTO1.setFileNo("2024-con00003_f001");
             attachmentDTO1.setFileOriname(pdfFile.getOriginalFilename());
             attachmentDTO1.setFileSavename(pdfFile.getName());
             attachmentDTO1.setFileSavepath("C:/login/upload");
-            attachmentDTO1.setApprovalNo("2024-con00001");
+            attachmentDTO1.setApprovalNo("2024-con00003");
 
             AttachmentDTO attachmentDTO2 = new AttachmentDTO();
-            attachmentDTO2.setFileNo("2024-con00001_f002");
+            attachmentDTO2.setFileNo("2024-con00003_f002");
             attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
             attachmentDTO2.setFileSavename(imgFile.getName());
             attachmentDTO2.setFileSavepath("C:/login/upload");
-            attachmentDTO2.setApprovalNo("2024-con00001");
+            attachmentDTO2.setApprovalNo("2024-con00003");
 
             attachmentList.add(attachmentDTO1);
             attachmentList.add(attachmentDTO2);
@@ -218,20 +218,42 @@ public class ApprovalServiceTest {
 
     @DisplayName("전자결재 결재 테스트")
     @ParameterizedTest
-    @CsvSource("2024-sup00001_apr002")
+    @CsvSource("2024-con00003_apr002")
     void testUpdateApprover (String approverNo){
         //when
         //결재처리 / 반려
         Map<String, String> statusMap = new HashMap<>();
-        statusMap.put("approverStatus", "반려");
+        statusMap.put("approverStatus", "승인");
         statusMap.put("rejectReason","이러한 사유로 반려합니다.");
 
         ApproverDTO approverDTO = approvalService.updateApprover(approverNo, statusMap);
+        System.out.println("***** TEST : approver : " + approverDTO );
+
+        System.out.println("***** approverDTO.getApproverStatus(): "  + approverDTO.getApproverStatus());
 
         //then
-        Assertions.assertEquals(approverDTO.getApproverStatus(), "반려");
+        Assertions.assertEquals(approverDTO.getApproverStatus(), statusMap.get("approverStatus"));
     }
 
+
+    @DisplayName("전자결재 목록 조회 테스트")
+    @Test
+    void testSelectApprovalList(){
+        //given
+        int memberId = 202401002;
+
+        Map<String, Object> condition = new HashMap<>();
+        condition.put("flag", "given");
+        condition.put("offset", 10);
+        condition.put("limit", 10);
+
+        //when
+        List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
+
+        //then
+        Assertions.assertNotNull(approvalList);
+        approvalList.forEach(System.out::println);
+    }
 
 
 }

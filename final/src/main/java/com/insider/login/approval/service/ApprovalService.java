@@ -72,7 +72,7 @@ public class ApprovalService {
                 approvalDTO.getMemberId(),
                 approvalDTO.getApprovalTitle(),
                 approvalDTO.getApprovalContent(),
-                LocalDateTime.parse(approvalDTO.getApprovalDate(),formatter),
+                now(),
                 approvalDTO.getApprovalStatus(),
                 approvalDTO.getRejectReason(),
                 approvalDTO.getFormNo()
@@ -87,7 +87,7 @@ public class ApprovalService {
                 approvalDTO.getApprovalNo(),
                 0,
                 "승인",
-                LocalDateTime.parse(approvalDTO.getApprovalDate(), formatter),
+                now(),
                 approvalDTO.getMemberId()
         );
 
@@ -102,7 +102,7 @@ public class ApprovalService {
                     approvalDTO.getApprover().get(i).getApprovalNo(),
                     approvalDTO.getApprover().get(i).getApproverOrder(),
                     approvalDTO.getApprover().get(i).getApproverStatus(),
-                    LocalDateTime.parse(approvalDTO.getApprover().get(i).getApproverDate(), formatter),
+                    null,
                     approvalDTO.getApprover().get(i).getMemberId()
             );
 
@@ -236,10 +236,16 @@ public class ApprovalService {
             //결재자 부서 정보 가져오기
             Department receiverDepart = departmentRepository.findById(receiverMember.getDepartNo());
 
+            String approverFormattedDateTime = "";
+
+            if(approverList.get(i).getApproverDate() != null){
+                //날짜가 null이 아닐때
+                approverFormattedDateTime = approverList.get(i).getApproverDate().format(formatter);
+            }
             //날짜 포맷
-            String approverFormattedDateTime = approverList.get(i).getApproverDate().format(formatter);
 
             ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
+
             approver.add(approverDTO);
 
 
@@ -263,11 +269,27 @@ public class ApprovalService {
             AttachmentDTO attachmentDTO = new AttachmentDTO(attachmentList.get(i).getFileNo(), attachmentList.get(i).getFileOriname(), attachmentList.get(i).getFileSavepath(), attachmentList.get(i).getFileSavename(), attachmentList.get(i).getApprovalNo());
             attachment.add(attachmentDTO);
         }
-
-
         log.info("***** formattedDateTime ***** " + approvalFormattedDateTime);
 
-        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer);
+
+        //최종 승인 날짜
+        String finalApproverDate = "";
+        if(approval.getApprovalStatus() == "승인" || approval.getApprovalStatus().equals("승인")){
+            finalApproverDate = approverList.get(approverList.size()-1).getApproverDate().format(formatter);
+        }
+
+        //진행중인 사람
+        Approver standByApprover = approverRepository.findStatusById(approvalNo);
+
+        String standByMemberName = "";
+
+        if(standByApprover != null ){
+
+            Member standByMember = memberRepository.findById(standByApprover.getMemberId());
+            standByMemberName = standByMember.getName();
+        }
+
+        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
 
         return approvalDTO;
     }
@@ -276,6 +298,7 @@ public class ApprovalService {
     //전자결재 회수
     @Transactional
     public ApprovalDTO updateApproval(String approvalNo) {
+        //***** 나를 제외한 다른 사람이 한사람이라도 처리했을 경우 회수 불가능
 
         //수정하고자 하는 전자결재 정보 조회
         ApprovalDTO approvalDTO = selectApproval(approvalNo);
@@ -341,29 +364,36 @@ public class ApprovalService {
                 LocalDateTime parsedDateTime = LocalDateTime.parse(approvalDTO.getApprovalDate(), formatter);
                 Approval approval = new Approval(approvalDTO.getApprovalNo(),approvalDTO.getMemberId(),approvalDTO.getApprovalTitle(),approvalDTO.getApprovalContent(), parsedDateTime, approvalDTO.getApprovalStatus(), approvalDTO.getRejectReason(), approvalDTO.getFormNo());
 
+                status :
                 switch(status){
                     case "승인" :
+                    {
                         if(i == approverList.size() -1 ){
                             //마지막 순서일 경우
 
                             //전자결재 처리상태 변경 (승인)
                             approval = new ApprovalBuilder(approval).approvalStatus(status).builder();
                         }
-                        break;
-
+                        break status;
+                    }
                     case "반려" :
+                    {
                         approval = new ApprovalBuilder(approval).approvalStatus(status).rejectReason(rejectReason).builder();
 
-                        break;
+                        break status;
+                    }
                 }
                 //db 결재자 update
                 approverRepository.update(approver);
                 approverDTO.setApproverStatus(status);
+                log.info("*****상태 : " + approverDTO.getApproverStatus());
 
                 //db 결재정보 update
                 approvalRepository.update(approval);
-                approvalDTO.setApprovalStatus(status);
 
+
+                log.info("***** Service 마지막 approverDTO : " + approverDTO);
+                return approverDTO;
             }
         }
 
@@ -371,4 +401,99 @@ public class ApprovalService {
 
     }
 
+    public List<ApprovalDTO> selectApprovalList(int memberId, Map<String, Object> condition) {
+        //상신함 조회 : given / member_id : 나 / 임시저장 제외 / 현재 처리중(ApprovalNo인 Approver중 '대기' 중 가장 첫번째)인 결재자(이름, 직급) 보여주기
+        //임시저장함 조회 : tempGiven / member_id : 나 / 임시저장만
+        //전체수신함 조회 : receivedAll : approver_id : 나 / 내 approver_order가 1이상 / 해당 approval_no의 approver의 상태 중 '대기' 상태의 마지막이 자신의 approver_order 이후일 경우에만
+        //결제대기내역 조회 : received / approver_id : 나 / 내 approver_order가 1이상 / approval 상태 = 처리중만, 해당 approval_no의 approver의 상태 중 '대기' 상태의 처음이 자신의 approver_order일 경우에만
+        //수신참조내역 조회 : receivedRef / referencer_id : 나 / 임시저장, 회수 제외
+
+        List<ApprovalDTO> approvalDTOList = new ArrayList<>();
+
+        String flag = condition.get("flag").toString();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        switch(flag){
+            case "given" : {
+                //결재 상신함 (내가 기안자 / 임시저장 제외)
+
+                List<Approval> approvalList = approvalRepository.findByMemberId(memberId);
+
+
+                //양식이름, 최종 승인 날짜, 현재 결재 진행자의 이름 및 직급
+                if(!approvalList.isEmpty() || approvalList.size() > 0){
+                    //목록이 있다면
+                    for(int i = 0; i < approvalList.size(); i++){
+
+                        Approval approval = approvalList.get(i);
+
+                        ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
+                        log.info("*****SERVICE(given) : 전자결재 한 건 DTO : " + approvalDTO);
+
+                        approvalDTOList.add(approvalDTO);
+                    }
+                }
+                break;
+            }
+            case "tempGiven" : {
+                // 임시저장함 (내가 기안자 / 임시저장만)
+                List<Approval> tempApprovalList = approvalRepository.findTempByMemberId(memberId);
+
+                if(!tempApprovalList.isEmpty() || tempApprovalList.size() > 0){
+                    for(int i = 0; i < tempApprovalList.size(); i++){
+                        Approval approval = tempApprovalList.get(i);
+
+                        ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
+                        log.info("*****SERVICE(tempGiven) : 임시저장 한 건 DTO : " + approvalDTO);
+
+                        approvalDTOList.add(approvalDTO);
+                    }
+                }
+
+                break;
+            }
+            case "receivedAll" : {
+                // 전체 수신함 (내가 결재자 / )
+
+                break;
+            }
+            case "received" : {
+                // 결재 대기함 (내가 결재자 / approvalStatus="처리 중", approverStatus = "대기" 인 approver 중 가장 첫번째의 member_id가 나의 member_id와 같은 결재번호의 전자결재)
+                //1. 내차례 (approverOrder > 0)
+                //- approvalNo 가 "approvalNo"인 Approver 중에 ApproverStatus 가 "대기" 인 것 중 가장 처음이 나의 Approver_order(2)일때
+                //- 단, approvalStatus = 처리중 일때
+
+                //approvalStatus = "처리 중", approverStatus = "대기" 인 approver 중 가장 낮은 approver_order의 approver 목록 가져오기
+                List<Approver> approverList = approverRepository.findByStandById();
+
+
+                for(int i = 0; i < approverList.size(); i++){
+                    Approver approver = approverList.get(i);
+
+                    //가장 낮은 approver_order의 approver의 memberId 가 나와 같다면
+                    if((approver.getMemberId() == memberId)){
+                        //해당 전자결재 번호의 전자결재 정보를 가져오기
+                        Approval approval = approvalRepository.findById(approver.getApprovalNo());
+
+                        ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
+                        log.info("*****SERVICE(received) : 결재대기 DTO : " + approvalDTO);
+
+                        approvalDTOList.add(approvalDTO);
+                    }
+                }
+
+                break;
+            }
+            case "receivedRef" : {
+                // 수신 참조내역 (내가 참조자 / 임시저장, 회수 제외)
+
+                break;
+            }
+            default : break;
+
+        }
+
+        return approvalDTOList;
+    }
 }
