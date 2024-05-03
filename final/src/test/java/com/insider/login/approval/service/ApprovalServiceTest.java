@@ -33,17 +33,6 @@ public class ApprovalServiceTest {
 //    @Autowired
 //    private MockMvc mockMvc;
 
-    private static Stream<Arguments> newForm(){
-        return Stream.of(
-                Arguments.of(
-                        "con",
-                        "<form><div></div></form>"
-                )
-        );
-    }
-
-
-
 
 /*
     @DisplayName("폼 양식 추가")
@@ -190,7 +179,7 @@ public class ApprovalServiceTest {
     @DisplayName("전자결재 상세조회 테스트")
     @ParameterizedTest
     @CsvSource("2024-con00001")
-    void testSelectApprovalList(String approvalNo){
+    void testSelectApproval(String approvalNo){
         //given
 
         //when
@@ -243,7 +232,7 @@ public class ApprovalServiceTest {
         int memberId = 2024001002;
 
         Map<String, Object> condition = new HashMap<>();
-        condition.put("flag", "received");
+        condition.put("flag", "receivedRef");
         condition.put("offset", 10);
         condition.put("limit", 10);
 
@@ -255,6 +244,13 @@ public class ApprovalServiceTest {
         //then
         Assertions.assertNotNull(approvalList);
 //        approvalList.forEach(System.out::println);
+    }
+
+
+    @DisplayName("전자결재 삭제 테스트")
+    @Test
+    void testDeleteApproval(){
+        String approvalNo = "";
     }
 
 

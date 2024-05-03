@@ -291,7 +291,6 @@ public class ApprovalService {
 
         ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
 
-        log.info("여기까지 했다...ApprovalDTO는 어디서 나오는건가?");
         return approvalDTO;
     }
 
@@ -492,6 +491,8 @@ public class ApprovalService {
             case "receivedRef" : {
                 // 수신 참조내역 (내가 참조자 / 임시저장, 회수 제외)
                 List<Referencer> referencerList = referencerRepository.findByMemberId(memberId);
+                log.info("*****SERVICE 참조내역 수 : " + referencerList.size());
+                log.info("???" + referencerList.isEmpty());
 
                 //참조내역이 있다면
                 if(referencerList.size() > 0 || !referencerList.isEmpty()){
