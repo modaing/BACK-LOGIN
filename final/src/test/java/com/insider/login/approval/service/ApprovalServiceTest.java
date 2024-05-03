@@ -254,7 +254,7 @@ public class ApprovalServiceTest {
 
         //then
         Assertions.assertNotNull(approvalList);
-        approvalList.forEach(System.out::println);
+//        approvalList.forEach(System.out::println);
     }
 
 
