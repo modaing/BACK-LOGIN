@@ -34,8 +34,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider { //
         System.out.println("로그인할 때 id 잘 기입을 했는지 확인용: " + id);
         System.out.println("로그인할 때 pass 잘 기입을 했는지 확인용: " + pass);
 
-        // id는 long이기 때문에 long type으로 반환을 해준다
-
         DetailsMember detailsMember = (DetailsMember) detailsService.loadUserByUsername(id); // 구성원의 정보를 받고
 
         if(!passwordEncoder.matches(pass, detailsMember.getPassword())) {     // 입력한 비밀번호를 검증을 하는데, 틀릴 시

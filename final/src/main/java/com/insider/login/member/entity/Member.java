@@ -1,8 +1,8 @@
 package com.insider.login.member.entity;
 
-import com.insider.login.auth.image.entity.Image;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.insider.login.common.utils.MemberRole;
+import com.insider.login.commute.entity.Commute;
 import com.insider.login.department.entity.Department;
 import com.insider.login.position.entity.Position;
 import jakarta.persistence.*;
@@ -23,10 +23,6 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private String name;
     @Column(name = "password", nullable = false)
     private String password;
-//    @Column(name = "depart_no", nullable = false)
-//    private int departNo;
-//    @Column(name = "position_name" ,nullable = false)
-//    private String positionName;
     @Column(name = "employed_date", nullable = false)
     private LocalDate employedDate;
     @Column(name = "address", nullable = false)
@@ -40,39 +36,20 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     @Column(name = "member_role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
-//    private com.insider.prefinal.common.UserRole userRole;
-//    @Column(name = "member_image_no")
-//    private int memberImageNo;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "depart_no")
     private Department department;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "position_name")
     private Position position;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_image_no", referencedColumnName = "member_image_no")
-    private Image image;
+    @Column(name = "image_url")
+    private String imageUrl;
+//    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    private List<Commute> commutes;                 // 출퇴근 리스트
+    protected Member() {}
 
-
-//    @OneToMany(mappedBy = "member_id")
-//    private List<EnteredRoom> enteredRooms;
-
-    public Member() {
-
-    }
-
-    public List<String> getRoleList() {
-        if (this.role.getRole().length() > 0) {
-            return Arrays.asList(this.role.getRole().split(","));
-        }
-        return new ArrayList<>();
-    }
-
-    public int getMemberId() {
-        return memberId;
-    }
-
-    public Member(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, Department department, Position position, Image image) {
+    public Member(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, Department department, Position position, String imageUrl, List<Commute> commutes) {
         this.memberId = memberId;
         this.name = name;
         this.password = password;
@@ -84,7 +61,12 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         this.role = role;
         this.department = department;
         this.position = position;
-        this.image = image;
+        this.imageUrl = imageUrl;
+//        this.commutes = commutes;
+    }
+
+    public int getMemberId() {
+        return memberId;
     }
 
     public void setMemberId(int memberId) {
@@ -103,56 +85,28 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public LocalDate getEmployedDate() {
         return employedDate;
-    }
-
-    public void setEmployedDate(LocalDate employedDate) {
-        this.employedDate = employedDate;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getPhoneNo() {
         return phoneNo;
-    }
-
-    public void setPhoneNo(String phoneNo) {
-        this.phoneNo = phoneNo;
     }
 
     public String getMemberStatus() {
         return memberStatus;
     }
 
-    public void setMemberStatus(String memberStatus) {
-        this.memberStatus = memberStatus;
-    }
-
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public MemberRole getRole() {
         return role;
-    }
-
-    public void setRole(MemberRole role) {
-        this.role = role;
     }
 
     public Department getDepartment() {
@@ -171,12 +125,27 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         this.position = position;
     }
 
-    public Image getImage() {
-        return image;
+//    public List<Commute> getCommutes() {
+//        return commutes;
+//    }
+//
+//    public void setCommutes(List<Commute> commutes) {
+//        this.commutes = commutes;
+//    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public List<String> getRoleList() {
+        if (!this.role.getRole().isEmpty()) {
+            return Arrays.asList(this.role.getRole().split(","));
+        }
+        return new ArrayList<>();
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
@@ -193,7 +162,8 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
                 ", role=" + role +
                 ", department=" + department +
                 ", position=" + position +
-                ", image=" + image +
+                ", imageUrl='" + imageUrl + '\'' +
+//                ", commutes=" + commutes +
                 '}';
     }
 }

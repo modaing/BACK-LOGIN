@@ -1,6 +1,6 @@
 package com.insider.login.department.repository;
 
-import com.insider.login.approval.entity.Department;
+import com.insider.login.department.entity.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

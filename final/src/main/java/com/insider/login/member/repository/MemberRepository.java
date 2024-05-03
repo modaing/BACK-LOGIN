@@ -13,13 +13,4 @@ public interface MemberRepository extends JpaRepository<Member, Integer> { // In
 
     Optional<Member> findMemberByMemberId(int id);
 
-    /*
-    * 반환할 entity type: User
-    * key값 type: Integer (User의 memberId)
-    *
-    * */
-
-    // better to use "Integer" than primitive type "int" -> this allows us to handle "null" values more efficiently
-//    Optional<Member> findMemberByMemberId(memberId); // findUserById : Optional객체를 반환을 하기 때문에 nullPointException을 방지를 할 수 있게 도움을 준다
-//    Optional<Member> findById(Long memberId);
 }

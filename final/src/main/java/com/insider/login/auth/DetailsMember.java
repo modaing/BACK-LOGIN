@@ -1,5 +1,6 @@
 package com.insider.login.auth;
 
+
 import com.insider.login.member.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 public class DetailsMember implements UserDetails {
 
-    private Member member;
+    private com.insider.login.member.entity.Member member;
 
     public DetailsMember() {}
 

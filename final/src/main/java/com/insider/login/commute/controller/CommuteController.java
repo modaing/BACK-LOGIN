@@ -27,12 +27,12 @@ import java.util.Map;
 @RestController
 public class CommuteController {
 
-    private final CommuteService commuteService;
-
-    @Autowired
-    public CommuteController(CommuteService commuteService) {
-        this.commuteService = commuteService;
-    }
+//    private final CommuteService commuteService;
+//
+//    @Autowired
+//    public CommuteController(CommuteService commuteService) {
+//        this.commuteService = commuteService;
+//    }
 
     /** 출근 시간 등록 */
     @PostMapping("/commutes")

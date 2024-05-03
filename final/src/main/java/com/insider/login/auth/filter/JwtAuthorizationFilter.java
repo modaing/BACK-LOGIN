@@ -4,7 +4,9 @@ import com.insider.login.auth.DetailsMember;
 import com.insider.login.common.AuthConstants;
 import com.insider.login.common.utils.TokenUtils;
 import com.insider.login.common.utils.MemberRole;
-import com.insider.login.member.entity.Member;
+import com.insider.login.department.dto.DepartmentDTO;
+import com.insider.login.member.dto.MemberDTO;
+import com.insider.login.position.dto.PositionDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -42,56 +44,59 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     /* 토큰 검증을 한 다음에 filter가 내부적으로 동작을 하는 method */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // we are able to intercept every requests and responses and provide new data within the response. (해석: 어떤 요청이 들어왔을 때 우선 인증을 할 것이고, 그 인증이 완료되면 보통 인증정보들이 SecurityContextHolder에 가지고있다. 그렇기 때문에 거기로 들어가기 위한 coding을 할것이다)
+        /* we are able to intercept every requests and responses and provide new data within the response. (해석: 어떤 요청이 들어왔을 때 우선 인증을 할 것이고, 그 인증이 완료되면 보통 인증정보들이 SecurityContextHolder에 가지고있다. 그렇기 때문에 거기로 들어가기 위한 coding을 할것이다) */
 
         System.out.println("===== JwtAuthorizationFilter 도착 =====");
-        List<String> roleLessList = Arrays.asList("/regist");
+        List<String> roleLessList = Arrays.asList("/signUp","/registDepart","/registPosition", "/login","/members/{memberId}");
 
-        // 인증은 했지만 권한이 필요 없는 resource들은 그냥 다음 동작으로 넘어간다... 하지만 권한이 필요한 resource면 -> SecurityContextHolder에 권한 정보를 같이 줘서, 거기에 접근을 할 수 있게 해줘야 한다
+        /* 인증은 했지만 권한이 필요 없는 resource들은 그냥 다음 동작으로 넘어간다... 하지만 권한이 필요한 resource면 -> SecurityContextHolder에 권한 정보를 같이 줘서, 거기에 접근을 할 수 있게 해줘야 한다 */
         if (roleLessList.contains((request.getRequestURI()))) {
             chain.doFilter(request, response);
             return;
         }
-        // ContextHolder에 setting을 하기 위해서는 token이 유효 하는지 확인을 해야한다
+        /* ContextHolder에 setting을 하기 위해서는 token이 유효 하는지 확인을 해야한다 */
         String header = request.getHeader(AuthConstants.AUTH_HEADER);
-
-        /* 확인용 */
-        if (header != null) {
-            System.out.println("header의 정보: " + header);
-        } else {
-            System.out.println("header가 존재하지 않습니다");
-        }
 
         try {
             if (header != null && !header.equalsIgnoreCase("")) {
                 String token = TokenUtils.splitHeader(header);
-                System.out.println("token의 정보: " + token);
 
-                // token이 유효하는지
                 if (TokenUtils.isValidToken(token)) {
-                    System.out.println("token은 유효하다.. token의 정보: " + token);
                     Claims claims = TokenUtils.getClaimsFromToken(token); // claims : token에 있는 정보들
-
                     System.out.println("Claims에 대한 정보: " + claims);
-                    // ContextHolder에 setting해줄 DetailsUser
-                    DetailsMember authentication = new DetailsMember();
-                    Member member = new Member();
-                    System.out.println("😭😭😭😭😭😭😭");
-//                  int memberId = claims.get("memberId", Integer.class); // 로그인할 때 입력한 Id를 가져온다. memberId는 int이기 떼문에 Integer.class 선정
-//                  user.setMemberId(Integer.parseInt(claims.get(memberId).toString())); // ????????
-                    member.setName(claims.get("userName").toString());
-                    member.setRole(MemberRole.valueOf(claims.get("Role").toString()));     // ???????? 02-jwt-security-03.mp4 40분쯤...!
-                    authentication.setMember(member);
-                    System.out.println("member정보: " + member);
 
-                    /*
-                     * ContextHolder에 setting
-                     * authenticated : 인증 성공난 후 (SecurityContextHolder가 관리하는 SecurityContext에 저장될 authentication, token, getAuthorities 객체를 생성해서 넘겨준다
-                     * type -> AbstractAuthenticationToken이다
-                     * */
+                    /* ContextHolder에 setting해줄 DetailsUser */
+                    DetailsMember authentication = new DetailsMember();
+                    MemberDTO memberDTO = new MemberDTO();
+
+                    /* member에다가 setting해줄 값들 */
+                    memberDTO.setName(claims.get("name").toString());                          // name
+                    memberDTO.setRole(MemberRole.valueOf(claims.get("role").toString()));      // Role
+
+                    /* image경로 설정하는 logic */
+                    memberDTO.setImageUrl((String) claims.get("imageUrl"));
+
+                    /* memberId 설정하는 logic*/
+                    memberDTO.setMemberId((Integer) claims.get("memberId"));                   // memberId
+
+                    /* memberStatus 설정해주는 logic */
+                    memberDTO.setMemberStatus((String) claims.get("memberStatus"));
+
+                    /* member안에 positionName setting하는 logic*/
+                    PositionDTO positionDTO = new PositionDTO();
+                    positionDTO.setPositionName((String) claims.get("positionName"));
+                    memberDTO.setPositionDTO(positionDTO);
+
+                    /* member의 department 저장 */
+                    DepartmentDTO departmentDTO = new DepartmentDTO();
+                    departmentDTO.setDepartName((String) claims.get("departName"));
+                    memberDTO.setDepartmentDTO(departmentDTO);
+
+                    System.out.println("member정보: " + memberDTO);
+                    authentication.setMember(memberDTO);
+
                     AbstractAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(authentication, token, authentication.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetails(request));     // 요청 정보를 가지고 details을 만들어서 token에다가 setting해주는 내용
-
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken); // SecurityContextHolder에다가 인증된 내용을 setting 해준다
                     chain.doFilter(request, response);
                 } else {
