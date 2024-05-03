@@ -1,11 +1,8 @@
 package com.insider.login.other.announce.entity;
 
-import com.insider.login.other.announce.dto.AnnounceDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
-import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Table(name = "ANNOUNCE_FILES")

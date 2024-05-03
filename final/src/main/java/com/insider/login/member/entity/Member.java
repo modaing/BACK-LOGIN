@@ -5,6 +5,7 @@ import com.insider.login.common.utils.MemberRole;
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.department.entity.Department;
 import com.insider.login.position.entity.Position;
+import com.insider.login.webSocket.Cahtting.entity.EnteredRoom;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -44,12 +45,14 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private Position position;
     @Column(name = "image_url")
     private String imageUrl;
-//    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
-//    @JsonIgnore
-//    private List<Commute> commutes;                 // 출퇴근 리스트
+
+    @OneToMany(mappedBy = "member")
+    private List<EnteredRoom> enteredRoom = new ArrayList<>();
+
+
     protected Member() {}
 
-    public Member(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, Department department, Position position, String imageUrl, List<Commute> commutes) {
+    public Member(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, Department department, Position position, String imageUrl) {
         this.memberId = memberId;
         this.name = name;
         this.password = password;
@@ -62,7 +65,6 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         this.department = department;
         this.position = position;
         this.imageUrl = imageUrl;
-//        this.commutes = commutes;
     }
 
     public int getMemberId() {
