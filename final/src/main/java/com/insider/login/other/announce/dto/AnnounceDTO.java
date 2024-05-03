@@ -2,7 +2,6 @@ package com.insider.login.other.announce.dto;
 
 import lombok.*;
 
-import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

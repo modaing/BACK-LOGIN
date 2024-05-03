@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -156,4 +157,19 @@ public class MemberService {
 
         System.out.println("비밀번호 초기화 성공!");
     }
+
+    public List<MemberDTO> selectMemberList() {
+
+        List<Member> member = memberRepository.findAll();
+
+        List<MemberDTO> memberList = new ArrayList<>();
+
+        for (Member members : member) {
+            MemberDTO memberDTO = modelMapper.map(members, MemberDTO.class);
+            memberList.add(memberDTO);
+        }
+
+        return memberList;
+    }
+
 }

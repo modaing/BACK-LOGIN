@@ -8,8 +8,6 @@ import com.insider.login.other.announce.entity.AncFile;
 import com.insider.login.other.announce.entity.Announce;
 import com.insider.login.other.announce.service.AnnounceService;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -19,9 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,6 +38,7 @@ public class AnnounceController extends FileController {
                                                          @RequestParam(value = "size", defaultValue = "10") int size,
                                                          @RequestParam(value = "sort", defaultValue = "sort") String sort,
                                                          @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
+
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
@@ -124,7 +121,7 @@ public class AnnounceController extends FileController {
         if (files != null) {
             // 파일이 있는 경우
 
-            announceDTO.setFilePath(ymlConfig.getDirectory());
+            announceDTO.setFilePath(ymlConfig.getUploadDir());
             serviceResult = announceService.insertAncWithFile(announceDTO, files);
             serviceResult.put("result", true);
         } else {
