@@ -24,4 +24,12 @@ public class ReferencerRepository {
 
         return referencerList;
     }
+
+    public List<Referencer> findByMemberId(int memberId) {
+        List<Referencer> referencerList = manager.createQuery("SELECT r FROM Referencer r WHERE r.memberId= :memberId", Referencer.class)
+                .setParameter("memberId", memberId)
+                .getResultList();
+
+        return referencerList;
+    }
 }

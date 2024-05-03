@@ -240,15 +240,17 @@ public class ApprovalServiceTest {
     @Test
     void testSelectApprovalList(){
         //given
-        int memberId = 202401002;
+        int memberId = 2024001002;
 
         Map<String, Object> condition = new HashMap<>();
-        condition.put("flag", "given");
+        condition.put("flag", "received");
         condition.put("offset", 10);
         condition.put("limit", 10);
 
         //when
         List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
+
+        System.out.println("*****TEST : 목록 size() : " + approvalList.size());
 
         //then
         Assertions.assertNotNull(approvalList);

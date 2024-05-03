@@ -56,18 +56,18 @@ public class ApproverRepository {
     }
 
     public List<Approver> findByStandById() {
-        String query = "SELECT approver_no, approval_no, approver_order, approver_status, approver_date, member_id" +
+        String query = "SELECT a.approver_no, a.approval_no, a.approver_order, a.approver_status, a.approver_date, a.member_id" +
                 " FROM approver a" +
                 " JOIN (" +
-                "       SELECT approval_no, MIN(approver_order) AS min_order" +
-                "       FROM approver" +
-                "       WHERE approver_status = '대기'" +
-                "       GROUP BY approval_no" +
+                "       SELECT d.approval_no, MIN(d.approver_order) AS min_order" +
+                "       FROM approver d" +
+                "       WHERE d.approver_status = '대기'" +
+                "       GROUP BY d.approval_no" +
                 ") b ON a.approval_no = b.approval_no AND a.approver_order = b.min_order" +
                 " WHERE a.approval_no IN (" +
-                "   SELECT approval_no" +
-                "   FROM approval" +
-                "   WHERE approval_status = '처리 중'" +
+                "   SELECT c.approval_no" +
+                "   FROM approval c" +
+                "   WHERE c.approval_status = '처리 중'" +
                 ")";
 
         List<Approver> approverList = manager.createNativeQuery(query, Approver.class)
