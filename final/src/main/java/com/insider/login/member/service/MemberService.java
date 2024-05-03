@@ -1,9 +1,11 @@
 package com.insider.login.member.service;
 
+import com.insider.login.commute.entity.CommuteMember;
 import com.insider.login.member.entity.Member;
 import com.insider.login.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -11,8 +13,8 @@ public class MemberService {
 
     private MemberRepository memberRepository;
 
-    public MemberService(MemberRepository userRepository) {
-        this.memberRepository = userRepository;
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     public Optional<Member> findMember(int id) {
