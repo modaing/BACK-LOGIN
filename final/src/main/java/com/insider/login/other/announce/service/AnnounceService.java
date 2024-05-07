@@ -8,24 +8,18 @@ import com.insider.login.other.announce.entity.Announce;
 import com.insider.login.other.announce.repository.AnnounceFileRepository;
 import com.insider.login.other.announce.repository.AnnounceRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.View;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.commons.io.FileUtils.delete;
-import static org.apache.commons.io.FileUtils.getFile;
 
 @Service
 @Slf4j
@@ -88,7 +82,7 @@ public class AnnounceService {
                     // 파일 저장
                     String fileName = file.getOriginalFilename();
                     String fileType = file.getContentType();
-                    String uploadDirectory = ymlConfig.getDirectory();
+                    String uploadDirectory = ymlConfig.getUploadDir();
                     String filePath = uploadDirectory + "\\" + fileName;   // 파일을 저장할 경로 지정
 
                     File newFile = new File(filePath);

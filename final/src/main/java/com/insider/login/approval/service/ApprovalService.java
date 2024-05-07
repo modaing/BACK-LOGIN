@@ -37,8 +37,10 @@ public class ApprovalService {
     private ApproverRepository approverRepository;
     private AttachmentRepository attachmentRepository;
     private ReferencerRepository referencerRepository;
+
     private ApprovalMemberRepository approvalMemberRepository;
     private ApprovalDepartmentRepository approvalDepartmentRepository;
+
     private FormRepository formRepository;
 
     private final ModelMapper modelMapper;
@@ -47,8 +49,10 @@ public class ApprovalService {
                            ApproverRepository approverRepository,
                            AttachmentRepository attachmentRepository,
                            ReferencerRepository referencerRepository,
+
                            ApprovalMemberRepository approvalMemberRepository,
                            ApprovalDepartmentRepository approvalDepartmentRepository,
+
                            FormRepository formRepository,
                            ModelMapper modelMapper){
         this.approvalRepository = approvalRepository;
@@ -227,7 +231,7 @@ public class ApprovalService {
 
 
         List<Approver> approverList = approverRepository.findByApprovalId(approvalNo);
-        log.info("*****selectApprover -- approverList " + approverList);
+//        log.info("*****selectApprover -- approverList " + approverList);
 
         for(int i = 0; i < approverList.size(); i++){
 
@@ -250,7 +254,7 @@ public class ApprovalService {
 
 
         }
-        log.info("*****selectApproval -- Approver List " + approver );
+//        log.info("*****selectApproval -- Approver List " + approver );
 
         List<Referencer> referencerList = referencerRepository.findByApprovalId(approvalNo);
         for(int i = 0; i < referencerList.size(); i++){
@@ -269,7 +273,7 @@ public class ApprovalService {
             AttachmentDTO attachmentDTO = new AttachmentDTO(attachmentList.get(i).getFileNo(), attachmentList.get(i).getFileOriname(), attachmentList.get(i).getFileSavepath(), attachmentList.get(i).getFileSavename(), attachmentList.get(i).getApprovalNo());
             attachment.add(attachmentDTO);
         }
-        log.info("***** formattedDateTime ***** " + approvalFormattedDateTime);
+//        log.info("***** formattedDateTime ***** " + approvalFormattedDateTime);
 
 
         //최종 승인 날짜
@@ -443,10 +447,12 @@ public class ApprovalService {
                 if(!tempApprovalList.isEmpty() || tempApprovalList.size() > 0){
                     for(int i = 0; i < tempApprovalList.size(); i++){
                         Approval approval = tempApprovalList.get(i);
+                        log.info("\n*****SERVIE(tempGiven) : 임시저장 한 건 : " +  tempApprovalList.size() + " \n*****SERVICE(tempGiven) : 임시저장 한 건 제목 : " + approval.getApprovalTitle());
 
                         ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
-                        log.info("*****SERVICE(tempGiven) : 임시저장 한 건 DTO : " + approvalDTO);
+//                        log.info("*****SERVICE(tempGiven) : 임시저장 한 건 DTO : " + approvalDTO);
 
+                        log.info("\n여기도 했단다.... 저 정체모를 approvalDTO는 어디서 나왔을까 ");
                         approvalDTOList.add(approvalDTO);
                     }
                 }
@@ -467,26 +473,46 @@ public class ApprovalService {
                 //approvalStatus = "처리 중", approverStatus = "대기" 인 approver 중 가장 낮은 approver_order의 approver 목록 가져오기
                 List<Approver> approverList = approverRepository.findByStandById();
 
+                if(approverList.size() > 0 || !approverList.isEmpty()){
+                    for(int i = 0; i < approverList.size(); i++){
+                        Approver approver = approverList.get(i);
 
-                for(int i = 0; i < approverList.size(); i++){
-                    Approver approver = approverList.get(i);
+                        //가장 낮은 approver_order의 approver의 memberId 가 나와 같다면
+                        if((approver.getMemberId() == memberId)){
+                            //해당 전자결재 번호의 전자결재 정보를 가져오기
+                            Approval approval = approvalRepository.findById(approver.getApprovalNo());
 
-                    //가장 낮은 approver_order의 approver의 memberId 가 나와 같다면
-                    if((approver.getMemberId() == memberId)){
-                        //해당 전자결재 번호의 전자결재 정보를 가져오기
-                        Approval approval = approvalRepository.findById(approver.getApprovalNo());
+                            ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
+                            log.info("*****SERVICE(received) : 결재대기 DTO : " + approvalDTO);
 
-                        ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
-                        log.info("*****SERVICE(received) : 결재대기 DTO : " + approvalDTO);
-
-                        approvalDTOList.add(approvalDTO);
+                            approvalDTOList.add(approvalDTO);
+                        }
                     }
                 }
-
+                log.info("\nSERVICE (received) 결재대기 DTO 갯수 : " + approvalDTOList.size());
                 break;
             }
             case "receivedRef" : {
                 // 수신 참조내역 (내가 참조자 / 임시저장, 회수 제외)
+                List<Referencer> referencerList = referencerRepository.findByMemberId(memberId);
+                log.info("*****SERVICE 참조내역 수 : " + referencerList.size());
+                log.info("???" + referencerList.isEmpty());
+
+                //참조내역이 있다면
+                if(referencerList.size() > 0 || !referencerList.isEmpty()){
+
+
+                    for(int i = 0; i < referencerList.size(); i++){
+                        Referencer referencer = referencerList.get(i);
+                        //해당 전자결재 정보 가져오기
+                        Approval approval = approvalRepository.findById(referencer.getApprovalNo());
+
+                        ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
+                        log.info("*****SERVICE(referenced) : 참조 DTO : " + approvalDTO);
+
+                        approvalDTOList.add(approvalDTO);
+                    }
+                }
 
                 break;
             }

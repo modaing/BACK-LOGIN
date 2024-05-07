@@ -27,3 +27,9 @@ jwt:
   key: asdkfjlkawdsjfw390r82309rjlkasdfja213498dlk
   time: 86400000
 
+logging:
+  level:
+    org:
+      hibernate:
+        sql: debug
+        type: trace
