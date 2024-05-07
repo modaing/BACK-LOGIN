@@ -1,0 +1,120 @@
+## ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+### 회원가입 (김지환)
+POST http://localhost:8080/signUp
+Content-Type: application/json
+Accept: */*
+
+{
+  "departmentDTO": {
+    "departNo": 1,
+    "departName": "인사팀"
+  },
+  "imageUrl": "이미지 경로들어갈 곳!!!!!!",
+  "address": "중구",
+  "email": "1111111111@naver.com",
+  "name": "김지환이이이이이이ㅣ",
+  "password": "0000",
+  "positionDTO": {
+    "positionName": "알바",
+    "positionLevel": "90"
+  },
+  "phoneNo": "01012341234",
+  "role": "ADMIN"
+}
+
+### 로그인 (김지환)
+POST http://localhost:8080/login
+Content-Type: application/json
+Accept: */*
+
+{
+  "id": 240501959,
+  "pass": "1111"
+}
+
+### 구성원의 전체 목록 조회
+GET http://localhost:8080/members/members?searchType={memberId}&value={memberId}
+Content-Type: application/json
+Accept: */*
+
+{
+  "memberId": 240501759
+}
+
+### 구성원 상세 조회
+GET http://localhost:8080/members/240501268
+Content-Type: application/json
+Accept: */*
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+### 특정 구성원의 정보 수정
+PUT http://localhost:8080/members/updateProfile/240501268
+Content-Type: application/json
+Accept: */*
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+{
+  "name": "김춘장",
+  "departmentDTO": {
+    "departNo": 5,
+    "departName":"관리팀"
+  },
+  "positionDTO": {
+    "positionName": "계약직",
+    "positionLevel": 5
+  },
+  "email": "123123123123@gmail.com",
+  "phoneNo": "010-1111-4444",
+  "memberStatus": "육아"
+}
+
+### GET 요청 test
+GET http://localhost:8080/test
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+### member정보를 꺼내기 위한 logic
+POST http://localhost:8080/test
+Content-Type: application/json
+Accept: */*
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+### member정
+GET http://localhost:8080/getMemberInfo
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+### GET token 김지환
+GET http://localhost:8080/getToken
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+### 구성원이 본인의 비밀번호를 수정하는 logic
+POST http://localhost:8080/updateOwnPassword
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg
+
+{
+  "currentPassword": "0000",
+  "newPassword1": "1111",
+  "newPassword2": "1111"
+}
+
+### 토큰 정보 받아오기 (test... 김지환)
+GET http://localhost:8080/getTokenInfo
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI0MTY5OTM2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxMDU2OSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.DhImAsoxtZNR2I-cp9VISX5UYevnv6YZTamA8R3iW4o
+
+### 구성원 전체 목록 조회 (김지환)
+GET http://localhost:8080/showAllMembersInfoPage
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI0MTY5OTM2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxMDU2OSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.DhImAsoxtZNR2I-cp9VISX5UYevnv6YZTamA8R3iW4o
+
+### 구성원 비밀번호 초기화
+PUT http://localhost:8080/resetMemberPassword
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI0MTY5OTM2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxMDU2OSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.DhImAsoxtZNR2I-cp9VISX5UYevnv6YZTamA8R3iW4o
+
+### 구성원 목록 다운로드 excel file
+GET http://localhost:8080/downloadMemberInfo
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE0NzI0MTY5OTM2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxMDU2OSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.DhImAsoxtZNR2I-cp9VISX5UYevnv6YZTamA8R3iW4o
