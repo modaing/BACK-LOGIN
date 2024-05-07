@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -203,5 +204,19 @@ public class MemberService {
     public List<Member> downloadAllMembers() {
         List<Member> downloadMemberList = memberRepository.findAll();
         return downloadMemberList;
+    }
+
+    public List<MemberDTO> selectMemberList() {
+
+        List<Member> member = memberRepository.findAll();
+
+        List<MemberDTO> memberList = new ArrayList<>();
+
+        for (Member members : member) {
+            MemberDTO memberDTO = modelMapper.map(members, MemberDTO.class);
+            memberList.add(memberDTO);
+        }
+
+        return memberList;
     }
 }
