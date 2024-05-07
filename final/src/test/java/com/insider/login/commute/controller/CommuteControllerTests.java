@@ -9,17 +9,21 @@ import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,10 +33,16 @@ public class CommuteControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
+    private RequestBuilder requestBuilder;
+    private final String token = "eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg";
+
+    @Value("${jwt.time}")
+    private long expireTime;
 
     @DisplayName("출근 시간 등록 테스트")
     @Test
     void testInsertTimeOfCommute() throws Exception {
+
         //given
         int memberId = 2024001003;
         LocalDate workingDate = LocalDate.now();
@@ -51,7 +61,8 @@ public class CommuteControllerTests {
         //when
         MvcResult result = mockMvc.perform(post("/commutes")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(newCommute)))
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(newCommute))
+                            .header("Authorization", token))
         //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("등록 성공"))

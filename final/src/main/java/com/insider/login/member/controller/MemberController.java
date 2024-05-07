@@ -2,30 +2,40 @@ package com.insider.login.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.insider.login.auth.DetailsMember;
-import com.insider.login.common.utils.TokenUtils;
-import com.insider.login.department.dto.DepartmentDTO;
 import com.insider.login.department.service.DepartmentService;
 import com.insider.login.member.dto.MemberDTO;
 import com.insider.login.member.dto.UpdatePasswordRequestDTO;
 import com.insider.login.member.entity.Member;
 import com.insider.login.member.service.MemberService;
-import com.insider.login.position.dto.PositionDTO;
 import com.insider.login.position.service.PositionService;
 import com.insider.login.transferredHistory.service.TransferredHistoryService;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDate;
 
-import java.time.Year;
-import java.time.YearMonth;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.*;
+
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
 
@@ -124,7 +134,7 @@ public class MemberController {
         }
     }
 
-    /** 구성원 정보 등록 */
+    /** 구성원 정보 수정 */
     @PutMapping("/members/updateProfile/{memberId}")
     public String updateSpecificMemberById(@PathVariable("memberId") int memberId, @RequestBody MemberDTO inputtedMemberInfo) {
         /* 특정 구성원의 정보를 전부 가져온다 */
@@ -134,16 +144,34 @@ public class MemberController {
         inputtedMemberInfo.setMemberId(memberId);
         inputtedMemberInfo.setPassword(specificMember.getPassword());
         inputtedMemberInfo.setEmployedDate(specificMember.getEmployedDate());
+        /*
         inputtedMemberInfo.setAddress(specificMember.getAddress());
         inputtedMemberInfo.setRole(specificMember.getRole());
         inputtedMemberInfo.setImageUrl(specificMember.getImageUrl());
-        System.out.println("수정을 하기전 구성원의 정보: " + specificMember);
+        */
+        System.out.println("수정을 하기 전 구성원의 정보: " + specificMember);
         System.out.println("입력 받은 값: " + inputtedMemberInfo);
 
         /* 입력 받은 것을 덮어 쓴다 */
-        String updatedMember = memberService.updateMember(inputtedMemberInfo);
+        String result = memberService.updateMember(inputtedMemberInfo);
+        System.out.println("updated member info: " + result);
 
-        return "찾은 구성원의 정보: " + updatedMember;
+        /* 퇴직으로 바뀌면 바뀐 시점으로부터 3년 뒤에 삭제 */
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+        LocalDate currentDate = LocalDate.now();
+
+        LocalDate deleteDate = currentDate.plus(3, ChronoUnit.YEARS);
+        long delay = ChronoUnit.DAYS.between(currentDate, deleteDate);
+
+        executorService.schedule(() -> {
+            memberService.deleteMemberById(memberId);
+            System.out.println("Member (" + memberId + ") will be deleted 3 years from now" );
+        }, delay, TimeUnit.DAYS);
+
+        executorService.shutdown();
+
+        return "updated member info: " + result;
     }
 
     /** 구성원 본인 비밀번호 */
@@ -192,25 +220,47 @@ public class MemberController {
         return getTokenInfo();
     }
 
-    @GetMapping("/showAllMembersInfoPage")
-    public List<MemberDTO> showAllMemberInfosInPage() {
+    /** 구성원 전체 조회 */
+    @GetMapping("/showAllMembersPage")
+    public List<MemberDTO> showAllMembersPage() {
         System.out.println("show all member infos in the page");
         List<MemberDTO> memberLists = memberService.showAllMembers();
         System.out.println("memberList: " + memberLists);
 
         for (MemberDTO member : memberLists) {
-            member.getName();
-            member.getMemberId();
-            member.getEmployedDate();
-            member.getPositionDTO().getPositionName();
-            member.getDepartmentDTO().getDepartName();
-            member.getMemberStatus();
-        }
+            System.out.println("memberName: " + member.getName());
+            System.out.println("memberId: " + member.getMemberId());
+            System.out.println("member department name: " + member.getDepartmentDTO().getDepartName());
+            System.out.println("member position name: " + member.getPositionDTO().getPositionName());
+            System.out.println("employedDate: " + member.getEmployedDate());
 
+            /* 근속년수 */
+            LocalDate employedDate = member.getEmployedDate();
+            LocalDate currentDate = LocalDate.now();
+            Period period = Period.between(employedDate, currentDate);
+            System.out.println("period값: " + period); // 예시 P5D
+
+            int years = period.getYears();      // 년
+            int months = period.getMonths();    // 개월
+            int days = period.getDays();
+
+            String yearsMonthString = "";
+            if (years > 0) {
+                yearsMonthString += years + "년 ";
+            } if (months > 0) {
+                yearsMonthString += months + "개월";
+            } else if (years == 0 || months == 0) {
+                yearsMonthString += days + "일";
+            }
+            System.out.println("근속년수: " + yearsMonthString);
+
+            System.out.println("member status: " + member.getMemberStatus());
+
+        }
         // 근속년수 작성할 것
         return memberLists;
     }
-
+    /** 구성원 비밀번호 초기화 */
     @PutMapping("/resetMemberPassword")
     public String resetMemberPassword() {
         MemberDTO memberInfo = memberService.findSpecificMember(getTokenInfo().getMemberId());
@@ -222,5 +272,68 @@ public class MemberController {
 
         /* 아직 ing */
         return null;
+    }
+
+    /** 엑셀 파일로 구성원 정보 다운로드 */
+    @GetMapping("/downloadMemberInfo")
+    public ResponseEntity<Resource> downloadMemberInfo() {
+
+        Workbook workbook = createExcelFile();
+
+        String fileName = "전체-구성원-정보.xlsx";
+        File file = new File(fileName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            workbook.write(fos);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+        Resource resource = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+    }
+
+    private Workbook createExcelFile() {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("구성원 정보");
+
+        /* excel 파일 header 설정 */
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("구성원 ID");
+        headerRow.createCell(1).setCellValue("이름");
+        headerRow.createCell(2).setCellValue("이메일");
+        headerRow.createCell(3).setCellValue("주소");
+        headerRow.createCell(4).setCellValue("전화번호");
+        headerRow.createCell(5).setCellValue("입사 일자");
+        headerRow.createCell(6).setCellValue("부서명");
+        headerRow.createCell(7).setCellValue("직급명");
+        headerRow.createCell(8).setCellValue("상태");
+
+        List<Member> members = memberService.downloadAllMembers();
+
+        int rowNum = 1;
+        for (Member member : members) {
+
+            /* 입사일 변환 */
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+            String formattedEmployedDate = member.getEmployedDate().format(formatter);
+
+
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(member.getMemberId());
+            row.createCell(1).setCellValue(member.getName());
+            row.createCell(2).setCellValue(member.getEmail());
+            row.createCell(3).setCellValue(member.getAddress());
+            row.createCell(4).setCellValue(member.getPhoneNo());
+            row.createCell(5).setCellValue(formattedEmployedDate);
+            row.createCell(6).setCellValue(member.getDepartment().getDepartName());
+            row.createCell(7).setCellValue(member.getPosition().getPositionName());
+            row.createCell(8).setCellValue(member.getMemberStatus());
+        }
+        return workbook;
     }
 }
