@@ -58,5 +58,11 @@ public class ApprovalRepository {
 
         return approvalList;
     }
+
+    public void deleteById(String approvalNo) {
+        Approval approval = findById(approvalNo);
+        Approval managedApproval = manager.merge(approval);
+        manager.remove(managedApproval);
+    }
 }
 

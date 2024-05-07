@@ -32,4 +32,21 @@ public class ReferencerRepository {
 
         return referencerList;
     }
+
+    public void deleteById(String approvalNo) {
+
+        List<Referencer> referencerList = findByApprovalId(approvalNo);
+
+        if(!referencerList.isEmpty()){
+
+            for(Referencer referencer : referencerList){
+                Referencer managedReferencer = manager.merge(referencer);
+                manager.remove(managedReferencer);
+            }
+        }
+        else{
+
+        }
+
+    }
 }

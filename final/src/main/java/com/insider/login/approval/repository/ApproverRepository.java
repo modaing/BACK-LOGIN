@@ -75,4 +75,14 @@ public class ApproverRepository {
 
         return approverList;
     }
+
+    public void deleteById(String approvalNo) {
+
+        List<Approver> approverList = findByApprovalId(approvalNo);
+
+        for(Approver approver : approverList){
+            Approver managedApprover = manager.merge(approver);
+            manager.remove(managedApprover);
+        }
+    }
 }

@@ -77,7 +77,7 @@ public class ApprovalService {
                 approvalDTO.getApprovalTitle(),
                 approvalDTO.getApprovalContent(),
                 now(),
-                approvalDTO.getApprovalStatus(),
+                approvalDTO.getApprovalStatus(),    //처리중, 임시저장
                 approvalDTO.getRejectReason(),
                 approvalDTO.getFormNo()
         );
@@ -86,6 +86,7 @@ public class ApprovalService {
         approvalRepository.save(approval);
 
         //추가한 결재자 이외 기안자도 결재자에 넣기 => 첫 결재자(기안자)는 결재처리 상태를 '승인' 으로 바꾸기
+        //임시저장시엔?
         Approver senderApprover = new Approver(
                 approvalDTO.getApprovalNo().concat("_apr000"),
                 approvalDTO.getApprovalNo(),
@@ -131,15 +132,15 @@ public class ApprovalService {
 
         List<AttachmentDTO> attachmentList = approvalDTO.getAttachment();
 
-        String savePath = UPLOAD_DIR + FILE_DIR;
+//        String savePath = UPLOAD_DIR + FILE_DIR;
 
         List<Map<String, String>> fileList = new ArrayList<>();
-
 
         if(files != null && !files.isEmpty()){
             try {
                 String savedName = "";
                 String ext = "";
+                String savePath = UPLOAD_DIR + FILE_DIR;
 
                 for(int i = 0; i < files.size(); i++)
                 {
@@ -159,6 +160,7 @@ public class ApprovalService {
                     attachmentDTO.setFileSavename(savedName);
 
                     Path uploadPath = Paths.get(savePath);
+                    log.info("savePath : " + savePath);
 
                     if(!Files.exists(uploadPath)){
                         Files.createDirectories(uploadPath);
@@ -168,7 +170,12 @@ public class ApprovalService {
                     Path filePath = uploadPath.resolve(savedName);
 
                     //**파일 경로에 저장
-                    Files.copy(file.getInputStream(), filePath);
+                    try{
+                        Files.copy(file.getInputStream(), filePath);
+                        log.info("파일 저장 됐어 : " + filePath);
+                    }catch(Exception e){
+                        log.info("파일 저장 안됐어");
+                    }
 
 
                     fileList.add(fileMap);
@@ -185,23 +192,10 @@ public class ApprovalService {
                 //무슨 에러가 발생해도 파일 지워주기
                 e.printStackTrace();
 
-                int cnt = 0;
-                for(int i = 0; i < fileList.size(); i++){
-                    Map<String, String> file = fileList.get(i);
-                    String savedFileName  = file.get("savedFileName");
-
-                    File deleteFile = new File(savePath + "/" + savedFileName);
-
-                    boolean isDeleted = deleteFile.delete();
-
-                    if(isDeleted == true){
-                        cnt++;
-                    }
-                }
-                if(cnt == fileList.size()){
-                    e.printStackTrace();
-                }
-                else{
+                try {
+                    deleteFile(fileList);
+                    log.info("파일 지워졌대요 ");
+                } catch (IOException ex) {
                     e.printStackTrace();
                 }
             }
@@ -211,6 +205,7 @@ public class ApprovalService {
 
     //부서목록조회
     public List<DepartmentDTO> selectDepartList(){
+
         List<DepartmentDTO> departmentDTOList = new ArrayList<>();
 
         List<Department> departmentList = approvalDepartmentRepository.findAll();
@@ -572,5 +567,67 @@ public class ApprovalService {
         }
 
         return approvalDTOList;
+    }
+
+    //전자결재 삭제
+
+    @Transactional
+    public boolean approvalDelete(String approvalNo) {
+
+        try{
+
+            List<Attachment> attachmentList = attachmentRepository.findByApprovalId(approvalNo);
+            List<Map<String, String>> fileList = new ArrayList<>();
+            Map<String, String> attachMap = new HashMap<>();
+
+            for(Attachment attachment : attachmentList){
+                attachMap.put("savedFileName", attachment.getFileSavename());
+                fileList.add(attachMap);
+            }
+
+            deleteFile(fileList);                           //첨부파일 삭제
+
+            attachmentRepository.deleteById(approvalNo);    //첨부파일 DB 삭제
+
+            referencerRepository.deleteById(approvalNo);    //참조선 삭제
+            approverRepository.deleteById(approvalNo);      //결제선 삭제
+            approvalRepository.deleteById(approvalNo);      //전자결재 삭제
+
+            return true;
+        }catch(IOException e){
+            e.printStackTrace();
+            log.info("파일 삭제 실패");
+            return false;
+
+        }catch(Exception e){
+            return false;
+        }
+
+    }
+
+    //파일 삭제
+    public void deleteFile(List<Map<String, String>> fileList) throws IOException  {
+        String savePath = UPLOAD_DIR + FILE_DIR;
+
+        List<String> failedFiles = new ArrayList<>();
+
+        for(int i = 0; i < fileList.size(); i++){
+            Map<String, String> file = fileList.get(i);
+            String savedFileName  = file.get("savedFileName");
+
+            File deleteFile = new File(savePath + "/" + savedFileName);
+
+
+            boolean isDeleted = deleteFile.delete();
+
+            if(!isDeleted){
+                failedFiles.add(savedFileName);
+            }
+        }
+
+       /* if(!failedFiles.isEmpty()){
+
+            throw new IOException("Failed to delete files : " + failedFiles.toString());
+        }*/
     }
 }
