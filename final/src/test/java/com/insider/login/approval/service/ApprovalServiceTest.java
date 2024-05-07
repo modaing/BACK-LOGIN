@@ -1,9 +1,6 @@
 package com.insider.login.approval.service;
 
-import com.insider.login.approval.dto.ApprovalDTO;
-import com.insider.login.approval.dto.ApproverDTO;
-import com.insider.login.approval.dto.AttachmentDTO;
-import com.insider.login.approval.dto.ReferencerDTO;
+import com.insider.login.approval.dto.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -173,6 +170,33 @@ public class ApprovalServiceTest {
                 () -> approvalService.insertApproval(approvalDTO, files)
         );
 
+    }
+
+    //전자결재용 부서 목록 조회 테스트
+    @DisplayName("부서 목록 조회 테스트")
+    @Test
+    void testSelectDepartList(){
+        List<DepartmentDTO> departmentDTOList = approvalService.selectDepartList();
+
+        Assertions.assertNotNull(departmentDTOList);
+        for(int i = 0; i < departmentDTOList.size(); i++){
+            System.out.println(departmentDTOList.get(i));
+        }
+    }
+
+    //전자결재용 부서별 사원 목록 조회 테스트
+    @DisplayName("부서별 사원 목록 조회 테스트")
+    @Test
+    void testSelectMemberList(){
+        //given
+        int departNo = 1;
+        //when
+        List<MemberDTO> memberDTOList = approvalService.selectMemberList(departNo);
+        //then
+        Assertions.assertNotNull(memberDTOList);
+        for(int i = 0; i < memberDTOList.size(); i++){
+            System.out.println(memberDTOList.get(i));
+        }
     }
 
     //전자결재 상세조회 테스트

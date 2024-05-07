@@ -209,6 +209,57 @@ public class ApprovalService {
     }
 
 
+    //부서목록조회
+    public List<DepartmentDTO> selectDepartList(){
+        List<DepartmentDTO> departmentDTOList = new ArrayList<>();
+
+        List<Department> departmentList = approvalDepartmentRepository.findAll();
+
+        for(int i = 0; i < departmentList.size(); i++){
+            Department department = departmentList.get(i);
+            DepartmentDTO departmentDTO = new DepartmentDTO(department.getDepartNo(), department.getDepartName());
+
+            departmentDTOList.add(i, departmentDTO);
+        }
+
+        return departmentDTOList;
+    }
+
+    //사원목록조회
+    public List<MemberDTO> selectMemberList(int departNo){
+
+        List<MemberDTO> memberDTOList = new ArrayList<>();
+        // 부서정보 : 부서명으로 조회할 경우
+//        Department department = approvalDepartmentRepository.findByName(departName);
+        // 부서정보 : 부서번호로 조회할 경우
+        Department department = approvalDepartmentRepository.findById(departNo);
+
+        //부서별 사원 목록
+        List<Member> memberList = approvalMemberRepository.findByDepart(departNo);
+        //한 부서의 멤버 목록 조회
+        for(Member member : memberList){
+            MemberDTO memberDTO = new MemberDTO(member.getName(),
+                                            member.getMemberId(),
+                                            member.getPassword(),
+                                            member.getDepartNo(),
+                                            member.getPositionName(),
+                                            member.getEmployedDate(),
+                                            member.getAddress(),
+                                            member.getPhoneNo(),
+                                            member.getMemberStatus(),
+                                            member.getEmail(),
+                                            member.getMemberRole(),
+                                            member.getImage_url(),
+                                            //departName,
+                                            department.getDepartName());
+
+            memberDTOList.add(memberDTO);
+        }
+
+        return memberDTOList;
+    }
+
+
     //한 전자결재 조회
     public ApprovalDTO selectApproval(String approvalNo){
         Approval approval = approvalRepository.findById(approvalNo);
