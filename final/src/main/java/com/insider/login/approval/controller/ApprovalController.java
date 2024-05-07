@@ -6,7 +6,9 @@ import com.insider.login.approval.dto.ResponseDTO;
 import com.insider.login.approval.service.ApprovalService;
 import com.insider.login.common.ResponseMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +41,18 @@ public class ApprovalController {
     }
 
 
+    //전자결재 상세 조회
+    @Tag(name = "전자결재 상세 조회", description = "전자결재 상세 조회")
+    @GetMapping("/{approvalNo}")
+    public ResponseEntity<ResponseDTO> SelectApprovalByNo(@PathVariable(name="approvalNo") String approvalNo){
+        ApprovalDTO approvalDTO = approvalService.selectApproval(approvalNo);
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 상세 조회 성공", approvalDTO));
+
+    }
+
     //전자결재 기안 화면으로
-    @GetMapping("/")
+    @PostMapping("/")
     public void goInsertApproval() {
 
     }

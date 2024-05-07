@@ -27,35 +27,6 @@ public class ApprovalServiceTest {
     @Autowired
     private ApprovalService approvalService;
 
-//    @Autowired
-//    private MockMvc mockMvc;
-
-
-/*
-    @DisplayName("폼 양식 추가")
-    @ParameterizedTest
-    @MethodSource("newForm")
-    public void testInsertForm(String form_no, String form_shape) {
-        */
-/*String requestBody = "{\"form_no\": \"con\", \"form_shape\": \"<form><div></div></form>\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/approval/")
-                .contentType("application/x-www-form-urlencoded")
-                .content(requestBody))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
-
-        *//*
-
-
-        Form newForm = new Form(form_no, form_name, form_shape);
-
-        Assertions.assertDoesNotThrow(
-                () -> approvalService.insertForm(newForm)
-        );
-    }
-*/
-
-
     //전자결재 기안 테스트
     @Test
     void testInsertApproval(){
