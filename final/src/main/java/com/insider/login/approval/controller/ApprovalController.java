@@ -47,7 +47,7 @@ public class ApprovalController {
 
     @Tag(name = "전자결재 회수", description = "회수")
     @PutMapping(value = "/{approvalNo}")
-    public ResponseEntity<ResponseDTO> updateApproval(@PathVariable String approvalNo){
+    public ResponseEntity<ResponseDTO> updateApproval(@PathVariable(name="approvalNo") String approvalNo){
 
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자 결재 회수 성공", approvalService.updateApproval(approvalNo)));
 
