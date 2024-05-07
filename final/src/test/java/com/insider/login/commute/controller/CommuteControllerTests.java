@@ -33,11 +33,6 @@ public class CommuteControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-    private RequestBuilder requestBuilder;
-    private final String token = "eyJkYXRlIjoxNzE0NzI5Mzc0MDQ2LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE5NTkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNDgxNTc3NCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE5NTl9.A7STTt-zOQpfnObkaSZ-IYDc_2RnB5bhs6czQ7eQUkg";
-
-    @Value("${jwt.time}")
-    private long expireTime;
 
     @DisplayName("출근 시간 등록 테스트")
     @Test
@@ -61,8 +56,7 @@ public class CommuteControllerTests {
         //when
         MvcResult result = mockMvc.perform(post("/commutes")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(newCommute))
-                            .header("Authorization", token))
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(newCommute)))
         //then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("등록 성공"))
