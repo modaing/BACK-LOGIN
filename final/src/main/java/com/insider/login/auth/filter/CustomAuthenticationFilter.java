@@ -16,9 +16,9 @@ import java.io.IOException;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter { // used for username-password authentication process
 
     /*
-    * CustomAuthenticationFilter intercepts the request and extracts the ID and password from the RequestedBody
-    * - it creates an "Authentication"
-    * */
+     * CustomAuthenticationFilter intercepts the request and extracts the ID and password from the RequestedBody
+     * - it creates an "Authentication"
+     * */
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
         super.setAuthenticationManager(authenticationManager);
     }

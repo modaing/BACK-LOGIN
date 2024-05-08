@@ -1,26 +1,13 @@
 package com.insider.login.approval.controller;
 
 import com.insider.login.approval.dto.ApprovalDTO;
-import com.insider.login.approval.dto.AttachmentDTO;
 import com.insider.login.approval.dto.ResponseDTO;
 import com.insider.login.approval.service.ApprovalService;
-import com.insider.login.common.ResponseMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.*;
-
-import static java.time.LocalDateTime.now;
 
 @RestController
 @RequestMapping("/approvals")

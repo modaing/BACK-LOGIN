@@ -3,14 +3,11 @@ package com.insider.login.approval.controller;
 import com.insider.login.approval.service.ApprovalService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -64,7 +61,7 @@ public class ApprovalControllerTest {
                        .with(user("240501959").password("0000"))
                .contentType(MediaType.APPLICATION_JSON))    //요청의 content type 설정
                .andExpect(MockMvcResultMatchers.status().isOk())    //HTTP 상태코드가 200인지 확인
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))  //응답의 content type을 확인
+               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.parseMediaType("application/json;charset=UTF-8")))  //응답의 content type을 확인
                .andReturn();
     }
 
