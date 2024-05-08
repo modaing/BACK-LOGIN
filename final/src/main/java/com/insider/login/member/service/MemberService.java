@@ -1,5 +1,6 @@
 package com.insider.login.member.service;
 
+import com.insider.login.auth.model.dto.LoginDTO;
 import com.insider.login.department.dto.DepartmentDTO;
 import com.insider.login.department.entity.Department;
 import com.insider.login.department.repository.DepartmentRepository;
@@ -13,6 +14,7 @@ import com.insider.login.transferredHistory.entity.TransferredHistory;
 import com.insider.login.transferredHistory.repository.TransferredHistoryRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,19 +35,18 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final DepartmentRepository departmentRepository;
     private final TransferredHistoryRepository transferredHistoryRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public MemberService(MemberRepository userRepository, ModelMapper modelMapper, DepartmentRepository departmentRepository, TransferredHistoryRepository transferredHistoryRepository) {
+    public MemberService(MemberRepository userRepository, ModelMapper modelMapper, DepartmentRepository departmentRepository, TransferredHistoryRepository transferredHistoryRepository, BCryptPasswordEncoder passwordEncoder) {
         this.memberRepository = userRepository;
         this.modelMapper = modelMapper;
         this.departmentRepository = departmentRepository;
         this.transferredHistoryRepository = transferredHistoryRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<MemberDTO> findMember(int id) {
-        System.out.println("id: " + id);
         Optional<Member> memberOptional = memberRepository.findById(id);
-
-        System.out.println("찾은 member는: " + memberOptional);
 
         if (memberOptional.isPresent()) { // 존재한다면
             Member member = memberOptional.get();
@@ -55,7 +56,7 @@ public class MemberService {
             memberDTO.setPositionDTO(PositionDTO.mapToDTO(member.getPosition()));
             return Optional.of(memberDTO);
         } else {
-            System.out.println("Member not found with id: " + id);
+            System.out.println("Member with " + id + " is not valid");
             return Optional.empty();
         }
     }
@@ -218,5 +219,44 @@ public class MemberService {
         }
 
         return memberList;
+    }
+
+    public void loggedInMember(MemberDTO memberDTO) {
+        System.out.println("memberService 도착");
+        Member loggedInMember = modelMapper.map(memberDTO, Member.class);
+
+        Optional<Member> optimalMember = memberRepository.findById(loggedInMember.getMemberId());
+
+        if (optimalMember.isPresent()) {
+            Member member = optimalMember.get();
+            if (passwordEncoder.matches(memberDTO.getPassword(), member.getPassword())) {
+                System.out.println("login successfull");
+            } else {
+                System.out.println("incorrect password");
+            }
+        } else {
+            System.out.println("member not found");
+        }
+    }
+
+    public MemberDTO checkLoggedMemberInfo(int memberId) {
+        System.out.println("checkedLoggedMemberInfo 도착");
+        Member loggedInMember = memberRepository.findById(memberId).orElse(null);
+        if (loggedInMember != null) {
+            return modelMapper.map(loggedInMember, MemberDTO.class);
+        } else {
+            return null;
+        }
+    }
+
+    public MemberDTO checkLoggedInfo(LoginDTO loginDTO) {
+        System.out.println("checkedLoggedInfo: " + loginDTO);
+        Member foundMember = memberRepository.findById(loginDTO.getMemberId()).orElse(null);
+        if (foundMember != null) {
+            return modelMapper.map(foundMember, MemberDTO.class);
+        } else {
+            return null;
+        }
+
     }
 }
