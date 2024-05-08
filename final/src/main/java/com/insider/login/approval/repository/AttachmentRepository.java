@@ -25,4 +25,19 @@ public class AttachmentRepository {
 
         return attachmentList;
     }
+
+    public void deleteById(String approvalNo) {
+        List<Attachment> attachmentList = findByApprovalId(approvalNo);
+
+        if(!attachmentList.isEmpty()){
+            for(Attachment attachment : attachmentList){
+                Attachment managedAttachment = manager.merge(attachment);
+                manager.remove(managedAttachment);
+            }
+
+        }else{
+
+        }
+
+    }
 }
