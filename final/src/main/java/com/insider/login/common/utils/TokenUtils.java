@@ -88,7 +88,6 @@ public class TokenUtils {
                 .setSubject("" + member.getMemberId())
                 .signWith(SignatureAlgorithm.HS256, createSignature())  // 반환 받은 key값으로 sign in
                 .setExpiration(expireTime);                             // 만료시간
-        System.out.println("builder의 정보: " + builder);
 
         return builder.compact();                                       // token을 String형식으로 바꿔서 반환을 해준다
     }
