@@ -177,7 +177,7 @@ public class LeaveService extends LeaveUtil {
                 tempDTO.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
             }
 
-            // 다시 dto를 엔티티로 전환 후 save
+            // update
             LeaveSubmit newSubmit = modelMapper.map(tempDTO, LeaveSubmit.class);
             leaveSubmitRepository.save(newSubmit);
 
