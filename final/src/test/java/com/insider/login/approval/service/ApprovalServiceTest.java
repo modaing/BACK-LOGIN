@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -257,20 +258,31 @@ public class ApprovalServiceTest {
     @Test
     void testSelectApprovalList(){
         //given
-        int memberId = 2024001002;
+        int memberId = 2024001001;
+        int pageNo = 0;
 
         Map<String, Object> condition = new HashMap<>();
         condition.put("flag", "receivedRef");
-        condition.put("offset", 10);
+        condition.put("offset", 0);
         condition.put("limit", 10);
+        condition.put("direction", null);
+        condition.put("title", "경조금");
 
         //when
-        List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
+//        List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
+        Page<ApprovalDTO> approvalDTOPage  = approvalService.selectApprovalList(memberId, condition, pageNo);
 
-        System.out.println("*****TEST : 목록 size() : " + approvalList.size());
+//        System.out.println("*****TEST : 목록 size() : " + approvalList.size());
+
+        List<ApprovalDTO> approvalDTOList = approvalDTOPage.getContent();
+
+        for(int i=0; i < approvalDTOList.size(); i++){
+            System.out.println(approvalDTOList.get(i).getApprovalDate() + " | "  + approvalDTOList.get(i).getApprovalTitle() + " | " + approvalDTOList.get(i).getApprovalNo()) ;
+        }
 
         //then
-        Assertions.assertNotNull(approvalList);
+//        Assertions.assertNotNull(approvalList);
+        Assertions.assertNotNull(approvalDTOPage);
 //        approvalList.forEach(System.out::println);
     }
 

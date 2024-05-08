@@ -72,6 +72,13 @@ public class ApprovalControllerTest {
     @Test
     public void SelectApprovalList(){
         // /approvals?fg={given}&page={pageno}
+        //RequestParam = fg, page
+        //memberId : ""
+        // selectApprovalList(int memberId, Map<String, Object> condition)
+        //  condition.put("flag", "receivedRef");
+        //  condition.put("offset", 10);
+        //  condition.put("limit", 10);
+
         //given
         int memberId = 2024001002;
 
