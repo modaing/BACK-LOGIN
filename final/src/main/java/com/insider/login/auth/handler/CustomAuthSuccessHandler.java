@@ -5,19 +5,20 @@ import com.insider.login.common.AuthConstants;
 import com.insider.login.common.utils.ConvertUtil;
 import com.insider.login.common.utils.TokenUtils;
 import com.insider.login.member.dto.MemberDTO;
-import com.insider.login.member.entity.Member;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
 /* 로그인이 성공적으로 되면 토큰은 여기서 발행을 한다 */
+@CrossOrigin(origins = "http://localhost:3000")
 public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
@@ -35,7 +36,7 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
             // 로그인이 성공을 했을 때 token 정보도 같이 줘야한다
             String token = TokenUtils.generateJwtToken(memberDTO);                                                  // token setting하는 logic
             System.out.println("token 정보: " + token); // eg) token 정보: eyJkYXRlIjoxNzE0NDU1NTU2OTM3LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJSb2xlIjoiQURNSU4iLCJpbWFnZSI6IuydtOuvuOyngOqwgCDrk6TslrTqsIgg6rK966GcIiwic3ViIjoiMjQwNDAxNTY4IiwibWVtYmVyU3RhdHVzIjoi7J6s7KeBIiwidXNlck5hbWUiOiLquYDsp4DtmZgiLCJleHAiOjE3MTQ1NDE5NTYsImRlcGFydE5hbWUiOiLsnbjsgqztjIAiLCJtZW1iZXJJZCI6MjQwNDAxNTY4fQ.fsgaqYu7OQGzlsqDd0lINkBIIPWUFpJVwKXBvYaPeeI
-
+            responseMap.put("token", token);
             response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + " " + token);         // token의 구조가 BEARER token... 이기 때문에 이런 형식으로 추가를 해준다
         } else {                                             // 그렇지 않으면 -> 휴면 상태라고 뜨게 하고 로그인을 못하겠금 막아준다
             responseMap.put("userInfo", jsonValue);

@@ -2,6 +2,7 @@ package com.insider.login.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.insider.login.auth.model.dto.LoginDTO;
 import com.insider.login.department.service.DepartmentService;
 import com.insider.login.member.dto.MemberDTO;
 import com.insider.login.member.dto.UpdatePasswordRequestDTO;
@@ -9,6 +10,7 @@ import com.insider.login.member.entity.Member;
 import com.insider.login.member.service.MemberService;
 import com.insider.login.position.service.PositionService;
 import com.insider.login.transferredHistory.service.TransferredHistoryService;
+import org.apache.coyote.Response;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -41,6 +43,7 @@ import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
 
 @RestController
 @RequestMapping
+@CrossOrigin(origins = "http://localhost:3000")
 public class MemberController {
 
     @Value("${jwt.key}")
@@ -335,5 +338,27 @@ public class MemberController {
             row.createCell(8).setCellValue(member.getMemberStatus());
         }
         return workbook;
+    }
+
+//    @PostMapping("/login")
+//    public void login(@RequestBody MemberDTO memberDTO) {
+//        System.out.println("controller 도착");
+//        memberService.loggedInMember(memberDTO);
+//    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+        System.out.println("inputted username: " + loginDTO.getMemberId());
+        System.out.println("inputted password: " + loginDTO.getPassword());
+
+        MemberDTO getMemberInfo = memberService.checkLoggedMemberInfo(loginDTO.getMemberId());
+
+        if (getMemberInfo == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username");
+        } else if (getMemberInfo != null && !passwordEncoder.matches(loginDTO.getPassword(), getMemberInfo.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+        } else {
+            return ResponseEntity.ok("Login successful");
+        }
     }
 }
