@@ -20,11 +20,11 @@ public class  DetailsService implements UserDetailsService { // 이 class를 사
     }
 
     /*
-    * 로그인 요청 시 사용자의 id를 받아 DB에서 사용자 정보를 가져오는 method
-    * loadUserbyUsername: represents the details of the user
-    *
-    * UserDetails: provides methods to access user-related info such as username, password, authorities (roles), account status and etc...
-    * */
+     * 로그인 요청 시 사용자의 id를 받아 DB에서 사용자 정보를 가져오는 method
+     * loadUserbyUsername: represents the details of the user
+     *
+     * UserDetails: provides methods to access user-related info such as username, password, authorities (roles), account status and etc...
+     * */
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
