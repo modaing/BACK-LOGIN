@@ -1,7 +1,6 @@
 package com.insider.login.approval.repository;
 
 import com.insider.login.approval.entity.Attachment;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -25,20 +24,5 @@ public class AttachmentRepository {
                 .getResultList();
 
         return attachmentList;
-    }
-
-    public void deleteById(String approvalNo) {
-        List<Attachment> attachmentList = findByApprovalId(approvalNo);
-
-        if(!attachmentList.isEmpty()){
-            for(Attachment attachment : attachmentList){
-                Attachment managedAttachment = manager.merge(attachment);
-                manager.remove(managedAttachment);
-            }
-
-        }else{
-
-        }
-
     }
 }

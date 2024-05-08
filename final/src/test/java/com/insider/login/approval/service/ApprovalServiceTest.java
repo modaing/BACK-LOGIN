@@ -1,6 +1,9 @@
 package com.insider.login.approval.service;
 
-import com.insider.login.approval.dto.*;
+import com.insider.login.approval.dto.ApprovalDTO;
+import com.insider.login.approval.dto.ApproverDTO;
+import com.insider.login.approval.dto.AttachmentDTO;
+import com.insider.login.approval.dto.ReferencerDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +13,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -28,6 +30,35 @@ public class ApprovalServiceTest {
     @Autowired
     private ApprovalService approvalService;
 
+//    @Autowired
+//    private MockMvc mockMvc;
+
+
+/*
+    @DisplayName("폼 양식 추가")
+    @ParameterizedTest
+    @MethodSource("newForm")
+    public void testInsertForm(String form_no, String form_shape) {
+        */
+/*String requestBody = "{\"form_no\": \"con\", \"form_shape\": \"<form><div></div></form>\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/approval/")
+                .contentType("application/x-www-form-urlencoded")
+                .content(requestBody))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        *//*
+
+
+        Form newForm = new Form(form_no, form_name, form_shape);
+
+        Assertions.assertDoesNotThrow(
+                () -> approvalService.insertForm(newForm)
+        );
+    }
+*/
+
+
     //전자결재 기안 테스트
     @Test
     void testInsertApproval(){
@@ -42,11 +73,11 @@ public class ApprovalServiceTest {
         //결재자번호 : 결재번호_apr00순번
         //참조자번호 : 결재번호_ref00순번
         //첨부파일번호: 결재번호_f00순번
-        ApproverDTO approverDTO1 = new ApproverDTO("2024-exp00003_apr001", "2024-exp00003", 1, "대기", null, 240401004);
-        ApproverDTO approverDTO2 = new ApproverDTO("2024-exp00003_apr002", "2024-exp00003", 2, "대기", null, 2024001003);
+        ApproverDTO approverDTO1 = new ApproverDTO("2024-con00003_apr001", "2024-con00003", 1, "대기", null, 240401004);
+        ApproverDTO approverDTO2 = new ApproverDTO("2024-con00003_apr002", "2024-con00003", 2, "대기", null, 2024001003);
 
-        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-exp00003_ref001", "2024-exp00003", 2024001001, 1);
-        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-exp00003_ref002", "2024-exp00003", 241811, 2);
+        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-con00003_ref001", "2024-con00003", 2024001001, 1);
+        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-con00003_ref002", "2024-con00003", 241811, 2);
 
         approverList.add(approverDTO1);
         approverList.add(approverDTO2);
@@ -54,77 +85,44 @@ public class ApprovalServiceTest {
         referencerList.add(referencerDTO1);
         referencerList.add(referencerDTO2);
 
-        approvalDTO.setApprovalNo("2024-exp00003");
+        approvalDTO.setApprovalNo("2024-con00003");
         approvalDTO.setMemberId(2024001002);
         approvalDTO.setApprovalTitle("경조금 지급 신청합니다.");
         approvalDTO.setApprovalContent("<form name=\"form\">\n" +
-                "\t\t\t\t\t\t\t<div name=\"wholeForm\"id=\"wholeForm\">\n" +
-                "\t\t\t\t\t\t\t<div name=\"titleform\" id=\"titleform\">\n" +
-                "\t\t\t\t\t\t\t  \n" +
-                "\t\t\t\t\t\t\t\t<input type=\"text\" name=\"title\" id=\"title\" placeholder=\"제목\">\n" +
-                "\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t<table name=\"sideTable\" id=\"sideTable\">\n" +
-                "\t\t\t\t\t\t\t  <tr>\n" +
-                "\t\t\t\t\t\t\t\t<th>금액</th>\n" +
-                "\t\t\t\t\t\t\t\t<td>100000</td>\n" +
-                "\t\t\t\t\t\t\t  </tr>\n" +
-                "\t\t\t\t\t\t\t  <tr>\n" +
-                "\t\t\t\t\t\t\t\t<th>지출사유</th>\n" +
-                "\t\t\t\t\t\t\t\t<td>사무용품 구입 및 출장 교통비</td>\n" +
-                "\t\t\t\t\t\t\t  </tr>\n" +
-                "\t\t\t\t\t\t\t</table>\n" +
-                "\t\t\t\t\t\t\t<table>\n" +
-                "\t\t\t\t\t\t\t\t<tr >\n" +
-                "\t\t\t\t\t\t\t\t\t<th>일자</th>\n" +
-                "\t\t\t\t\t\t\t\t\t<th>분류</th>\n" +
-                "\t\t\t\t\t\t\t\t\t<th name=\"useDetail\" id=\"useDetail\">사용내역</th>\n" +
-                "\t\t\t\t\t\t\t\t\t<th name=\"usePrice\" id=\"usePrice\">금액</th>\n" +
-                "\t\t\t\t\t\t\t\t\t<th>비고</th>\n" +
-                "\t\t\t\t\t\t\t\t  </tr>\n" +
-                "\t\t\t\t\t\t\t\t  <tr >\n" +
-                "\t\t\t\t\t\t\t\t\t<td name=\"exp_date\" class=\"exp_date\">2024-05-07</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td>물품구입비</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td>필기구 외 물품 구입</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td>20000</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t  </tr>\n" +
-                "\t\t\t\t\t\t\t\t  <tr >\n" +
-                "\t\t\t\t\t\t\t\t\t<td name=\"exp_date\" class=\"exp_date\">2024-05-07</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td>교통비</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td>출장 교통비</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td>80000</td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
+                "\t\t\t\t\t\t\t\t\t<div name=\"wholeForm\"id=\"wholeForm\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t<div name=\"titleform\" id=\"titleform\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" name=\"title\" id=\"title\" placeholder=\"제목\">\n" +
+                "\t\t\t\t\t\t\t\t\t\t</div>\n" +
+                "\t\t\t\t\t\t\t\t\t\t<table>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>경조사항</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>조부 장례식</td>\n" +
                 "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<td  name=\"exp_date\" class=\"exp_date\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t<td  name=\"exp_date\" class=\"exp_date\"></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t<td></td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t  <th colspan=\"3\">\n" +
-                "\t\t\t\t\t\t\t\t\t합계\n" +
-                "\t\t\t\t\t\t\t\t  </th>\n" +
-                "\t\t\t\t\t\t\t\t  <td>100000</td>\n" +
-                "\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\n" +
-                "\t\t\t\t\t\t\t   </table>\n" +
-                "\t\t\t\t\t\t\t </div>\n" +
-                "\t\t\t\t\t\t  <div name=\"date\" id=\"date\">\n" +
-                "\t\t\t\t\t\t\t<div>2024-05-07</div>\n" +
-                "\t\t\t\t\t\t   </div>\n" +
-                "\t\t\t\t\t\t</form>");
-        approvalDTO.setApprovalDate("2024-05-07 15:13:13");
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>본인과의 관계</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>조부</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr >\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>발생일자</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>2024-04-28</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>장소</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>OO장례식장</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<th>휴가기간</th>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t\t<td>2024-04-28 ~ 2024-05-01</td>\n" +
+                "\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
+                "\t\t\t\t\t\t\t\t\t   </table>\n" +
+                "\t\t\t\t\t\t\t\t\t </div>\n" +
+                "\t\t\t\t\t\t\t\t  <div name=\"date\" id=\"date\">\n" +
+                "\t\t\t\t\t\t\t\t\t<div>2024-05-03</div>\n" +
+                "\t\t\t\t\t\t\t\t  </div>\n" +
+                "\t\t\t\t\t\t\t\t</form>");
+        approvalDTO.setApprovalDate("2024-05-03 10:02:02");
         approvalDTO.setApprovalStatus("처리 중");
-        approvalDTO.setFormNo("exp");
+        approvalDTO.setFormNo("con");
 
 
             //파일 처리
@@ -144,18 +142,18 @@ public class ApprovalServiceTest {
 
             List<AttachmentDTO> attachmentList = new ArrayList<>();
             AttachmentDTO attachmentDTO1 = new AttachmentDTO();
-            attachmentDTO1.setFileNo("2024-exp00003_f001");
+            attachmentDTO1.setFileNo("2024-con00003_f001");
             attachmentDTO1.setFileOriname(pdfFile.getOriginalFilename());
             attachmentDTO1.setFileSavename(pdfFile.getName());
             attachmentDTO1.setFileSavepath("C:/login/upload");
-            attachmentDTO1.setApprovalNo("2024-exp00003");
+            attachmentDTO1.setApprovalNo("2024-con00003");
 
             AttachmentDTO attachmentDTO2 = new AttachmentDTO();
-            attachmentDTO2.setFileNo("2024-exp00003_f002");
+            attachmentDTO2.setFileNo("2024-con00003_f002");
             attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
             attachmentDTO2.setFileSavename(imgFile.getName());
             attachmentDTO2.setFileSavepath("C:/login/upload");
-            attachmentDTO2.setApprovalNo("2024-exp00003");
+            attachmentDTO2.setApprovalNo("2024-con00003");
 
             attachmentList.add(attachmentDTO1);
             attachmentList.add(attachmentDTO2);
@@ -175,33 +173,6 @@ public class ApprovalServiceTest {
                 () -> approvalService.insertApproval(approvalDTO, files)
         );
 
-    }
-
-    //전자결재용 부서 목록 조회 테스트
-    @DisplayName("부서 목록 조회 테스트")
-    @Test
-    void testSelectDepartList(){
-        List<DepartmentDTO> departmentDTOList = approvalService.selectDepartList();
-
-        Assertions.assertNotNull(departmentDTOList);
-        for(int i = 0; i < departmentDTOList.size(); i++){
-            System.out.println(departmentDTOList.get(i));
-        }
-    }
-
-    //전자결재용 부서별 사원 목록 조회 테스트
-    @DisplayName("부서별 사원 목록 조회 테스트")
-    @Test
-    void testSelectMemberList(){
-        //given
-        int departNo = 1;
-        //when
-        List<MemberDTO> memberDTOList = approvalService.selectMemberList(departNo);
-        //then
-        Assertions.assertNotNull(memberDTOList);
-        for(int i = 0; i < memberDTOList.size(); i++){
-            System.out.println(memberDTOList.get(i));
-        }
     }
 
     //전자결재 상세조회 테스트
@@ -258,46 +229,28 @@ public class ApprovalServiceTest {
     @Test
     void testSelectApprovalList(){
         //given
-        int memberId = 2024001001;
-        int pageNo = 0;
+        int memberId = 2024001002;
 
         Map<String, Object> condition = new HashMap<>();
         condition.put("flag", "receivedRef");
-        condition.put("offset", 0);
+        condition.put("offset", 10);
         condition.put("limit", 10);
-        condition.put("direction", null);
-        condition.put("title", "경조금");
 
         //when
-//        List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
-        Page<ApprovalDTO> approvalDTOPage  = approvalService.selectApprovalList(memberId, condition, pageNo);
+        List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
 
-//        System.out.println("*****TEST : 목록 size() : " + approvalList.size());
-
-        List<ApprovalDTO> approvalDTOList = approvalDTOPage.getContent();
-
-        for(int i=0; i < approvalDTOList.size(); i++){
-            System.out.println(approvalDTOList.get(i).getApprovalDate() + " | "  + approvalDTOList.get(i).getApprovalTitle() + " | " + approvalDTOList.get(i).getApprovalNo()) ;
-        }
+        System.out.println("*****TEST : 목록 size() : " + approvalList.size());
 
         //then
-//        Assertions.assertNotNull(approvalList);
-        Assertions.assertNotNull(approvalDTOPage);
+        Assertions.assertNotNull(approvalList);
 //        approvalList.forEach(System.out::println);
     }
 
 
     @DisplayName("전자결재 삭제 테스트")
-    @ParameterizedTest
-    @CsvSource("2024-exp00002")
-    void testDeleteApproval(String approvalNo){
-        //given
-        //when
-
-        boolean isDeleted = approvalService.approvalDelete(approvalNo);
-
-        //then
-        Assertions.assertTrue(isDeleted);
+    @Test
+    void testDeleteApproval(){
+        String approvalNo = "";
     }
 
 

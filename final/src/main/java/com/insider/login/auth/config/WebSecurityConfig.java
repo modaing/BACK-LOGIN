@@ -21,14 +21,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /*
-* @EnableGlobalMethodSecurity(prePostEnabled = true)
-* -> enable method-level security with pre- and post- invocation authorization.
-* ::: prePostEnabled = true: allows us to use @PreAuthorize and @PostAuthorize to secure methods based on conditions defined in these annotations
-* "" we're telling Spring Security to enable method-level security based on annotations like @PreAuthorize and @PostAuthorize across our apps
-* this allows us to control access to our methods based on specific criteria in our apps
-*
-* 해삭: @EnableGlobalMethodSecurity(prePostEnabled = true) -> annotation을 사용해서 class에 접근을 할 수 있는 권한을 줄 수 있다~
-* */
+ * @EnableGlobalMethodSecurity(prePostEnabled = true)
+ * -> enable method-level security with pre- and post- invocation authorization.
+ * ::: prePostEnabled = true: allows us to use @PreAuthorize and @PostAuthorize to secure methods based on conditions defined in these annotations
+ * "" we're telling Spring Security to enable method-level security based on annotations like @PreAuthorize and @PostAuthorize across our apps
+ * this allows us to control access to our methods based on specific criteria in our apps
+ *
+ * 해삭: @EnableGlobalMethodSecurity(prePostEnabled = true) -> annotation을 사용해서 class에 접근을 할 수 있는 권한을 줄 수 있다~
+ * */
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true) // annotation을 통해서 권환 설정을 가능하겠금 해주는 것이 바로 이 annotation이다
@@ -55,35 +55,35 @@ public class WebSecurityConfig {
                 .httpBasic(basic -> basic.disable()); // 기본 인증을 요청하는 것. HTTP basic authentication is not needed in a stateless app using JWT for authentication (해석: 불필요하다)
 
         /*
-        * -- addFilterBefore() parameters의 정의 --
-        * 1. jwtAuthorizationFilter()
-        * -> token 인증을 한 다음에 사용자 인증 정보를 setting 해주는 역할
-        * 2. customAuthenticationFilter()
-        * -> login에 대한 url설정과 각각 로그인 인증 성공, 실패 시 처리해주는 handler method 등록
-        *
-        * BasicAuthenticationFilter & UsernamePasswordAuthenticationFilter -> 상속을 받아서 customize할 것
-        * */
+         * -- addFilterBefore() parameters의 정의 --
+         * 1. jwtAuthorizationFilter()
+         * -> token 인증을 한 다음에 사용자 인증 정보를 setting 해주는 역할
+         * 2. customAuthenticationFilter()
+         * -> login에 대한 url설정과 각각 로그인 인증 성공, 실패 시 처리해주는 handler method 등록
+         *
+         * BasicAuthenticationFilter & UsernamePasswordAuthenticationFilter -> 상속을 받아서 customize할 것
+         * */
 
         /*
-        * -- addFilterBefore ... STATELESS (browser session은 우리가 관리를 하지 않기 때문이다)
-        * */
+         * -- addFilterBefore ... STATELESS (browser session은 우리가 관리를 하지 않기 때문이다)
+         * */
 
         return http.build(); // 최종적으로 반환을 해줘야한다
     }
 
     /*
-    * <정리>
-    * csrf disabled -> 보완성이 낮아짐. final에서는 front, back server가 구분되어 있기 때문에 disable해도 상관이 없다.
-    * 하지만 session 사용하는 server는 able를 해야 보완성이 높아진다
-    * this is commonly done to avoid unnecessary complexity and overhead, especially in stateless authentication scenarios like those using JWT for authentication
-    *
-    * */
+     * <정리>
+     * csrf disabled -> 보완성이 낮아짐. final에서는 front, back server가 구분되어 있기 때문에 disable해도 상관이 없다.
+     * 하지만 session 사용하는 server는 able를 해야 보완성이 높아진다
+     * this is commonly done to avoid unnecessary complexity and overhead, especially in stateless authentication scenarios like those using JWT for authentication
+     *
+     * */
 
     /* 사용자가 요청 (request)시 수행되는 method */
     /*
-    * BasicAuthenticationFilter를 상속 받아서 우리가 원하는대로 override 하겠금 만들 것이다 (SecurityFilter 참조할 것!)
-    * BasicAuthenticationFilter는 기본적으로 AuthenticationManager가 필요하고, 이것은 또 AuthenticationProvider가 필요하다
-    * */
+     * BasicAuthenticationFilter를 상속 받아서 우리가 원하는대로 override 하겠금 만들 것이다 (SecurityFilter 참조할 것!)
+     * BasicAuthenticationFilter는 기본적으로 AuthenticationManager가 필요하고, 이것은 또 AuthenticationProvider가 필요하다
+     * */
     private JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(authenticationManager());
     }

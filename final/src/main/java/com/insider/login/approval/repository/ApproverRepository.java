@@ -4,10 +4,6 @@ import com.insider.login.approval.entity.Approver;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -59,7 +55,7 @@ public class ApproverRepository {
         return approver;
     }
 
-    public List<Approver> findByStandById(String title) {
+    public List<Approver> findByStandById() {
         String query = "SELECT a.approver_no, a.approval_no, a.approver_order, a.approver_status, a.approver_date, a.member_id" +
                 " FROM approver a" +
                 " JOIN (" +
@@ -72,28 +68,11 @@ public class ApproverRepository {
                 "   SELECT c.approval_no" +
                 "   FROM approval c" +
                 "   WHERE c.approval_status = '처리 중'" +
-                ") AND EXISTS(" +
-                "   SELECT 1" +
-                "   FROM approval e" +
-                "   WHERE e.approval_no = a.approval_no" +
-                "   AND e.approval_title LIKE ?" +
                 ")";
 
         List<Approver> approverList = manager.createNativeQuery(query, Approver.class)
-                .setParameter(1, "%" + title + "%")
                 .getResultList();
 
         return approverList;
-    }
-
-
-    public void deleteById(String approvalNo) {
-
-        List<Approver> approverList = findByApprovalId(approvalNo);
-
-        for(Approver approver : approverList){
-            Approver managedApprover = manager.merge(approver);
-            manager.remove(managedApprover);
-        }
     }
 }

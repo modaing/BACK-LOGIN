@@ -2,7 +2,6 @@ package com.insider.login.leave.service;
 
 import com.insider.login.leave.dto.LeaveInfoDTO;
 import com.insider.login.leave.entity.Leaves;
-import com.insider.login.leave.repository.LeaveMemberRepository;
 import com.insider.login.leave.util.LeaveUtil;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeavesDTO;
@@ -12,6 +11,7 @@ import com.insider.login.leave.entity.LeaveSubmit;
 import com.insider.login.leave.repository.LeaveAccrualRepository;
 import com.insider.login.leave.repository.LeaveRepository;
 import com.insider.login.leave.repository.LeaveSubmitRepository;
+import com.insider.login.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -31,14 +31,12 @@ public class LeaveService extends LeaveUtil {
     private final LeaveRepository leaveRepository;
     private final LeaveSubmitRepository leaveSubmitRepository;
     private final ModelMapper modelMapper;
-    private final LeaveMemberRepository leaveMemberRepository;
 
-    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper, LeaveMemberRepository leaveMemberRepository) {
+    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper) {
         this.leaveAccrualRepository = leaveAccrualRepository;
         this.leaveRepository = leaveRepository;
         this.leaveSubmitRepository = leaveSubmitRepository;
         this.modelMapper = modelMapper;
-        this.leaveMemberRepository = leaveMemberRepository;
     }
 
     public Page<LeaveSubmitDTO> selectLeaveSubmitList(int applicantId, Pageable pageable) {
@@ -47,9 +45,6 @@ public class LeaveService extends LeaveUtil {
             Page<LeaveSubmit> submitList = null;
             if (applicantId > 0) {
                 submitList = leaveSubmitRepository.findByMemberId(applicantId, pageable);
-                for (LeaveSubmit submit : submitList) {
-                    System.out.println(submit);
-                }
             } else {
                 submitList = leaveSubmitRepository.findAll(pageable);
             }
@@ -58,11 +53,13 @@ public class LeaveService extends LeaveUtil {
             for (LeaveSubmit submit : submitList) {
                 LeaveSubmitDTO leaveSubmitDTO = modelMapper.map(submit, LeaveSubmitDTO.class);
 
-                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
+                // TODO:사번으로 사원명 조회해서 DTO에 넣기 ( member 안정화되면 추가 예정 )
+//            leaveSubmitDTO.setApplicantName(memberRepository.findMemberNameByMemberId(applicantId));
 
-                if (submit.getLeaveSubApprover() != 0) {
-                    leaveSubmitDTO.setApproverName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
-                }
+                // TODO:승인자 사번이 존재할 경우 승인자 사번으로 사원명을 조회해서 DTO에 넣기 ( member 안정화 후 추가 예정 )
+//            if (submit.getLeaveSubApprover() != 0) {
+//                leaveSubmitDTO.setApproverName(memberRepository.findById(submit.getLeaveSubApprover()));
+//            }
 
                 DTOList.add(leaveSubmitDTO);
             }
@@ -70,9 +67,7 @@ public class LeaveService extends LeaveUtil {
             // DTOList를 기존 pageable 정보를 가진 새로운 페이지로 만들어서 반환
             return new PageImpl<>(DTOList, submitList.getPageable(), submitList.getTotalElements());
         } catch (Exception e) {
-            log.info("[휴가내역] 에러 ===================================== ");
             return Page.empty();
-
         }
     }
 
