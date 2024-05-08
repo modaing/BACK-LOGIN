@@ -28,11 +28,17 @@ public class CalendarContorller {
      * 일정 조회
      */
     @GetMapping("/calendars")
-    public ResponseEntity<ResponseMessage> selectCalendar(@RequestBody CalendarCriteriaDTO criteriaDTO) {
+    public ResponseEntity<ResponseMessage> selectCalendar(@RequestParam String type,
+                                                          @RequestParam(name = "year", defaultValue = "0") int year,
+                                                          @RequestParam(name = "month", defaultValue = "0") int month,
+                                                          @RequestParam(name = "week", defaultValue = "0") int week,
+                                                          @RequestParam(name = "day", defaultValue = "0") int day,
+                                                          @RequestParam String department) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
+        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, week, day, department);
         List<CalendarDTO> calendarList = calendarService.selectCalendar(criteriaDTO);
 
         if (calendarList.isEmpty()) {
