@@ -1,6 +1,5 @@
 package com.insider.login.calendar.service;
 
-import com.insider.login.calendar.dto.CalendarCriteriaDTO;
 import com.insider.login.calendar.dto.CalendarDTO;
 import com.insider.login.calendar.entity.Calendar;
 import com.insider.login.calendar.repository.CalendarRepository;
@@ -27,25 +26,10 @@ public class CalendarService {
     }
 
 
-    public List<CalendarDTO> selectCalendar(CalendarCriteriaDTO criteriaDTO) {
+    public List<CalendarDTO> selectCalendar(String department) {
 
         log.info("[일정조회] 시작 ======================================================");
-        log.info("[일정조회] 매개변수 확인 =========================================\n" + criteriaDTO);
-        List<Calendar> calendars = new ArrayList<>();
-
-        switch (criteriaDTO.getType()) {
-            case "monthly":
-                calendars = calendarRepository.findByMonth(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getDepartment());
-                break;
-            case "weekly":
-                calendars = calendarRepository.findByWeek(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getWeek(), criteriaDTO.getDepartment());
-                break;
-            case "daily":
-                calendars = calendarRepository.findByDay(criteriaDTO.getYear(), criteriaDTO.getMonth(), criteriaDTO.getDay(), criteriaDTO.getDepartment());
-                break;
-            default:
-                return new ArrayList<>();
-        }
+        List<Calendar> calendars = calendarRepository.findBydepartment(department);
 
         return calendars.stream()
                 .map(calendar -> modelMapper.map(calendar, CalendarDTO.class))
