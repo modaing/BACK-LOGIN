@@ -1,5 +1,5 @@
 ### 수요조사 목록 전체 조회
-GET http://localhost:8080/surveys?page=0&properties=leaveSubNo&direction=DESC
+GET http://localhost:8080/surveys?page=0&properties=surveyNo&direction=DESC
 Authorization: BEARER eyJkYXRlIjoxNzE1MTY1NzY0ODQ5LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA0MDE4MzUiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IjEiLCJuYW1lIjoi6rmA7KeA7ZmYIiwibWVtYmVyU3RhdHVzIjoi7J6s7KeBIiwiZXhwIjoxNzE1MjUyMTY0LCJkZXBhcnROYW1lIjoi7J247IKs7YyAIiwibWVtYmVySWQiOjI0MDQwMTgzNX0.4sqgjgXe2-X75SA3N3ZfHEhTHbBkBv-tk16AmDyrTlI
 
 ### 수요조사 상세 조회
