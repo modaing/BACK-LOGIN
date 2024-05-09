@@ -12,6 +12,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter { // used for username-password authentication process
 
@@ -31,15 +33,29 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         UsernamePasswordAuthenticationToken authRequest;
-        System.out.println("🥈 reach Authentication ✅ in CustomAuthenticationFilter");
+        System.out.println("== CustomAuthenticationFilter ==");
 
         try {
             authRequest = getAuthRequest(request);
             setDetails(request,authRequest);
+        } catch (NumberFormatException e) {
+            // handle the case where the input value exceeds the range of int
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            // return a custom error message as JSON
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Input value out of range");
+            response.setContentType("application/json");
+
+            try {
+                response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
+            } catch (IOException ioException) {
+                throw new RuntimeException(ioException);
+            }
+            return null;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 

@@ -9,7 +9,7 @@ public class HeaderFilter implements Filter { // CORS 설정을 위한 filter �
 
     @Override // 필수, called by the servlet container each time a request / response pair is passed through the filter chain. it intercepts each requests before they are sent to the servlet or JSPm and outgoing response before they are sent back to the client
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        System.out.println("🥇 reach HeaderFilter (순서 확인용)");
+        System.out.println("== HeaderFilter ==");
         HttpServletResponse res = (HttpServletResponse) servletResponse; // downcasting
         res.setHeader("Access-Control-Allow-Origin", "*");  // 다른 외부 요청의 응답을 허용할 것인가? * -> 전체 허용 (분리된 front-server에서 요청을 받아올 것이기 때문에)
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"); // 외부 요청에 허용할 method
