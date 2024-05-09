@@ -263,6 +263,9 @@ public class ApprovalService {
 
     //한 전자결재 조회
     public ApprovalDTO selectApproval(String approvalNo){
+
+        log.info("service 들어왔다 : " + approvalNo);
+        System.out.println("service 들어왔다 : " + approvalNo);
         Approval approval = approvalRepository.findById(approvalNo);
 
         //기안자 정보 가져오기
@@ -346,6 +349,9 @@ public class ApprovalService {
         }
 
         ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
+
+
+        log.info("service : " + approvalDTO);
 
         return approvalDTO;
     }
@@ -466,6 +472,9 @@ public class ApprovalService {
         //결제대기내역 조회 : received / approver_id : 나 / 내 approver_order가 1이상 / approval 상태 = 처리중만, 해당 approval_no의 approver의 상태 중 '대기' 상태의 처음이 자신의 approver_order일 경우에만
         //수신참조내역 조회 : receivedRef / referencer_id : 나 / 임시저장, 회수 제외
 
+        log.info("service 들어왔다 : selectApprovalList");
+        System.out.println("service 들어왔다 : selectApprovalList");
+
         List<ApprovalDTO> approvalDTOList = new ArrayList<>();
 
         String flag = condition.get("flag").toString();
@@ -475,6 +484,10 @@ public class ApprovalService {
         int limit = (Integer) condition.get("limit");
 
         String direction = isNull(condition.get("direction")) ? "" : condition.get("direction").toString();
+
+
+        log.info("*****서비스 들어옴 : memberId : " + memberId + ", flag : " + flag + ", title : " + title + ", pageNo : " + pageNo);
+        System.out.println("*****서비스 들어옴 : memberId : " + memberId + ", flag : " + flag + ", title : " + title + ", pageNo : " + pageNo);
 
 
         Pageable pageable = PageRequest.of(pageNo, limit);
@@ -575,7 +588,12 @@ public class ApprovalService {
             approvalDTOList = approvalPage.getContent().stream()
                     .map(approval -> {
                         ApprovalDTO approvalDTO = modelMapper.map(approval, ApprovalDTO.class);
+                        String approvalNo = approval.getApprovalNo();
+
+                        approvalDTO = selectApproval(approvalNo);
                         approvalDTO.setApprovalDate(approval.getApprovalDate().format(formatter));
+
+
                         return approvalDTO;
                     })
                     .collect(Collectors.toList());
@@ -588,7 +606,6 @@ public class ApprovalService {
     }
 
     //전자결재 삭제
-
     @Transactional
     public boolean approvalDelete(String approvalNo) {
 

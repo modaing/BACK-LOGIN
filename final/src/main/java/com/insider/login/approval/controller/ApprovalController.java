@@ -4,13 +4,21 @@ import com.insider.login.approval.dto.ApprovalDTO;
 import com.insider.login.approval.dto.ResponseDTO;
 import com.insider.login.approval.service.ApprovalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/approvals")
+@Slf4j
 public class ApprovalController {
 
 
@@ -32,9 +40,56 @@ public class ApprovalController {
     @Tag(name = "전자결재 상세 조회", description = "전자결재 상세 조회")
     @GetMapping("/{approvalNo}")
     public ResponseEntity<ResponseDTO> SelectApprovalByNo(@PathVariable(name="approvalNo") String approvalNo){
-        ApprovalDTO approvalDTO = approvalService.selectApproval(approvalNo);
+       /* ApprovalDTO approvalDTO = approvalService.selectApproval(approvalNo);
+        log.info("approvalDTO: " + approvalDTO);*/
 
-        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 상세 조회 성공", approvalDTO));
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 상세 조회 성공", approvalService.selectApproval(approvalNo)));
+
+    }
+
+    @Tag(name = "전자결재 목록 조회", description = "전자결재 목록 조회")
+    @GetMapping("")
+    public ResponseEntity<ResponseDTO> SelectApprovalList(@RequestParam("fg") String fg,
+                                                          @RequestParam(name="page",defaultValue = "0") String page,
+                                                          @RequestParam(name="title", defaultValue = "") String title,
+                                                          @RequestHeader(value = "memberId", required = false) String memberIdstr){
+        log.info("****컨트롤러 들어왔어");
+
+        int memberId = 0;
+
+        if(memberIdstr == null){
+            //현재 사용자의 인증 정보 가져오기
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            log.info("memberId: " + authentication.getName());
+
+            //인증 정보에서 사용자의 식별 정보 가져오기
+            memberId = Integer.parseInt(authentication.getName());
+
+        }
+        else{
+            memberId = Integer.parseInt(memberIdstr);
+        }
+        log.info("현재 사용자 : " + memberId);
+
+        Map<String, Object> condition = new HashMap<>();
+        condition.put("flag", fg);
+        condition.put("offset", 0);
+        condition.put("limit", 10);
+        condition.put("direction", null);
+        condition.put("title", title);
+
+        int pageNo = Integer.parseInt(page);
+        System.out.println("현재 pageNo : " + pageNo);
+        log.info("현재 pageNo : " + pageNo);
+
+        //http코드로 할땐 service메소드로 들어가지만 테스트코드로 할땐 service메소드로 들어가지못함 WHY?
+
+        Page<ApprovalDTO> approvalDTOPage =  approvalService.selectApprovalList(memberId, condition, pageNo);
+//        log.info("approvalDTOPage : " + approvalDTOPage.getContent());
+
+            ResponseDTO response = new ResponseDTO(HttpStatus.OK, "상신 목록 조회 성공", approvalDTOPage);
+            System.out.println("조회성공");
+            return ResponseEntity.ok().body(response);
 
     }
 
