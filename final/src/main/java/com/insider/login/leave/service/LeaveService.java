@@ -57,7 +57,7 @@ public class LeaveService extends LeaveUtil {
                 LeaveSubmitDTO leaveSubmitDTO = modelMapper.map(submit, LeaveSubmitDTO.class);
 
 //                사번으로 사원명 조회해서 DTO에 넣기
-                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
+                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApplicant()));
 
 //                승인자 사번이 존재할 경우 승인자 사번으로 사원명을 조회해서 DTO에 넣기
                 if (submit.getLeaveSubApprover() != 0) {
