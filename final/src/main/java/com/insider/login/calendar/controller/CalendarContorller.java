@@ -1,6 +1,5 @@
 package com.insider.login.calendar.controller;
 
-import com.insider.login.calendar.dto.CalendarCriteriaDTO;
 import com.insider.login.calendar.dto.CalendarDTO;
 import com.insider.login.calendar.service.CalendarService;
 import com.insider.login.common.ResponseMessage;
@@ -30,18 +29,12 @@ public class CalendarContorller {
      * 일정 조회
      */
     @GetMapping("/calendars")
-    public ResponseEntity<ResponseMessage> selectCalendar(@RequestParam String type,
-                                                          @RequestParam(name = "year", defaultValue = "0") int year,
-                                                          @RequestParam(name = "month", defaultValue = "0") int month,
-                                                          @RequestParam(name = "week", defaultValue = "0") int week,
-                                                          @RequestParam(name = "day", defaultValue = "0") int day,
-                                                          @RequestParam String department) {
+    public ResponseEntity<ResponseMessage> selectCalendar(@RequestParam(name = "department", defaultValue = "all") String department) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        CalendarCriteriaDTO criteriaDTO = new CalendarCriteriaDTO(type, year, month, week, day, department);
-        List<CalendarDTO> calendarList = calendarService.selectCalendar(criteriaDTO);
+        List<CalendarDTO> calendarList = calendarService.selectCalendar(department);
 
         if (calendarList.isEmpty()) {
             String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요.";
