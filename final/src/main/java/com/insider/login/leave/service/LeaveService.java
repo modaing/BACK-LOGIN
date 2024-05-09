@@ -2,6 +2,7 @@ package com.insider.login.leave.service;
 
 import com.insider.login.leave.dto.LeaveInfoDTO;
 import com.insider.login.leave.entity.Leaves;
+import com.insider.login.leave.repository.LeaveMemberRepository;
 import com.insider.login.leave.util.LeaveUtil;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeavesDTO;
@@ -31,12 +32,14 @@ public class LeaveService extends LeaveUtil {
     private final LeaveRepository leaveRepository;
     private final LeaveSubmitRepository leaveSubmitRepository;
     private final ModelMapper modelMapper;
+    private final LeaveMemberRepository leaveMemberRepository;
 
-    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper) {
+    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper, LeaveMemberRepository leaveMemberRepository) {
         this.leaveAccrualRepository = leaveAccrualRepository;
         this.leaveRepository = leaveRepository;
         this.leaveSubmitRepository = leaveSubmitRepository;
         this.modelMapper = modelMapper;
+        this.leaveMemberRepository = leaveMemberRepository;
     }
 
     public Page<LeaveSubmitDTO> selectLeaveSubmitList(int applicantId, Pageable pageable) {
@@ -53,13 +56,13 @@ public class LeaveService extends LeaveUtil {
             for (LeaveSubmit submit : submitList) {
                 LeaveSubmitDTO leaveSubmitDTO = modelMapper.map(submit, LeaveSubmitDTO.class);
 
-                // TODO:사번으로 사원명 조회해서 DTO에 넣기 ( member 안정화되면 추가 예정 )
-//            leaveSubmitDTO.setApplicantName(memberRepository.findMemberNameByMemberId(applicantId));
+//                사번으로 사원명 조회해서 DTO에 넣기
+                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApplicant()));
 
-                // TODO:승인자 사번이 존재할 경우 승인자 사번으로 사원명을 조회해서 DTO에 넣기 ( member 안정화 후 추가 예정 )
-//            if (submit.getLeaveSubApprover() != 0) {
-//                leaveSubmitDTO.setApproverName(memberRepository.findById(submit.getLeaveSubApprover()));
-//            }
+//                승인자 사번이 존재할 경우 승인자 사번으로 사원명을 조회해서 DTO에 넣기
+                if (submit.getLeaveSubApprover() != 0) {
+                    leaveSubmitDTO.setApproverName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
+                }
 
                 DTOList.add(leaveSubmitDTO);
             }
