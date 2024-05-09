@@ -254,11 +254,11 @@ public class ApprovalServiceTest {
     @Test
     void testSelectApprovalList(){
         //given
-        int memberId = 2024001001;
+        int memberId = 240501629;
         int pageNo = 0;
 
         Map<String, Object> condition = new HashMap<>();
-        condition.put("flag", "receivedRef");
+        condition.put("flag", "given");
         condition.put("offset", 0);
         condition.put("limit", 10);
         condition.put("direction", null);
@@ -273,7 +273,7 @@ public class ApprovalServiceTest {
         List<ApprovalDTO> approvalDTOList = approvalDTOPage.getContent();
 
         for(int i=0; i < approvalDTOList.size(); i++){
-            System.out.println(approvalDTOList.get(i).getApprovalDate() + " | "  + approvalDTOList.get(i).getApprovalTitle() + " | " + approvalDTOList.get(i).getApprovalNo()) ;
+            System.out.println(approvalDTOList.get(i).getApprovalDate() + " | "  + approvalDTOList.get(i).getApprovalTitle() + " | " + approvalDTOList.get(i).getApprovalNo() + " | 현재 진행 중 : " + approvalDTOList.get(i).getStandByApprover()) ;
         }
 
         //then
