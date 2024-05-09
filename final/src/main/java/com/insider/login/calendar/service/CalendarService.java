@@ -60,6 +60,7 @@ public class CalendarService {
         try {
             Calendar calendar = modelMapper.map(calendarDTO, Calendar.class);
             log.info("[일정등록] 엔티티 확인 ====================================\n" + calendar);
+            log.info("[일정등록] type 확인 {}", calendar.getCalendarStart().getClass());
 
             calendarRepository.save(calendar);
             result = 1;
