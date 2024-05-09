@@ -35,7 +35,7 @@ public class ApproverRepository {
         String query = "SELECT approver_no, approval_no, approver_order, approver_status, approver_date, member_id" +
                 " FROM approver" +
                 " WHERE approval_no = ?" +
-                " AND approver_status = '처리 중'" +
+                " AND approver_status = '대기'" +
                 " ORDER BY approver_order ASC" +
                 " LIMIT 1";
 
