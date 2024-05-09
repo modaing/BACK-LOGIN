@@ -15,6 +15,15 @@ public class CalendarCriteriaDTO {
         this.department = department;
     }
 
+    public CalendarCriteriaDTO(String type, int year, int month, int week, int day, String department) {
+        this.type = type;
+        this.year = year;
+        this.month = month;
+        this.week = week;
+        this.day = day;
+        this.department = department;
+    }
+
     public String getType() {
         return type;
     }
