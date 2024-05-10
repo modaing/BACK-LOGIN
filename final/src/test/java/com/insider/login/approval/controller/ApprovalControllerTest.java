@@ -56,36 +56,7 @@ public class ApprovalControllerTest {
 
     private final String token = "BEARER eyJkYXRlIjoxNzE1MzI1NjIzMjk4LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNTQxMjAyMywiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.3y1zkFUIHq8cEGHBKPqvToYWT_m9iaVvDGphqoJ2c1s";
 
-/*    @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext){
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-    }*/
 
-
-/*
-    @DisplayName("폼 양식 추가")
-    @ParameterizedTest
-    @MethodSource("newForm")
-    public void testInsertForm(String form_no, String form_shape) {
-        */
-/*String requestBody = "{\"form_no\": \"con\", \"form_shape\": \"<form><div></div></form>\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/approval/")
-                .contentType("application/x-www-form-urlencoded")
-                .content(requestBody))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
-
-        */
-    /*
-
-
-        Form newForm = new Form(form_no, form_name, form_shape);
-
-        Assertions.assertDoesNotThrow(
-                () -> approvalService.insertForm(newForm)
-        );
-    }
-*/
 
     @DisplayName("전자 결재 상세 조회")
     @Test
@@ -197,5 +168,23 @@ public class ApprovalControllerTest {
         }
 
     }
+
+    @DisplayName("전자결재 회수 테스트")
+    @Test
+    @WithMockUser(username = "240501629")
+    public void testUpdateApproval() throws Exception {
+        //given
+
+        //when
+        String approvalNo = "2024-abs00003";
+
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.put("/approvals/{approvalNo}", approvalNo)
+                .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
 
 }
