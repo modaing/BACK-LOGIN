@@ -73,139 +73,147 @@ public class ApprovalService {
 
     //전자결재 기안(등록)
     @Transactional
-    public void insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
+    public Object insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        int result = 0;
 
-        Approval approval = new Approval(
-                approvalDTO.getApprovalNo(),
-                approvalDTO.getMemberId(),
-                approvalDTO.getApprovalTitle(),
-                approvalDTO.getApprovalContent(),
-                now(),
-                approvalDTO.getApprovalStatus(),    //처리중, 임시저장
-                approvalDTO.getRejectReason(),
-                approvalDTO.getFormNo()
-        );
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        // Approval 엔티티 저장
-        approvalRepository.save(approval);
-
-        //추가한 결재자 이외 기안자도 결재자에 넣기 => 첫 결재자(기안자)는 결재처리 상태를 '승인' 으로 바꾸기
-        //임시저장시엔?
-        Approver senderApprover = new Approver(
-                approvalDTO.getApprovalNo().concat("_apr000"),
-                approvalDTO.getApprovalNo(),
-                0,
-                "승인",
-                now(),
-                approvalDTO.getMemberId()
-        );
-
-        approverRepository.save(senderApprover);
-
-        //결재선 꺼내기
-        for(int i = 0; i < approvalDTO.getApprover().size(); i++){
-
-
-            Approver approvers = new Approver(
-                    approvalDTO.getApprover().get(i).getApproverNo(),
-                    approvalDTO.getApprover().get(i).getApprovalNo(),
-                    approvalDTO.getApprover().get(i).getApproverOrder(),
-                    approvalDTO.getApprover().get(i).getApproverStatus(),
-                    null,
-                    approvalDTO.getApprover().get(i).getMemberId()
+            Approval approval = new Approval(
+                    approvalDTO.getApprovalNo(),
+                    approvalDTO.getMemberId(),
+                    approvalDTO.getApprovalTitle(),
+                    approvalDTO.getApprovalContent(),
+                    now(),
+                    approvalDTO.getApprovalStatus(),    //처리중, 임시저장
+                    approvalDTO.getRejectReason(),
+                    approvalDTO.getFormNo()
             );
 
-            //Approver 엔티티 저장
-            approverRepository.save(approvers);
-        }
+            // Approval 엔티티 저장
+            approvalRepository.save(approval);
 
-        //참조선 꺼내기
-        for(int i = 0; i < approvalDTO.getReferencer().size(); i++){
-            Referencer referencer = new Referencer(
-                    approvalDTO.getReferencer().get(i).getRefNo(),
-                    approvalDTO.getReferencer().get(i).getApprovalNo(),
-                    approvalDTO.getReferencer().get(i).getMemberId(),
-                    approvalDTO.getReferencer().get(i).getRefOrder()
+            //추가한 결재자 이외 기안자도 결재자에 넣기 => 첫 결재자(기안자)는 결재처리 상태를 '승인' 으로 바꾸기
+            //임시저장시엔?
+            Approver senderApprover = new Approver(
+                    approvalDTO.getApprovalNo().concat("_apr000"),
+                    approvalDTO.getApprovalNo(),
+                    0,
+                    "승인",
+                    now(),
+                    approvalDTO.getMemberId()
             );
 
-            //Referencer 엔티티 저장
-            referencerRepository.save(referencer);
-        }
+            approverRepository.save(senderApprover);
 
-        // 파일 꺼내기
+            //결재선 꺼내기
+            for(int i = 0; i < approvalDTO.getApprover().size(); i++){
 
-        List<AttachmentDTO> attachmentList = approvalDTO.getAttachment();
+
+                Approver approvers = new Approver(
+                        approvalDTO.getApprover().get(i).getApproverNo(),
+                        approvalDTO.getApprover().get(i).getApprovalNo(),
+                        approvalDTO.getApprover().get(i).getApproverOrder(),
+                        approvalDTO.getApprover().get(i).getApproverStatus(),
+                        null,
+                        approvalDTO.getApprover().get(i).getMemberId()
+                );
+
+                //Approver 엔티티 저장
+                approverRepository.save(approvers);
+            }
+
+            //참조선 꺼내기
+            for(int i = 0; i < approvalDTO.getReferencer().size(); i++){
+                Referencer referencer = new Referencer(
+                        approvalDTO.getReferencer().get(i).getRefNo(),
+                        approvalDTO.getReferencer().get(i).getApprovalNo(),
+                        approvalDTO.getReferencer().get(i).getMemberId(),
+                        approvalDTO.getReferencer().get(i).getRefOrder()
+                );
+
+                //Referencer 엔티티 저장
+                referencerRepository.save(referencer);
+            }
+
+            // 파일 꺼내기
+
+            List<AttachmentDTO> attachmentList = approvalDTO.getAttachment();
 
 //        String savePath = UPLOAD_DIR + FILE_DIR;
 
-        List<Map<String, String>> fileList = new ArrayList<>();
+            List<Map<String, String>> fileList = new ArrayList<>();
 
-        if(files != null && !files.isEmpty()){
-            try {
-                String savedName = "";
-                String ext = "";
-                String savePath = UPLOAD_DIR + FILE_DIR;
-
-                for(int i = 0; i < files.size(); i++)
-                {
-                    MultipartFile file = files.get(i);
-
-                    AttachmentDTO attachmentDTO = approvalDTO.getAttachment().get(i);
-                    ext = attachmentDTO.getFileOriname().substring(attachmentDTO.getFileOriname().lastIndexOf("."));
-                    savedName = UUID.randomUUID().toString().replace("-", "") + ext;
-                    //파일저장명 암호화
-
-                    Map<String, String> fileMap = new HashMap<>();
-
-                    fileMap.put("originFileName", file.getOriginalFilename());
-                    fileMap.put("savedFileName", savedName);
-                    fileMap.put("savePath", savePath);
-
-                    attachmentDTO.setFileSavename(savedName);
-
-                    Path uploadPath = Paths.get(savePath);
-                    log.info("savePath : " + savePath);
-
-                    if(!Files.exists(uploadPath)){
-                        Files.createDirectories(uploadPath);
-                    }
-                    //파일저장경로 없으면 만들어주기
-
-                    Path filePath = uploadPath.resolve(savedName);
-
-                    //**파일 경로에 저장
-                    try{
-                        Files.copy(file.getInputStream(), filePath);
-                        log.info("파일 저장 됐어 : " + filePath);
-                    }catch(Exception e){
-                        log.info("파일 저장 안됐어");
-                    }
-
-
-                    fileList.add(fileMap);
-
-
-                    Attachment attachment = modelMapper.map(attachmentDTO, Attachment.class);
-
-                    //** 첨부파일정보 DB에 저장
-                    attachmentRepository.save(attachment);
-
-                }
-
-            } catch (IOException e) {
-                //무슨 에러가 발생해도 파일 지워주기
-                e.printStackTrace();
-
+            if(files != null && !files.isEmpty()){
                 try {
-                    deleteFile(fileList);
-                    log.info("파일 지워졌대요 ");
-                } catch (IOException ex) {
+                    String savedName = "";
+                    String ext = "";
+                    String savePath = UPLOAD_DIR + FILE_DIR;
+
+                    for(int i = 0; i < files.size(); i++)
+                    {
+                        MultipartFile file = files.get(i);
+
+                        AttachmentDTO attachmentDTO = approvalDTO.getAttachment().get(i);
+                        ext = attachmentDTO.getFileOriname().substring(attachmentDTO.getFileOriname().lastIndexOf("."));
+                        savedName = UUID.randomUUID().toString().replace("-", "") + ext;
+                        //파일저장명 암호화
+
+                        Map<String, String> fileMap = new HashMap<>();
+
+                        fileMap.put("originFileName", file.getOriginalFilename());
+                        fileMap.put("savedFileName", savedName);
+                        fileMap.put("savePath", savePath);
+
+                        attachmentDTO.setFileSavename(savedName);
+
+                        Path uploadPath = Paths.get(savePath);
+                        log.info("savePath : " + savePath);
+
+                        if(!Files.exists(uploadPath)){
+                            Files.createDirectories(uploadPath);
+                        }
+                        //파일저장경로 없으면 만들어주기
+
+                        Path filePath = uploadPath.resolve(savedName);
+
+                        //**파일 경로에 저장
+                        try{
+                            Files.copy(file.getInputStream(), filePath);
+                            log.info("파일 저장 됐어 : " + filePath);
+                        }catch(Exception e){
+                            log.info("파일 저장 안됐어");
+                        }
+
+
+                        fileList.add(fileMap);
+
+
+                        Attachment attachment = modelMapper.map(attachmentDTO, Attachment.class);
+
+                        //** 첨부파일정보 DB에 저장
+                        attachmentRepository.save(attachment);
+
+                    }
+
+                    result = 1;
+
+                } catch (IOException e) {
+                    //무슨 에러가 발생해도 파일 지워주기
                     e.printStackTrace();
+
+                    try {
+
+                        deleteFile(fileList);
+                        log.info("파일 지워졌대요 ");
+
+                    } catch (IOException ex) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
+
+        return ( result > 0 ) ? "성공" : "실패";
     }
 
 
@@ -667,5 +675,12 @@ public class ApprovalService {
     }
 
 
+    //가장 마지막 전자결재 번호 조회
+    public String selectApprovalNo(String yearFormNo) {
 
+        String lastApprovalNo = approvalRepository.findByApprovalNo(yearFormNo);
+        log.info("Service lastApprovalNo: " + lastApprovalNo);
+
+        return lastApprovalNo;
+    }
 }

@@ -167,9 +167,7 @@ public class ApprovalServiceTest {
 //        approvalService.insertApproval(approvalDTO);
 
         //then
-        Assertions.assertDoesNotThrow(
-                () -> approvalService.insertApproval(approvalDTO, files)
-        );
+        Assertions.assertEquals(approvalService.insertApproval(approvalDTO, files), "성공");
 
     }
 

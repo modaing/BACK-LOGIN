@@ -171,5 +171,21 @@ public class ApprovalRepository {
     }
 
 
+    //가장 마지막 전자결재 번호 조회
+    public String findByApprovalNo(String yearFormNo) {
+
+        String sql = "SELECT approval_no" +
+                " FROM approval" +
+                " WHERE approval_no LIKE ?" +
+                " ORDER BY approval_date desc" +
+                " limit 1";
+
+        Query query = manager.createNativeQuery(sql)
+                .setParameter(1, "%" + yearFormNo + "%");
+
+
+
+        return (String)query.getSingleResult();
+    }
 }
 
