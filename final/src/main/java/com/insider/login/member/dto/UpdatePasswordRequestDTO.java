@@ -15,6 +15,11 @@ public class UpdatePasswordRequestDTO {
         this.newPassword2 = newPassword2;
     }
 
+    public UpdatePasswordRequestDTO(String newPassword1, String newPassword2) {
+        this.newPassword1 = newPassword1;
+        this.newPassword2 = newPassword2;
+    }
+
     public String getCurrentPassword() {
         return currentPassword;
     }

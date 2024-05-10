@@ -1,7 +1,6 @@
 package com.insider.login.calendar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.insider.login.calendar.dto.CalendarCriteriaDTO;
 import com.insider.login.calendar.dto.CalendarDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

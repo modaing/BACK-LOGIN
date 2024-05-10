@@ -2,30 +2,38 @@ package com.insider.login.auth.model.dto;
 
 public class LoginDTO {
 
-    private int id;
-    private String pass;
+    private int memberId;
+    private String password;
 
-    public int getId() {
-        return id;
+    public LoginDTO() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public LoginDTO(int memberId, String password) {
+        this.memberId = memberId;
+        this.password = password;
     }
 
-    public String getPass() {
-        return pass;
+    public int getMemberId() {
+        return memberId;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setMemberId(int memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String toString() {
         return "LoginDTO{" +
-                "id='" + id + '\'' +
-                ", pass='" + pass + '\'' +
+                "memberId=" + memberId +
+                ", password='" + password + '\'' +
                 '}';
     }
 }

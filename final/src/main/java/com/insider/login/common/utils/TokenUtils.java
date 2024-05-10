@@ -37,8 +37,8 @@ public class TokenUtils {
     public static String splitHeader(String header) {
         if (header != null) {
             return header.split(" ")[1];
-            } else {
-                return null;
+        } else {
+            return null;
         }
     }
 
@@ -77,18 +77,17 @@ public class TokenUtils {
         System.out.println("로그인한 구성원의 정보 (in Token Utils): " + member);
 
         /*
-        * token에서는 header, payload, signature가 존재를 하기 때문에 각각 값들을 입력을 해줘야 한다
-        * - header: setHeader
-        * - payload: setSubject
-        * - signature: signWith
-        * */
+         * token에서는 header, payload, signature가 존재를 하기 때문에 각각 값들을 입력을 해줘야 한다
+         * - header: setHeader
+         * - payload: setSubject
+         * - signature: signWith
+         * */
         JwtBuilder builder = Jwts.builder()                             // used to construct JWTs
                 .setHeader(createHeader())
                 .setClaims(createClaims(member))                        // payload에다가 user data를 넣어준다
                 .setSubject("" + member.getMemberId())
                 .signWith(SignatureAlgorithm.HS256, createSignature())  // 반환 받은 key값으로 sign in
                 .setExpiration(expireTime);                             // 만료시간
-        System.out.println("builder의 정보: " + builder);
 
         return builder.compact();                                       // token을 String형식으로 바꿔서 반환을 해준다
     }
@@ -110,6 +109,7 @@ public class TokenUtils {
         System.out.println("member 정보: " + memberDTO);
 
         /* 토큰을 통해서 쉽게 정보들을 꺼낼 수 있는 logic */
+        claims.put("departNo", memberDTO.getDepartmentDTO().getDepartNo());
         claims.put("departName", memberDTO.getDepartmentDTO().getDepartName());     // 부서명
         claims.put("positionName", memberDTO.getPositionDTO().getPositionName());   // 직급명
         claims.put("imageUrl",memberDTO.getImageUrl());                             // 이미지 경로
@@ -130,9 +130,9 @@ public class TokenUtils {
         return new SecretKeySpec(secretBytes, signatureAlgorithm.getJcaName());         // constructs specification for the secret key, which can be used for cryptographic operations
 
         /* in summary...
-        * - takes Base64-encoded secret key, convert into byte array, select HS256 signature algorithm, and construct a secret key specification using the provided secret key bytes and selected algorithm.
-        * - The resulting 'Key' is then used for signing JTWs.
-        * */
+         * - takes Base64-encoded secret key, convert into byte array, select HS256 signature algorithm, and construct a secret key specification using the provided secret key bytes and selected algorithm.
+         * - The resulting 'Key' is then used for signing JTWs.
+         * */
     }
 
     public static MemberDTO getTokenInfo() {
@@ -145,8 +145,8 @@ public class TokenUtils {
 
 
     /*
-    * 이렇게 method를 분리 시킨 이유:
-    * 1. private으로 접근을 제한을 하기 위해서
-    * 2. debugging 하기 편하다
-    * */
+     * 이렇게 method를 분리 시킨 이유:
+     * 1. private으로 접근을 제한을 하기 위해서
+     * 2. debugging 하기 편하다
+     * */
 }

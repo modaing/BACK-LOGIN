@@ -15,11 +15,12 @@ public class MemberDTO {
     private String memberStatus;        //재직상태
     private String email;               //이메일
     private String memberRole;          //자격
-    private int memberImageNo;          //이미지번호
+    private String imageUrl;            //이미지url
+    private String departName;          //부서명
 
     public MemberDTO(){}
 
-    public MemberDTO(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, int memberImageNo) {
+    public MemberDTO(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl, String departName) {
         this.name = name;
         this.memberId = memberId;
         this.password = password;
@@ -31,7 +32,23 @@ public class MemberDTO {
         this.memberStatus = memberStatus;
         this.email = email;
         this.memberRole = memberRole;
-        this.memberImageNo = memberImageNo;
+        this.imageUrl = imageUrl;
+        this.departName = departName;
+    }
+
+    public MemberDTO(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl) {
+        this.name = name;
+        this.memberId = memberId;
+        this.password = password;
+        this.departNo = departNo;
+        this.positionName = positionName;
+        this.employedDate = employedDate;
+        this.address = address;
+        this.phoneNo = phoneNo;
+        this.memberStatus = memberStatus;
+        this.email = email;
+        this.memberRole = memberRole;
+        this.imageUrl = imageUrl;
     }
 
     public String getName() {
@@ -122,12 +139,20 @@ public class MemberDTO {
         this.memberRole = memberRole;
     }
 
-    public int getMemberImageNo() {
-        return memberImageNo;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setMemberImageNo(int memberImageNo) {
-        this.memberImageNo = memberImageNo;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getDepartName() {
+        return departName;
+    }
+
+    public void setDepartName(String departName) {
+        this.departName = departName;
     }
 
     @Override
@@ -144,7 +169,8 @@ public class MemberDTO {
                 ", memberStatus='" + memberStatus + '\'' +
                 ", email='" + email + '\'' +
                 ", memberRole='" + memberRole + '\'' +
-                ", memberImageNo=" + memberImageNo +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", departName='" + departName + '\'' +
                 '}';
     }
 }

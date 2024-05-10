@@ -20,24 +20,31 @@ public class  DetailsService implements UserDetailsService { // 이 class를 사
     }
 
     /*
-    * 로그인 요청 시 사용자의 id를 받아 DB에서 사용자 정보를 가져오는 method
-    * loadUserbyUsername: represents the details of the user
-    *
-    * UserDetails: provides methods to access user-related info such as username, password, authorities (roles), account status and etc...
-    * */
+     * 로그인 요청 시 사용자의 id를 받아 DB에서 사용자 정보를 가져오는 method
+     * loadUserbyUsername: represents the details of the user
+     *
+     * UserDetails: provides methods to access user-related info such as username, password, authorities (roles), account status and etc...
+     * */
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        int intTypeId = Integer.parseInt(id);
 
-        // id가 존재 하지 않으면
-        if (intTypeId == 0) {
-            throw new AuthenticationServiceException((id + " is empty!"));
-        } else {
-            System.out.println("받은 아이디 값: " + intTypeId);
-            System.out.println("DB에 가입을 한 구성원의 정보가 있는지 확인");
-            return memberService.findMember(intTypeId) // userId                                                     // Optional: nullPointerException을 방지해준다.. 그렇기 때문에 여러가지의 예외방지를 위해서 여러가지 기능들을 제공 하는데
-                    .map(data -> new DetailsMember(Optional.of(data)))                                  // map: 하나씩 본다 ... of(data) -> data가 가지고 있는 null이 아닌 값들을 반환을 해서 DetailsUser로 만들어준다
-                    .orElseThrow(() -> new AuthenticationServiceException(id));
+        // Check if id is null
+        if (id.equals("0")) {
+            throw new AuthenticationServiceException("ID is null!");
+        }
+
+        try {
+            int intTypeId = Integer.parseInt(id);
+            System.out.println("ID is an integer: " + intTypeId);
+
+            // DB에 가입을 한 구성원의 정보가 있는지 확인
+            return memberService.findMember(intTypeId)
+                    .map(data -> new DetailsMember(Optional.of(data)))
+                    .orElseThrow(() -> new AuthenticationServiceException("Member not found for ID: " + intTypeId));
+        } catch (NumberFormatException e) {
+            System.out.println("ID is not an integer: " + id);
+            throw new AuthenticationServiceException("ID is not a valid integer: " + id);
         }
     }
+
 }

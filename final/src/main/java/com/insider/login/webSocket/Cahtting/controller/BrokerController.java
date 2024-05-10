@@ -25,7 +25,6 @@ BrokerController {
         try {
             log.info("# roomId = {}", roomId);
             log.info("# message = {}", message.getMessage());
-            System.out.println("이새기 ㅈㄴ 안탐");
             ObjectMapper objectMapper = new ObjectMapper();
             String payload = objectMapper.writeValueAsString(message);
             template.convertAndSend("/sub/room/" + roomId, payload);

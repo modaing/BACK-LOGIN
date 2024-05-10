@@ -16,6 +16,8 @@ public class CalendarDTO {
 
     private String department;
 
+    private String detail;
+
     private int registrantId;
 
 
@@ -41,7 +43,16 @@ public class CalendarDTO {
         this.registrantId = registrantId;
     }
 
-
+    public CalendarDTO(int calendarNo, String calendarName, LocalDateTime calendarStart, LocalDateTime calendarEnd, String color, String department, String detail, int registrantId) {
+        this.calendarNo = calendarNo;
+        this.calendarName = calendarName;
+        this.calendarStart = calendarStart;
+        this.calendarEnd = calendarEnd;
+        this.color = color;
+        this.department = department;
+        this.detail = detail;
+        this.registrantId = registrantId;
+    }
 
     public int getCalendarNo() {
         return calendarNo;
@@ -91,6 +102,14 @@ public class CalendarDTO {
         this.department = department;
     }
 
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
     public int getRegistrantId() {
         return registrantId;
     }
@@ -108,6 +127,7 @@ public class CalendarDTO {
                 ", calendarEnd=" + calendarEnd +
                 ", color='" + color + '\'' +
                 ", department='" + department + '\'' +
+                ", detail='" + detail + '\'' +
                 ", registrantId=" + registrantId +
                 '}';
     }

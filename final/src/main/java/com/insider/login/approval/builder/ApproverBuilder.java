@@ -1,8 +1,6 @@
 package com.insider.login.approval.builder;
 
 import com.insider.login.approval.entity.Approver;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 

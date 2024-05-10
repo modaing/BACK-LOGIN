@@ -2,6 +2,7 @@ package com.insider.login.proposal.Repository;
 
 import com.insider.login.proposal.DTO.ProposalDTO;
 import com.insider.login.proposal.Entity.Proposal;
+import io.micrometer.observation.ObservationFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,9 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
 
     Page<Proposal> findByMemberId(int memberId, Pageable pageable);
 
-    Page<ProposalDTO> findById(Long id, Pageable pageable);}
+    Page<ProposalDTO> findById(Long id, Pageable pageable);
+
+    Page<Proposal> findByMemberId(String memberId, Pageable pageable);
+
+
+}

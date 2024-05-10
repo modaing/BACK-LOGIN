@@ -21,7 +21,7 @@ public class Proposal extends ProposalDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "proposal_id")
-    private Long id;
+    private int id;
 
     @Column(name = "content")
     private String content;
@@ -39,13 +39,8 @@ public class Proposal extends ProposalDTO {
     private boolean deleteYn;
 
 
-    public Long getId() {
-        return this.id;
-    }
 
-
-
-    public Proposal(String title, String content, int memberId, LocalDate proposalDate) {
+    public Proposal(String content, int memberId, LocalDate proposalDate) {
         this.content = content;
         this.memberId = memberId;
         this.setProposalDate(proposalDate);
@@ -68,7 +63,7 @@ public class Proposal extends ProposalDTO {
     }
 
 
-    public Long getProposalNo() {
+    public int getProposalNo() {
         return id;
     }
 

@@ -25,7 +25,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider { //
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         // 입력 받은 id,pass를 조회 하는것은 UserDetails에서 사용을 한다
-        System.out.println("🥉 Authentication 도착 ✅ in CustomAuthenticationProvider");
+        System.out.println("== CustomAuthenticationProvider ==");
 
         UsernamePasswordAuthenticationToken loginToken = (UsernamePasswordAuthenticationToken) authentication; // downcasting
         String id = loginToken.getName();                   // 인증대상자가 존재하는지 확인하는 logic (ID)
