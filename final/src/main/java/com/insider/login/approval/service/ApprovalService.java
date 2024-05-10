@@ -679,6 +679,7 @@ public class ApprovalService {
     public String selectApprovalNo(String yearFormNo) {
 
         String lastApprovalNo = approvalRepository.findByApprovalNo(yearFormNo);
+        log.info("Service lastApprovalNo: " + lastApprovalNo);
 
         return lastApprovalNo;
     }

@@ -175,13 +175,15 @@ public class ApprovalRepository {
     public String findByApprovalNo(String yearFormNo) {
 
         String sql = "SELECT approval_no" +
-                " FROM APPROVAL" +
+                " FROM approval" +
                 " WHERE approval_no LIKE ?" +
                 " ORDER BY approval_date desc" +
                 " limit 1";
 
         Query query = manager.createNativeQuery(sql)
                 .setParameter(1, "%" + yearFormNo + "%");
+
+
 
         return (String)query.getSingleResult();
     }
