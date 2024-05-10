@@ -208,5 +208,20 @@ public class ApprovalController {
                 approvalService.insertApproval(approvalDTO, multipartFile)));
     }
 
+    @Tag(name = "전자결재 처리", description = "결재처리")
+    @PutMapping("/approvers/{approverNo}")
+    public ResponseEntity<ResponseDTO> updateApprover(@PathVariable(name = "approverNo") String approverNo,
+                                                      @RequestBody ApproverDTO approverStatus,
+                                                      @RequestBody ApprovalDTO rejectReason){
+
+
+
+        Map<String, String> statusMap = new HashMap<>();
+        statusMap.put("approverStatus", approverStatus.getApproverStatus());
+        statusMap.put("rejectReason", rejectReason.getRejectReason());
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재" + approverStatus + "처리 완료",
+                approvalService.updateApprover(approverNo, statusMap)));
+    }
 
 }

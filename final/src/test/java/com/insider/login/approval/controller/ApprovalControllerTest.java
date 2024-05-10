@@ -185,6 +185,23 @@ public class ApprovalControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    @DisplayName("전자결재 결재 처리 테스트")
+    @Test
+    public void testUpdateApprover() throws Exception {
+        //given
 
+        //when
+        String approverNo = "2024-abs00003_apr001";
+        String approverStatus = "승인";
+        String rejectReason = "이러한 사유로 반려합니다.";
 
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.put("/approvers/{approverNo}", approverNo)
+                        .content(approverStatus)
+                        .content(rejectReason)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+    }
 }
