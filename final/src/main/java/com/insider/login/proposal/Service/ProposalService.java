@@ -1,14 +1,22 @@
 package com.insider.login.proposal.Service;
 
+import com.insider.login.member.entity.Member;
+import com.insider.login.member.repository.MemberRepository;
 import com.insider.login.proposal.DTO.ProposalDTO;
 import com.insider.login.proposal.Entity.Proposal;
 import com.insider.login.proposal.Repository.ProposalRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.time.LocalDate;
+import org.springframework.transaction.annotation.Transactional;
+
+
+
+
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,105 +24,116 @@ import java.util.Optional;
 @Service
 public class ProposalService {
 
-    private final ModelMapper modelMapper;
     private final ProposalRepository proposalRepository;
-    private ProposalDTO proposalDTO;
+
+    private final MemberRepository memberInfoRepository;
+    private Long Id;
 
     @Autowired
-    public ProposalService(ModelMapper modelMapper, ProposalRepository proposalRepository) {
-        this.modelMapper = modelMapper;
+    public ProposalService(ProposalRepository proposalRepository, MemberRepository memberInfoRepository) {
         this.proposalRepository = proposalRepository;
+        this.memberInfoRepository = memberInfoRepository;
     }
 
-    // 건의 등록
-    public Map<String, Object> registProposal(ProposalDTO proposalDTO) {
-        this.proposalDTO = proposalDTO;
+    @Transactional
+    public Proposal registerProposal(Proposal proposal) {
+        // member_id 값이 member_info 테이블에 존재하는지 확인
+        Optional<Member> memberInfoOptional = memberInfoRepository.findById(proposal.getMemberId());
+        if (memberInfoOptional.isEmpty()) {
+            throw new IllegalArgumentException("Invalid member_id: " + proposal.getMemberId());
+        }
+
+        // proposal 저장
+        return proposalRepository.save(proposal);
+    }
+
+    public Map<String, Object> deleteProposal(Long proposalId) {
         Map<String, Object> result = new HashMap<>();
+
         try {
-            Proposal proposal = modelMapper.map(proposalDTO, Proposal.class);
-            proposal.setDate(LocalDate.now()); // 현재 날짜로 등록일자 설정
-            proposalRepository.save(proposal); // proposalRepository를 통해 저장
+            proposalRepository.deleteById((long) proposalId);
             result.put("result", true);
         } catch (Exception e) {
             result.put("result", false);
         }
+
         return result;
     }
 
-    // 건의 삭제
-    public Map<String, Object> deleteSuggest(int suggestId) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            proposalRepository.deleteById(suggestId);
-            result.put("result", true);
-        } catch (Exception e) {
-            result.put("result", false);
-        }
-        return result;
+    public Proposal getProposalByProposalNo(int proposalNo) {
+        return proposalRepository.findById((long) proposalNo).orElse(null);
     }
 
-    // 건의 상세 조회
-    public Optional<Proposal> findSuggestBySuggestId(int suggestId) {
-        return proposalRepository.findById(suggestId);
-    }
-
-    // 건의 수정
-    public Map<String, Object> modifySuggest(int suggestId, ProposalDTO proposalDTO) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            Optional<Proposal> optionalSuggest = proposalRepository.findById(suggestId);
-            if (optionalSuggest.isPresent()) {
-                Proposal proposal = optionalSuggest.get();
-
-                // SuggestDTO에서 값을 추출하여 Suggest 객체에 반영
-                if (proposalDTO.getTitle() != null) {
-                    proposal.setTitle(proposalDTO.getTitle());
-                }
-                if (proposalDTO.getContent() != null) {
-                    proposal.setContent(proposalDTO.getContent());
-                }
-                if (proposalDTO.getSuggestDate() != null) {
-                    proposal.setSuggestDate(proposalDTO.getSuggestDate());
-                }
-                // 필요한 만큼 위와 같은 방식으로 다른 필드에 대해서도 처리
-
-                // 변경된 Suggest 객체를 데이터베이스에 저장
-                proposalRepository.save(proposal);
-
-                // 수정 성공 여부를 결과 맵에 추가
-                result.put("result", true);
-            } else {
-                result.put("result", false);
+    public void updateProposal(int proposalNo, ProposalDTO proposalDTO) {
+        Optional<Proposal> optionalProposal = proposalRepository.findById((long) proposalNo);
+        optionalProposal.ifPresent(proposal -> {
+            if (proposalDTO.getContent() != null) {
+                proposal.setContent(proposalDTO.getContent());
             }
-        } catch (Exception e) {
-            result.put("result", false);
-        }
-        return result;
+            if (proposalDTO.getProposalDate() != null) {
+                proposal.setProposalDate(proposalDTO.getProposalDate());
+            }
+            proposalRepository.save(proposal);
+        });
     }
 
-    // 아직 미구현된 메서드들
-    public Map<String, Object> registSuggest(ProposalDTO proposalDTO) {
-        // 구현 필요
-        return null;
+
+    public Proposal retrieveProposalByProposalNo(int proposalNo) {
+        return proposalRepository.findById((long) proposalNo).orElse(null);
     }
 
-    public Object getSuggestBySuggestNo(int suggestNo) {
-        // 구현 필요
-        return null;
+    public void deleteById(int proposalNo) {
+        proposalRepository.deleteById((long) proposalNo);
     }
 
-    public void deleteById(int suggestNo) {
-        // 구현 필요
+
+    public Optional<Proposal> findProposalByProposalNo(int proposalNo) {
+        return proposalRepository.findById((long) proposalNo);
     }
 
-    public void modifyProposal(int suggestNo, ProposalDTO proposalDTO) {
+    public Proposal modifyProposal(Long proposalNo, ProposalDTO proposalDTO) {
+        Optional<Proposal> optionalProposal = proposalRepository.findById(proposalNo);
+        return optionalProposal.map(proposal -> {
+            if (proposalDTO.getContent() != null) {
+                proposal.setContent(proposalDTO.getContent());
+            }
+            if (proposalDTO.getProposalDate() != null) {
+                proposal.setProposalDate(proposalDTO.getProposalDate());
+            }
+            return proposalRepository.save(proposal);
+        }).orElse(null);
     }
 
-    public Object getSuggestByProposalNo(int suggestNo) {
-        return null;
+    public Page<ProposalDTO> getProposalList(UserDetails user, Pageable pageable) {
+        // 사용자 정보를 기반으로 건의사항 목록을 조회하여 페이지로 반환
+        return proposalRepository.findById(Id, pageable);
     }
 
-    public Map<String, Object> registpro(ProposalDTO proposalDTO) {
-        return null;
+    public ProposalDTO registerProposal(ProposalDTO proposalDTO) {
+        Proposal proposal = mapToEntity(proposalDTO);
+        Proposal savedProposal = proposalRepository.save(proposal);
+        return mapToDto(savedProposal);
     }
+
+    private Proposal mapToEntity(ProposalDTO proposalDTO) {
+        Proposal proposal = new Proposal();
+        proposal.setContent(proposalDTO.getContent());
+        proposal.setMemberId(proposalDTO.getMemberId());
+        proposal.setProposalDate(proposalDTO.getProposalDate());
+        return proposal;
+    }
+
+    private ProposalDTO mapToDto(Proposal proposal) {
+        ProposalDTO proposalDTO = new ProposalDTO();
+        proposalDTO.setId(proposal.getId());
+        proposalDTO.setContent(proposal.getContent());
+        proposalDTO.setMemberId(proposal.getMemberId());
+        proposalDTO.setProposalDate(proposal.getProposalDate());
+        return proposalDTO;
+    }
+
+
+
+
 }
+

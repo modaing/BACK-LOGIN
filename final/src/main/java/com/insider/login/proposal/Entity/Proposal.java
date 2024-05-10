@@ -1,5 +1,6 @@
 package com.insider.login.proposal.Entity;
 
+import com.insider.login.proposal.DTO.ProposalDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,65 +8,72 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "suggest")
+@Table(name = "proposal")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @ToString
-public class Proposal {
+public class Proposal extends ProposalDTO {
 
     @Id
-    @Column(name = "suggestion_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int suggestionId;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "proposal_id")
+    private Long id;
 
-    @Column(name = "content", nullable = false, length = 500)
+    @Column(name = "content")
     private String content;
 
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
-
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id")
     private int memberId;
 
-    @Column(name = "receiver_id") // receiverId 프로퍼티 추가
+    @Column(name = "receiver_id")
     private int receiverId;
 
-    @Column(name = "delete_yn") // deleteYn 프로퍼티 추가
+    @Column(name = "created_at")
+    private LocalDate proposalDate;
+
+    @Column(name = "delete_yn")
     private boolean deleteYn;
 
-    @Column(name = "suggest_date") // suggestDate 프로퍼티 추가
-    private LocalDate suggestDate;
 
-    public Proposal(String title, String content, int memberId) {
-        this.title = title;
+    public Long getId() {
+        return this.id;
+    }
+
+
+
+    public Proposal(String title, String content, int memberId, LocalDate proposalDate) {
         this.content = content;
         this.memberId = memberId;
+        this.setProposalDate(proposalDate);
     }
 
-    public void setDate(LocalDate suggestDate) {
-        this.suggestDate = suggestDate;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setDate(LocalDate proposalDate) {
+        this.setProposalDate(proposalDate);
     }
 
     public void setContent(String content) {
         this.content = content;
     }
 
-    public LocalDate getSuggestDate() {
-        return suggestDate;
+    public LocalDate getProposalDate() {
+        return this.proposalDate;
     }
 
-    public void setSuggestDate(LocalDate suggestDate) {
-        this.suggestDate = suggestDate;
+    public void setProposalDate(LocalDate proposalDate) {
+        this.proposalDate = proposalDate;
+    }
+
+
+    public Long getProposalNo() {
+        return id;
+    }
+
+
+    public void setMemberId(int memberId) {
+        this.memberId = memberId;
     }
 }
