@@ -56,8 +56,6 @@ public class CalendarContorller {
     @PostMapping("/calendars")
     public ResponseEntity<String> insertCalendar(@RequestBody CalendarDTO calendarDTO) {
 
-        log.info("[일정등록] 컨트롤러 시작 ============================================================");
-        log.info("[일정등록] CalendarDTO 확인 {}", calendarDTO);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
