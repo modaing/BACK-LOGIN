@@ -70,20 +70,13 @@ public class CalendarService {
 
     @Transactional
     public String deleteCalendar(int calendarNo) {
-        log.info("[일정삭제] 시작 =========================================================");
-        int result = 0;
-
         try {
             calendarRepository.deleteById(calendarNo);
-            log.info("[일정삭제] 삭제 확인 ====================================\n" + calendarRepository.findById(calendarNo));
-            result = 1;
 
+            return "일정 삭제 성공";
         } catch (Exception e) {
-            log.info("[일정삭제] 에러 =====================================================");
-            result = 0;
+            return "일정 삭제 실패";
         }
-
-        return (result > 0) ? "일정 삭제 성공" : "일정 삭제 실패";
     }
 
 }
