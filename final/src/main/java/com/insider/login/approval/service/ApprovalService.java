@@ -311,7 +311,7 @@ public class ApprovalService {
             }
             //날짜 포맷
 
-            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
+            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName(), approval.getRejectReason());
 
             approver.add(approverDTO);
 
@@ -399,8 +399,11 @@ public class ApprovalService {
     public ApproverDTO updateApprover(String approverNo, Map<String, String> statusMap){
         // DTO -> 엔티티 -> DTO
 
+        log.info("Service : updateApprover 들어왔다 : " + approverNo);
+
         //전자결재 번호 가져오기
         String approvalNo = approverNo.substring(0, approverNo.indexOf("_"));
+        log.info("Service : updateApprover - approvalNo 추출 : " + approvalNo);
 
         //전자결재 번호 받아서 해당 전자결재 정보 조회
         ApprovalDTO approvalDTO = selectApproval(approvalNo);

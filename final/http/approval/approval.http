@@ -53,3 +53,13 @@ Content-Disposition: form-data; name="multipartFile"; filename="image.png"
 
 < ./image.png
 --WebAppBoundary--
+
+### 전자결재 처리 (put)
+PUT http://localhost:8080/approvers/2024-exp00001_apr001
+Content-Type: application/json
+Authorization: BEARER eyJkYXRlIjoxNzE1NDUyNTYzODMxLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNTUzODk2MywiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.xbs2kanmXScmF9CoAFpaRWWHs2pvaAXAXD7mzIk1FkI
+
+{
+"approverStatus": "반려",
+"rejectReason": "이런 사유로 반려합니다."
+}

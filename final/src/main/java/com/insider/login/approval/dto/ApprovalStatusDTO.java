@@ -2,14 +2,9 @@ package com.insider.login.approval.dto;
 
 import java.util.List;
 
-public class ApprovalDetailDTO {
+public class ApprovalStatusDTO {
 
-    // 결재번호, 기안자 사번(*membmer_info), 제목, 기안 내용, 작성일시, 상태, 반려사유, 양식번호(*form),
-    // 기안자 부서(*member_info *depart_info), 기안자 직급(*member_info)
-    // 첨부파일번호, 첨부파일원본명, 첨부파일저장경로, 첨부파일저장명
-    // 결재자 번호, 결재순번, 결재자 사번(*member), 결재처리상태, 결재처리일시
-    // 결재자 직급(*member_info), 결재자 부서명(*member_info, *depart_info)
-
+    // 결재번호, 기안자, 결재자 결재상태, 반려사유
     private String approvalNo;                  //결재번호
     private int memberId;                       //기안자사번
     private String approvalTitle;               //제목
@@ -26,10 +21,10 @@ public class ApprovalDetailDTO {
     private String receiverPositionName;        //(*member_infO) 결재자 직급
 
 
-    public ApprovalDetailDTO() {
+    public ApprovalStatusDTO() {
     }
 
-    public ApprovalDetailDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, List<AttachmentDTO> attachment, List<ApproverDTO> approver, String senderDepartName, String senderPositionName, String receiverPositionName, String receiverDepartName) {
+    public ApprovalStatusDTO(String approvalNo, int memberId, String approvalTitle, String approvalContent, String approvalDate, String approvalStatus, String rejectReason, String formNo, List<AttachmentDTO> attachment, List<ApproverDTO> approver, String senderDepartName, String senderPositionName, String receiverPositionName, String receiverDepartName) {
         this.approvalNo = approvalNo;
         this.memberId = memberId;
         this.approvalTitle = approvalTitle;

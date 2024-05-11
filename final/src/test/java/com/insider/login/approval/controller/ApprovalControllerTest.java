@@ -187,18 +187,25 @@ public class ApprovalControllerTest {
 
     @DisplayName("전자결재 결재 처리 테스트")
     @Test
+    @WithMockUser(username = "240501629")
     public void testUpdateApprover() throws Exception {
         //given
 
-        //when
         String approverNo = "2024-abs00003_apr001";
         String approverStatus = "승인";
         String rejectReason = "이러한 사유로 반려합니다.";
 
+        ApproverDTO approverDTO = new ApproverDTO();
+        approverDTO.setApproverStatus(approverStatus);
+        approverDTO.setRejectReason(rejectReason);
+
+        //when
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonBody = objectMapper.writeValueAsString(approverDTO);
+
         //then
         mockMvc.perform(MockMvcRequestBuilders.put("/approvers/{approverNo}", approverNo)
-                        .content(approverStatus)
-                        .content(rejectReason)
+                .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().isOk());

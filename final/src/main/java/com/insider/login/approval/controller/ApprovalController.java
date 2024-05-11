@@ -211,16 +211,15 @@ public class ApprovalController {
     @Tag(name = "전자결재 처리", description = "결재처리")
     @PutMapping("/approvers/{approverNo}")
     public ResponseEntity<ResponseDTO> updateApprover(@PathVariable(name = "approverNo") String approverNo,
-                                                      @RequestBody ApproverDTO approverStatus,
-                                                      @RequestBody ApprovalDTO rejectReason){
+                                                      @RequestBody ApproverDTO approverDTO){
 
 
 
         Map<String, String> statusMap = new HashMap<>();
-        statusMap.put("approverStatus", approverStatus.getApproverStatus());
-        statusMap.put("rejectReason", rejectReason.getRejectReason());
+        statusMap.put("approverStatus", approverDTO.getApproverStatus());
+        statusMap.put("rejectReason", approverDTO.getRejectReason());
 
-        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재" + approverStatus + "처리 완료",
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재" + approverDTO.getApproverStatus() + "처리 완료",
                 approvalService.updateApprover(approverNo, statusMap)));
     }
 
