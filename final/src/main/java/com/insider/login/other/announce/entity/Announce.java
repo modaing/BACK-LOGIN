@@ -34,11 +34,6 @@ public class Announce {
     protected Announce() {}
 
 
-    /** 조회수 증가 비즈니스 로직 */
-    public void increaseHits() {
-        this.hits++;
-    }
-
 
 
 }

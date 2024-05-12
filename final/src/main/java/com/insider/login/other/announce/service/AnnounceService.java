@@ -50,20 +50,9 @@ public class AnnounceService {
 
     }
 
-    /** 공지사항 상세 조회 공지사항 + 파일 같이 있을 때 */
-    public Announce findAncWithFile(int ancNo) {
-        Announce announce = announceRepository.findAnnounceWithFiles(ancNo);
-        if (announce != null) {
-            announce.increaseHits(); // 조회수 증가 비즈니스 로직 메서드
-            announceRepository.save(announce);
-        }
-
-        return announce;
-    }
-
-    /** 공지사항 상세조회 공지사항만 있을 때 */
+    /** 공지사항 상세조회 */
     public Announce findAnc(int ancNo) {
-        // 공지사항 번호를 기준으로 공지사항을 조회하여 반환
+
         return announceRepository.findByAncNo(ancNo);
     }
 
@@ -187,5 +176,14 @@ public class AnnounceService {
         return fileList;
     }
 
-
+    /** 조회수 증가 메서드 분리 */
+    public void incrementHits(int ancNo) {
+        Announce announce = announceRepository.findByAncNo(ancNo);
+        if (announce != null) {
+            AnnounceDTO announceDTO = modelMapper.map(announce, AnnounceDTO.class);
+            announceDTO.setHits(announce.getHits() + 1);
+            Announce updateAnc = modelMapper.map(announceDTO, Announce.class);
+            announceRepository.save(updateAnc);
+        }
+    }
 }
