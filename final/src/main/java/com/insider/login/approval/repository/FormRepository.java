@@ -1,17 +1,20 @@
 package com.insider.login.approval.repository;
 
 import com.insider.login.approval.entity.Form;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public class FormRepository {
+public interface FormRepository extends JpaRepository<Form, String> {
 
-    @PersistenceContext
-    private EntityManager manager;
-
-    public Form findById(String formNo) {
+    public Optional<Form> findByFormNo(String formNo) ;
+    /*{
         return manager.find(Form.class, formNo);
-    }
+    }*/
+
+    public List<Form> findAll();
 }
+

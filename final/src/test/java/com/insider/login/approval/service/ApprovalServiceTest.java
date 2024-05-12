@@ -24,6 +24,33 @@ public class ApprovalServiceTest {
     @Autowired
     private ApprovalService approvalService;
 
+
+    @DisplayName("양식 목록 조회")
+    @Test
+    void testSelectFormList(){
+        //given
+        //when
+        List<FormDTO> formDTOList = approvalService.selectFormList();
+
+        //then
+        Assertions.assertNotNull(formDTOList);
+    }
+
+    @DisplayName("양식 조회")
+    @Test
+    void testSelectForm(){
+        //given
+        String formNo = "abs";
+
+        //when
+        FormDTO formDTO = approvalService.selectForm(formNo);
+
+        //then
+        Assertions.assertNotNull(formDTO);
+        System.out.println(formDTO);
+    }
+
+
     //전자결재 기안 테스트
     @Test
     void testInsertApproval(){
