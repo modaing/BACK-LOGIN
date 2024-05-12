@@ -33,10 +33,11 @@ public class Note {
     @Column(name = "RECEIVER_ID", nullable = false)
     private int receiverId;  // 사번
 
-    @Column(name = "DELETE_YN", nullable = false)
-    private String deleteYn; // 디폴트 값으로 "N"을 할당
+    @Column(name = "SEND_DELETE_YN")
+    private String sendDeleteYn;
 
-
+    @Column(name = "RECEIVE_DELETE_YN")
+    private String receiveDeleteYn;
 
     public Note() {
 
@@ -50,11 +51,11 @@ public class Note {
         this.sendNoteDate = noteDTO.getSendNoteDate();
         this.receiverId = noteDTO.getReceiverId();
         this.senderId = noteDTO.getSenderId();
-        this.deleteYn = noteDTO.getDeleteYn();
+        this.sendDeleteYn = noteDTO.getSendNoteDate();
     }
 
     public Note(String deleteYn) {
-        this.deleteYn = deleteYn;
+        this.sendDeleteYn = sendDeleteYn;
     }
 
 

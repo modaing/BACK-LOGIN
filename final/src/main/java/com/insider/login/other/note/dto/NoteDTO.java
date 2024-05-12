@@ -21,7 +21,9 @@ public class NoteDTO implements java.io.Serializable {
 
     private int receiverId;  // 사번
 
-    private String deleteYn;    // 삭제여부
+    private String sendDeleteYn;    // 삭제여부
+
+    private String receiveDeleteYn;;
 
 
 }
