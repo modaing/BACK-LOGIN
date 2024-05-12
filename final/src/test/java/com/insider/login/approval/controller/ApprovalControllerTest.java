@@ -57,6 +57,36 @@ public class ApprovalControllerTest {
     private final String token = "BEARER eyJkYXRlIjoxNzE1MzI1NjIzMjk4LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNTQxMjAyMywiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.3y1zkFUIHq8cEGHBKPqvToYWT_m9iaVvDGphqoJ2c1s";
 
 
+    @DisplayName("양식 목록 조회")
+    @Test
+    @WithMockUser(username = "240501629")
+    public void testSelectFormList() throws Exception {
+        //given
+        //when
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.get("/approvals/forms")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+    }
+
+    @DisplayName("특정 양식 조회")
+    @Test
+    @WithMockUser(username = "240501629")
+    public void testSelectForm() throws Exception {
+        //given
+        String formNo = "abs";
+
+        //when
+
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.get("/approvals/forms/{formNo}", formNo)
+                        .contentType(MediaType.APPLICATION_JSON))    //요청의 content type 설정
+                .andExpect(status().isOk())    //HTTP 상태코드가 200인지 확인
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.parseMediaType("application/json;charset=UTF-8")))  //응답의 content type을 확인
+                .andReturn();
+    }
+
 
     @DisplayName("전자 결재 상세 조회")
     @Test
@@ -101,9 +131,8 @@ public class ApprovalControllerTest {
         Mockito.when(approvalService.selectApprovalList(Mockito.anyInt(), Mockito.anyMap(), Mockito.anyInt()))
                         .thenReturn(dummyPage);
 */
-
-
         //when
+        //then
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/approvals")
                         .param("fg", condition.get("flag").toString())
@@ -112,7 +141,7 @@ public class ApprovalControllerTest {
                         .header("memberId", memberId))
                 .andExpect(status().isOk());
 
-        //then
+
 
     }
 

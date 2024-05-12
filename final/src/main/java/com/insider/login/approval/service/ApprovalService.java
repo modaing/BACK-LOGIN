@@ -73,6 +73,7 @@ public class ApprovalService {
 
     //양식 목록 조회
     public List<FormDTO> selectFormList(){
+
         List<Form> formList = formRepository.findAll();
 
         List<FormDTO> formDTOList = formList.stream()

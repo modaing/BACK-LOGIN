@@ -11,9 +11,6 @@ import java.util.Optional;
 public interface FormRepository extends JpaRepository<Form, String> {
 
     public Optional<Form> findByFormNo(String formNo) ;
-    /*{
-        return manager.find(Form.class, formNo);
-    }*/
 
     public List<Form> findAll();
 }

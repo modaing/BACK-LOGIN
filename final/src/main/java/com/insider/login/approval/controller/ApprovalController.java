@@ -39,6 +39,23 @@ public class ApprovalController {
     }
 
 
+    @Tag(name = "폼 목록 조회", description = "폼 목록 조회")
+    @GetMapping("/approvals/forms")
+    public ResponseEntity<ResponseDTO> selectFormList(){
+
+        log.info("폼 목록 조회 controller 들어왔다");
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "폼 목록 조회 성공", approvalService.selectFormList()));
+    }
+
+    @Tag(name = "특정 폼 조회", description = "특정 폼 조회")
+    @GetMapping("/approvals/forms/{formNo}")
+    public ResponseEntity<ResponseDTO> selectForm(@PathVariable(name = "formNo") String formNo){
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "특정 폼 조회 성공", approvalService.selectForm(formNo)));
+    }
+
+
     //전자결재 상세 조회
     @Tag(name = "전자결재 상세 조회", description = "전자결재 상세 조회")
     @GetMapping("/approvals/{approvalNo}")
