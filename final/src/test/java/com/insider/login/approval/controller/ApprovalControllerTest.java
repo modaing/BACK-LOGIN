@@ -211,4 +211,21 @@ public class ApprovalControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
     }
+
+    @DisplayName("전자결재 임시저장 삭제 테스트")
+    @Test
+    @WithMockUser(username = "240501629")
+    public void testDeleteApproval() throws Exception {
+        //given
+        String approvalNo = "2024-sup00002";
+
+        //when
+
+
+        //then
+        mockMvc.perform(MockMvcRequestBuilders.delete("/approvals/{approvalNo}", approvalNo)
+                .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }

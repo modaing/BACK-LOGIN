@@ -223,4 +223,12 @@ public class ApprovalController {
                 approvalService.updateApprover(approverNo, statusMap)));
     }
 
+    @Tag(name = "전자결재 삭제", description = "전자결재 임시저장 삭제")
+    @DeleteMapping("/approvals/{approvalNo}")
+    public ResponseEntity<ResponseDTO> deleteApproval(@PathVariable(name="approvalNo") String approvalNo){
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 삭제 성공",
+                approvalService.approvalDelete(approvalNo)));
+    }
+
 }
