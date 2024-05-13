@@ -1,8 +1,10 @@
 package com.insider.login.position.entity;
 import jakarta.persistence.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Entity
 @Table(name = "position_info")
+@PreAuthorize("hasAuthority(ADMIN)")
 public class Position {
 
     @Id

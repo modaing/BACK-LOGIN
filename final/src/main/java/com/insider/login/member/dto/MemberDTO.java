@@ -191,7 +191,6 @@ public class MemberDTO {
         return positionDTO;
     }
 
-
     public String getImageUrl() {
         return imageUrl;
     }
