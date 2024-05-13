@@ -70,8 +70,9 @@ public class AnnounceController extends FileController {
     public ResponseEntity<?> selectAncWithFiles(@PathVariable("ancNo") int ancNo) throws IOException {
         Announce announce = announceService.findAnc(ancNo);
 
-        if (announce == null) {
-            return ResponseEntity.notFound().build(); // 공지사항이 없는 경우 404 에러 반환
+        // 공지사항이 존재할 경우 hits를 증가시킴
+        if (announce != null) {
+            announceService.incrementHits(ancNo);
         }
 
         // 파일이 있으면 파일 정보를 함께 반환
@@ -94,21 +95,18 @@ public class AnnounceController extends FileController {
             Map<String, Object> result = new HashMap<>();
             result.put("announce", announce);
             result.put("files", fileResponses);
+
             return ResponseEntity.ok().body(result);
         } else {
             return ResponseEntity.ok().body(announce);
         }
     }
 
-
-
     public List<AncFile> findAncFilesByAnc(int ancNo) {
 
-        List<AncFile> fileList = announceService.selectFileList(ancNo);
-
-
-        return fileList;
+        return announceService.selectFileList(ancNo);
     }
+
 
     /** 공지사항 등록 */
     @PostMapping(value = "/announces", consumes = {"multipart/form-data"})

@@ -54,7 +54,7 @@ public class AnnounceServiceTests extends FileController {
         int ancNo = 19;
 
         // when
-        Announce announce = announceService.findAncWithFile(ancNo);
+        Announce announce = announceService.findAnc(ancNo);
 
         // then
         Assertions.assertNotNull(announce);

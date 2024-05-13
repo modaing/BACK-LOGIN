@@ -35,10 +35,11 @@ public class NoteServiceTests {
         Integer receiverId = 1;
         Integer senderId =2;
         Pageable pageable = Pageable.ofSize(10);
-        String deleteYn = "N";
+        String sendDeleteYn = "N";
+        String receiveDeleteYn = "N";
 
         // when
-        Page<NoteDTO> noteList = noteService.selectNoteList(memberId, receiverId, senderId, pageable, deleteYn);
+        Page<NoteDTO> noteList = noteService.selectNoteList(memberId, receiverId, senderId, pageable, sendDeleteYn, receiveDeleteYn);
 
 
         // then
@@ -70,7 +71,7 @@ public class NoteServiceTests {
     public void insertNote() {
 
         // given
-        NoteDTO noteDTO = new NoteDTO(1, "2020-20-20", "제목", "내용", 2, 3, "N");
+        NoteDTO noteDTO = new NoteDTO(1, "2020-20-20", "제목", "내용", 2, 3, "N", "n");
 
         // when
         Map<String, Object> result = new HashMap<>();
@@ -98,13 +99,18 @@ public class NoteServiceTests {
 
         // given
         int noteNo = 1;
-        String deleteYn = "Y";
+        String sendDeleteYn = "Y";
+        String receiveDeleteYn = "Y";
+
+        NoteDTO note = new NoteDTO();
+        note.setSendDeleteYn(sendDeleteYn);
+        note.setReceiveDeleteYn(receiveDeleteYn);
 
         // when
         Map<String, Object> result = new HashMap<>();
 
         try {
-            result.put("result", noteService.deleteNote(noteNo, deleteYn));
+            result.put("result", noteService.deleteNote(noteNo, note));
             System.out.println("Check : " + result);
 
         } catch (Exception e) {

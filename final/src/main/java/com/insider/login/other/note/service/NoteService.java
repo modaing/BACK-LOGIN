@@ -34,26 +34,23 @@ public class NoteService {
     /**
      * 쪽지 전체 목록 조회 + 페이징
      */
-    public Page<NoteDTO> selectNoteList(int memberId, Integer receiverId, Integer senderId, Pageable pageable, String deleteYn) {
+    public Page<NoteDTO> selectNoteList(int memberId, Integer receiverId, Integer senderId, Pageable pageable, String sendDeleteYn, String receiveDeleteYn) {
 
         Page<Note> notes;
 
-        if (deleteYn != null) {
-            if (receiverId != null && deleteYn.equals("N")) {
-                notes = noteRepository.findByReceiverIdAndDeleteYn(memberId, pageable, "N");
-            } else if (senderId != null && deleteYn.equals("N")) {
-                notes = noteRepository.findBySenderIdAndDeleteYn(memberId, pageable, "N");
+        if (sendDeleteYn != null && receiveDeleteYn != null) {
+            if (senderId != null && sendDeleteYn.equals("N")) {
+                notes = noteRepository.findBySenderIdAndSendDeleteYn(memberId, pageable,"N");
+                return notes.map(note -> modelMapper.map(note, NoteDTO.class));
+
+            } else if (receiverId != null && receiveDeleteYn.equals("N")) {
+                notes = noteRepository.findByReceiverIdAndReceiveDeleteYn(memberId, pageable,"N");
+                return notes.map(note -> modelMapper.map(note, NoteDTO.class));
+
             } else {
                 // 빈 페이지 반환
                 return Page.empty();
             }
-        } else {
-            return Page.empty();
-        }
-
-
-        if (notes != null) {
-            return notes.map(note -> modelMapper.map(note, NoteDTO.class));
         } else {
             return Page.empty();
         }
@@ -87,18 +84,21 @@ public class NoteService {
 
     /** 쪽지 삭제여부 업데이트 */
 
-    public Map<String, Object> deleteNote(int noteNo, String deleteYn) {
+    public Map<String, Object> deleteNote(int noteNo, NoteDTO noteDTO) {
 
         Map<String, Object> result = new HashMap<>();
 
         Note note = noteRepository.findByNoteNo(noteNo);
 
         if (note != null) {
-            NoteDTO noteDTO = modelMapper.map(note, NoteDTO.class);
+            NoteDTO notes = modelMapper.map(note, NoteDTO.class);
 
-            noteDTO.setDeleteYn(deleteYn);
+            System.out.println("❤️️❤️" + notes);
+            notes.setSendDeleteYn(noteDTO.getSendDeleteYn());
+            notes.setReceiveDeleteYn(noteDTO.getReceiveDeleteYn());
 
-            Note updateNote = modelMapper.map(noteDTO, Note.class);
+            System.out.println("❤️❤️❤️❤️❤️❤️" + noteDTO);
+            Note updateNote = modelMapper.map(notes, Note.class);
             noteRepository.save(updateNote);
 
             result.put("result", true);
