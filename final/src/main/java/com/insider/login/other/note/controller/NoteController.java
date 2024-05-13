@@ -43,7 +43,7 @@ public class NoteController extends CommonController {
                                                            @RequestParam(value = "receiveDeleteYn", required = false) String receiveDeleteYn,
                                                            @RequestParam(value = "page", defaultValue = "0") int page,
                                                            @RequestParam(value = "size", defaultValue = "10") int size,
-                                                           @RequestParam(value = "sort", defaultValue = "sort") String sort,
+                                                           @RequestParam(value = "sort", defaultValue = "noteNo") String sort,
                                                            @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
 
 
