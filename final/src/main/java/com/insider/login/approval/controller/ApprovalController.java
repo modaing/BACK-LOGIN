@@ -39,6 +39,23 @@ public class ApprovalController {
     }
 
 
+    @Tag(name = "폼 목록 조회", description = "폼 목록 조회")
+    @GetMapping("/approvals/forms")
+    public ResponseEntity<ResponseDTO> selectFormList(){
+
+        log.info("폼 목록 조회 controller 들어왔다");
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "폼 목록 조회 성공", approvalService.selectFormList()));
+    }
+
+    @Tag(name = "특정 폼 조회", description = "특정 폼 조회")
+    @GetMapping("/approvals/forms/{formNo}")
+    public ResponseEntity<ResponseDTO> selectForm(@PathVariable(name = "formNo") String formNo){
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "특정 폼 조회 성공", approvalService.selectForm(formNo)));
+    }
+
+
     //전자결재 상세 조회
     @Tag(name = "전자결재 상세 조회", description = "전자결재 상세 조회")
     @GetMapping("/approvals/{approvalNo}")
@@ -208,5 +225,27 @@ public class ApprovalController {
                 approvalService.insertApproval(approvalDTO, multipartFile)));
     }
 
+    @Tag(name = "전자결재 처리", description = "결재처리")
+    @PutMapping("/approvers/{approverNo}")
+    public ResponseEntity<ResponseDTO> updateApprover(@PathVariable(name = "approverNo") String approverNo,
+                                                      @RequestBody ApproverDTO approverDTO){
+
+
+
+        Map<String, String> statusMap = new HashMap<>();
+        statusMap.put("approverStatus", approverDTO.getApproverStatus());
+        statusMap.put("rejectReason", approverDTO.getRejectReason());
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재" + approverDTO.getApproverStatus() + "처리 완료",
+                approvalService.updateApprover(approverNo, statusMap)));
+    }
+
+    @Tag(name = "전자결재 삭제", description = "전자결재 임시저장 삭제")
+    @DeleteMapping("/approvals/{approvalNo}")
+    public ResponseEntity<ResponseDTO> deleteApproval(@PathVariable(name="approvalNo") String approvalNo){
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 삭제 성공",
+                approvalService.approvalDelete(approvalNo)));
+    }
 
 }

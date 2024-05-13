@@ -71,6 +71,44 @@ public class ApprovalService {
         this.modelMapper = modelMapper;
     }
 
+    //양식 목록 조회
+    public List<FormDTO> selectFormList(){
+
+        List<Form> formList = formRepository.findAll();
+
+        List<FormDTO> formDTOList = formList.stream()
+                .map(form -> new FormDTO(form.getFormNo(), form.getFormName(), form.getFormShape()))
+                .sorted((form1, form2) -> {
+                    //non을 가장 위에 두고 그 외의 경우는 한글순으로 정렬
+                    if("non".equals(form1.getFormNo()) && !"non".equals(form2.getFormNo())){
+                        //form1이 "non"이고 form2가 "non"이 아니면 form1을 더 위로
+                        return -1;
+                    }else if(!"non".equals(form1.getFormNo())&&"non".equals(form2.getFormNo())){
+                        //form1이 "non"이 아니고 form2가 "non"이면 form2를 더 위로
+                        return 1;
+                    }
+                    else{
+                        return form1.getFormName().compareTo(form2.getFormName());
+                    }
+                })
+                .collect(Collectors.toList());
+
+        return formDTOList;
+    }
+
+    //양식번호로 양식 조회
+    public FormDTO selectForm(String formNo){
+
+        FormDTO formDTO = new FormDTO();
+        Form form = formRepository.findByFormNo(formNo)
+                .orElseThrow(() -> new RuntimeException("양식을 찾을 수 없습니다. : " + formNo));
+
+        formDTO = modelMapper.map(form, FormDTO.class);
+
+
+        return formDTO;
+    }
+
     //전자결재 기안(등록)
     @Transactional
     public Object insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
@@ -281,7 +319,9 @@ public class ApprovalService {
         //기안자의 부서 정보 가져오기
         Department senderDepart = approvalDepartmentRepository.findById(senderMember.getDepartNo());
         //양식 정보 가져오기
-        Form approvalForm = formRepository.findById(approval.getFormNo());
+        Form form = formRepository.findByFormNo(approval.getFormNo())
+                .orElseThrow(() -> new RuntimeException("양식을 찾을 수 없습니다. : " + approval.getFormNo()));
+
 
         List<ApproverDTO> approver = new ArrayList<>();
         List<ReferencerDTO> referencer = new ArrayList<>();
@@ -311,7 +351,7 @@ public class ApprovalService {
             }
             //날짜 포맷
 
-            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName());
+            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName(), approval.getRejectReason());
 
             approver.add(approverDTO);
 
@@ -356,7 +396,7 @@ public class ApprovalService {
             standByMemberName = standByMember.getName();
         }
 
-        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), approvalForm.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
+        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), form.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
 
 
         log.info("service : " + approvalDTO);
@@ -399,8 +439,11 @@ public class ApprovalService {
     public ApproverDTO updateApprover(String approverNo, Map<String, String> statusMap){
         // DTO -> 엔티티 -> DTO
 
+        log.info("Service : updateApprover 들어왔다 : " + approverNo);
+
         //전자결재 번호 가져오기
         String approvalNo = approverNo.substring(0, approverNo.indexOf("_"));
+        log.info("Service : updateApprover - approvalNo 추출 : " + approvalNo);
 
         //전자결재 번호 받아서 해당 전자결재 정보 조회
         ApprovalDTO approvalDTO = selectApproval(approvalNo);
