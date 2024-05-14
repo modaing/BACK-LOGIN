@@ -102,6 +102,14 @@ public class MemberController {
         Path targetLocation = Paths.get(filePath);
         System.out.println("targetLocation: " + targetLocation);
         System.out.println("file input stream: " + file.getInputStream());
+        System.out.println("file info1: " + file.getSize());
+        System.out.println("file info3: " + file.getName());
+        System.out.println("file info4: " + file.getOriginalFilename());
+        System.out.println("file info5: " + file.getClass());
+        System.out.println("file info6: " + file.getResource());
+        System.out.println("file info7: " + file.getBytes());
+        System.out.println("file info8: " + file.getContentType());
+
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
         String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -110,6 +118,8 @@ public class MemberController {
                 .toUriString();
 
         memberDTO.setImageUrl(fileUrl);
+
+//        return "hi";
         Member savedMember = memberService.saveMember(memberDTO);
 //        return savedMember + "";
         System.out.println("회원 가입한 구성원 정보: " + savedMember);
