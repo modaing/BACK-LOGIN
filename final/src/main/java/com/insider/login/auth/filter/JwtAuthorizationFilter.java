@@ -46,8 +46,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         /* we are able to intercept every requests and responses and provide new data within the response. (해석: 어떤 요청이 들어왔을 때 우선 인증을 할 것이고, 그 인증이 완료되면 보통 인증정보들이 SecurityContextHolder에 가지고있다. 그렇기 때문에 거기로 들어가기 위한 coding을 할것이다) */
 
+        /* 요청 및 응답의 문자 인코딩 설정 */
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        /* 응답의 Content-Type 헤더 설정 */
+        response.setContentType("application/json; charset=UTF-8");
+
         System.out.println("===== JwtAuthorizationFilter 도착 =====");
-        List<String> roleLessList = Arrays.asList("/signUp","/registDepart","/registPosition", "/login","/members/{memberId}","/showAllMembersPage","/departmentDetails");
+        List<String> roleLessList = Arrays.asList("/signUp","/registDepart","/registPosition", "/login","/members/{memberId}","/showAllMembersPage", "/announces", "/announces/{ancNo}, /approvals");
 
         /* 인증은 했지만 권한이 필요 없는 resource들은 그냥 다음 동작으로 넘어간다... 하지만 권한이 필요한 resource면 -> SecurityContextHolder에 권한 정보를 같이 줘서, 거기에 접근을 할 수 있게 해줘야 한다 */
         if (roleLessList.contains((request.getRequestURI()))) {

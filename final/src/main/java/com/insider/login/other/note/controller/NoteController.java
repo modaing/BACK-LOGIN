@@ -39,10 +39,11 @@ public class NoteController extends CommonController {
     public ResponseEntity<ResponseMessage> receiveNoteList(@PathVariable("memberId") int memberId,
                                                            @RequestParam(value = "receiverId", required = false) Integer receiverId,
                                                            @RequestParam(value = "senderId", required = false) Integer senderId,
-                                                           @RequestParam(value = "deleteYn", required = true) String deleteYn,
+                                                           @RequestParam(value = "sendDeleteYn", required = false) String sendDeleteYn,
+                                                           @RequestParam(value = "receiveDeleteYn", required = false) String receiveDeleteYn,
                                                            @RequestParam(value = "page", defaultValue = "0") int page,
                                                            @RequestParam(value = "size", defaultValue = "10") int size,
-                                                           @RequestParam(value = "sort", defaultValue = "sort") String sort,
+                                                           @RequestParam(value = "sort", defaultValue = "noteNo") String sort,
                                                            @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
 
 
@@ -54,7 +55,7 @@ public class NoteController extends CommonController {
 
         Pageable pageable = CommonController.getPageable(page, size, sort, direction);
 
-        Page<NoteDTO> notePage = noteService.selectNoteList(memberId, receiverId, senderId, pageable, deleteYn);
+        Page<NoteDTO> notePage = noteService.selectNoteList(memberId, receiverId, senderId, pageable, sendDeleteYn, receiveDeleteYn);
 
         if (notePage.isEmpty()) {
             String errorMessage = "조회된 노트가 없습니다.";
@@ -97,18 +98,17 @@ public class NoteController extends CommonController {
     public ResponseEntity<ResponseMessage> insertNote(@RequestBody NoteDTO noteDTO) {
 
         noteDTO.setSendNoteDate(nowDate());
-        noteDTO.setDeleteYn("N");
+        noteDTO.setSendDeleteYn("N");
+        noteDTO.setReceiveDeleteYn("N");
 
         return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", noteService.insertNote(noteDTO)));
     }
 
     @PutMapping("/notes/{noteNo}")
-    public ResponseEntity<?> deleteNote(@PathVariable (value = "noteNo") int noteNo,
-                                        @RequestParam (value = "deleteYn", required = false) String deleteYn) {
+    public ResponseEntity<?> deleteNote(@PathVariable(value = "noteNo") int noteNo,
+                                        @RequestBody NoteDTO noteDTO) {
 
-        deleteYn = "Y";
-        return ResponseEntity.ok().body(new ResponseMessage(200, "삭제 성공", noteService.deleteNote(noteNo, deleteYn)));
-
+        return ResponseEntity.ok().body(new ResponseMessage(200, "삭제 성공", noteService.deleteNote(noteNo, noteDTO)));
     }
 
 

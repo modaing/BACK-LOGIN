@@ -5,21 +5,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @SpringBootTest
 //@AutoConfigureMockMvc
@@ -27,6 +23,33 @@ public class ApprovalServiceTest {
 
     @Autowired
     private ApprovalService approvalService;
+
+
+    @DisplayName("양식 목록 조회")
+    @Test
+    void testSelectFormList(){
+        //given
+        //when
+        List<FormDTO> formDTOList = approvalService.selectFormList();
+
+        //then
+        Assertions.assertNotNull(formDTOList);
+    }
+
+    @DisplayName("양식 조회")
+    @Test
+    void testSelectForm(){
+        //given
+        String formNo = "abs";
+
+        //when
+        FormDTO formDTO = approvalService.selectForm(formNo);
+
+        //then
+        Assertions.assertNotNull(formDTO);
+        System.out.println(formDTO);
+    }
+
 
     //전자결재 기안 테스트
     @Test
@@ -171,9 +194,7 @@ public class ApprovalServiceTest {
 //        approvalService.insertApproval(approvalDTO);
 
         //then
-        Assertions.assertDoesNotThrow(
-                () -> approvalService.insertApproval(approvalDTO, files)
-        );
+        Assertions.assertEquals(approvalService.insertApproval(approvalDTO, files), "성공");
 
     }
 
@@ -258,11 +279,11 @@ public class ApprovalServiceTest {
     @Test
     void testSelectApprovalList(){
         //given
-        int memberId = 2024001001;
+        int memberId = 240501629;
         int pageNo = 0;
 
         Map<String, Object> condition = new HashMap<>();
-        condition.put("flag", "receivedRef");
+        condition.put("flag", "given");
         condition.put("offset", 0);
         condition.put("limit", 10);
         condition.put("direction", null);
@@ -277,7 +298,7 @@ public class ApprovalServiceTest {
         List<ApprovalDTO> approvalDTOList = approvalDTOPage.getContent();
 
         for(int i=0; i < approvalDTOList.size(); i++){
-            System.out.println(approvalDTOList.get(i).getApprovalDate() + " | "  + approvalDTOList.get(i).getApprovalTitle() + " | " + approvalDTOList.get(i).getApprovalNo()) ;
+            System.out.println(approvalDTOList.get(i).getApprovalDate() + " | "  + approvalDTOList.get(i).getApprovalTitle() + " | " + approvalDTOList.get(i).getApprovalNo() + " | 현재 진행 중 : " + approvalDTOList.get(i).getStandByApprover()) ;
         }
 
         //then

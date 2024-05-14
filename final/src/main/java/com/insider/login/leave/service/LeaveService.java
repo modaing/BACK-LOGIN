@@ -12,6 +12,7 @@ import com.insider.login.leave.entity.LeaveSubmit;
 import com.insider.login.leave.repository.LeaveAccrualRepository;
 import com.insider.login.leave.repository.LeaveRepository;
 import com.insider.login.leave.repository.LeaveSubmitRepository;
+import com.insider.login.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -47,9 +48,6 @@ public class LeaveService extends LeaveUtil {
             Page<LeaveSubmit> submitList = null;
             if (applicantId > 0) {
                 submitList = leaveSubmitRepository.findByMemberId(applicantId, pageable);
-                for (LeaveSubmit submit : submitList) {
-                    System.out.println(submit);
-                }
             } else {
                 submitList = leaveSubmitRepository.findAll(pageable);
             }
@@ -58,8 +56,10 @@ public class LeaveService extends LeaveUtil {
             for (LeaveSubmit submit : submitList) {
                 LeaveSubmitDTO leaveSubmitDTO = modelMapper.map(submit, LeaveSubmitDTO.class);
 
-                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
+//                사번으로 사원명 조회해서 DTO에 넣기
+                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApplicant()));
 
+//                승인자 사번이 존재할 경우 승인자 사번으로 사원명을 조회해서 DTO에 넣기
                 if (submit.getLeaveSubApprover() != 0) {
                     leaveSubmitDTO.setApproverName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
                 }
@@ -70,9 +70,7 @@ public class LeaveService extends LeaveUtil {
             // DTOList를 기존 pageable 정보를 가진 새로운 페이지로 만들어서 반환
             return new PageImpl<>(DTOList, submitList.getPageable(), submitList.getTotalElements());
         } catch (Exception e) {
-            log.info("[휴가내역] 에러 ===================================== ");
             return Page.empty();
-
         }
     }
 
@@ -182,7 +180,7 @@ public class LeaveService extends LeaveUtil {
                 tempDTO.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
             }
 
-            // 다시 dto를 엔티티로 전환 후 save
+            // update
             LeaveSubmit newSubmit = modelMapper.map(tempDTO, LeaveSubmit.class);
             leaveSubmitRepository.save(newSubmit);
 

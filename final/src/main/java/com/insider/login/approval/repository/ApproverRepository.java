@@ -3,14 +3,8 @@ package com.insider.login.approval.repository;
 import com.insider.login.approval.entity.Approver;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -41,7 +35,7 @@ public class ApproverRepository {
         String query = "SELECT approver_no, approval_no, approver_order, approver_status, approver_date, member_id" +
                 " FROM approver" +
                 " WHERE approval_no = ?" +
-                " AND approver_status = '처리 중'" +
+                " AND approver_status = '대기'" +
                 " ORDER BY approver_order ASC" +
                 " LIMIT 1";
 

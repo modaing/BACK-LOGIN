@@ -50,16 +50,10 @@ public class AnnounceService {
 
     }
 
+    /** 공지사항 상세조회 */
+    public Announce findAnc(int ancNo) {
 
-
-    /** 공지사항 상세 조회 */
-    public Announce findAncWithFile(int ancNo) {
-        Announce announce = announceRepository.findAnnounceWithFiles(ancNo);
-        if (announce != null) {
-            announce.increaseHits(); // 조회수 증가 비즈니스 로직 메서드
-            announceRepository.save(announce);
-        }
-        return announce;
+        return announceRepository.findByAncNo(ancNo);
     }
 
     /** 파일과 공지사항 모두 있을 때 insert */
@@ -83,7 +77,7 @@ public class AnnounceService {
                     String fileName = file.getOriginalFilename();
                     String fileType = file.getContentType();
                     String uploadDirectory = ymlConfig.getUploadDir();
-                    String filePath = uploadDirectory + "\\" + fileName;   // 파일을 저장할 경로 지정
+                    String filePath = uploadDirectory + fileName;   // 파일을 저장할 경로 지정
 
                     File newFile = new File(filePath);
                     file.transferTo(newFile);
@@ -179,7 +173,17 @@ public class AnnounceService {
 
         List<AncFile> fileList = announceFileRepository.findByAncNo(ancNo);
 
-
         return fileList;
+    }
+
+    /** 조회수 증가 메서드 분리 */
+    public void incrementHits(int ancNo) {
+        Announce announce = announceRepository.findByAncNo(ancNo);
+        if (announce != null) {
+            AnnounceDTO announceDTO = modelMapper.map(announce, AnnounceDTO.class);
+            announceDTO.setHits(announce.getHits() + 1);
+            Announce updateAnc = modelMapper.map(announceDTO, Announce.class);
+            announceRepository.save(updateAnc);
+        }
     }
 }

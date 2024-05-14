@@ -5,6 +5,7 @@ import com.insider.login.common.ResponseMessage;
 import com.insider.login.leave.dto.LeaveInfoDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import com.insider.login.other.survey.dto.SurveyDTO;
+import com.insider.login.other.survey.dto.SurveyInsertRequestDTO;
 import com.insider.login.other.survey.service.SurveyService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -94,14 +95,13 @@ public class SurveyController extends CommonController {
      * 수요조사 등록
      */
     @PostMapping("/surveys")
-    public ResponseEntity<String> insertSurvey(@RequestBody SurveyDTO surveyDTO,
-                                               @RequestBody List<String> answers) {
+    public ResponseEntity<String> insertSurvey(@RequestBody SurveyInsertRequestDTO request) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        surveyDTO.setSurveyApplyDate(nowDate());
+        request.getSurveyDTO().setSurveyApplyDate(nowDate());
 
-        return ResponseEntity.ok().headers(headers).body(surveyService.insertSurvey(surveyDTO, answers));
+        return ResponseEntity.ok().headers(headers).body(surveyService.insertSurvey(request.getSurveyDTO(), request.getAnswers()));
     }
 
     /**

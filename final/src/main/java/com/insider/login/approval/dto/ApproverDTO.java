@@ -15,6 +15,8 @@ public class ApproverDTO {
     private String positionName;            //결재자 직급명
     private String departName;              //결재자 부서명
 
+    private String rejectReason;            //결재자 반려사유
+
     public ApproverDTO () {}
 
     public ApproverDTO(String approverNo, String approvalNo, int approverOrder, String approverStatus, String approverDate, int memberId) {
@@ -26,7 +28,7 @@ public class ApproverDTO {
         this.memberId = memberId;
     }
 
-    public ApproverDTO(String approverNo, String approvalNo, int approverOrder, String approverStatus, String approverDate, int memberId, String name, String positionName, String departName) {
+    public ApproverDTO(String approverNo, String approvalNo, int approverOrder, String approverStatus, String approverDate, int memberId, String name, String positionName, String departName, String rejectReason) {
         this.approverNo = approverNo;
         this.approvalNo = approvalNo;
         this.approverOrder = approverOrder;
@@ -36,6 +38,7 @@ public class ApproverDTO {
         this.name = name;
         this.positionName = positionName;
         this.departName = departName;
+        this.rejectReason = rejectReason;
     }
 
     public String getApproverNo() {
@@ -110,6 +113,15 @@ public class ApproverDTO {
         this.departName = departName;
     }
 
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+
     @Override
     public String toString() {
         return "ApproverDTO{" +
@@ -122,6 +134,7 @@ public class ApproverDTO {
                 ", name='" + name + '\'' +
                 ", positionName='" + positionName + '\'' +
                 ", departName='" + departName + '\'' +
+                ", rejectReason='" + rejectReason + '\'' +
                 '}';
     }
 }
