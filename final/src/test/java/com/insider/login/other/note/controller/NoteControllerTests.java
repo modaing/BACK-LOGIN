@@ -91,7 +91,7 @@ public class NoteControllerTests {
     public void testInsertNote() throws Exception {
 
         // given
-        NoteDTO noteDTO = new NoteDTO(9, "2020-20-20", "제목", "내용", 2, 3, "N");
+        NoteDTO noteDTO = new NoteDTO(9, "2020-20-20", "제목", "내용", 2, 3, "N", "N");
 
         // when
         MvcResult result = mockMvc.perform(post("/notes")

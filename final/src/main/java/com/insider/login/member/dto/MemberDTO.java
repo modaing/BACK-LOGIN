@@ -33,6 +33,10 @@ public class MemberDTO {
     public MemberDTO() {
     }
 
+    public MemberDTO(int memberId) {
+        this.memberId = memberId;
+    }
+
     public MemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl) {
         this.memberId = memberId;
         this.name = name;
@@ -159,6 +163,7 @@ public class MemberDTO {
     public void setRole(MemberRole role) {
         this.role = role;
     }
+
 
     public DepartmentDTO getDepartmentDTO() {
         return departmentDTO;

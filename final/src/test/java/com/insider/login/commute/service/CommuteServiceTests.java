@@ -34,8 +34,9 @@ public class CommuteServiceTests {
     private static Stream<Arguments> getStartWork() {
         return Stream.of(
                 Arguments.of(
-                        2024001003,
-                        LocalDate.now(),
+                        240401835,
+//                        LocalDate.now(),
+                        LocalDate.of(2024,04,29),
                         LocalTime.of(8,55),
                         "근무중",
                         0
@@ -71,21 +72,13 @@ public class CommuteServiceTests {
 //    @Transactional
     void testUpdateTimeOfCommuteByCommuteNo() {
         //given
-        int commuteNo = 18;
+        int commuteNo = 35;
         LocalTime endWork = LocalTime.of(18,00);
         String workingStatus = "퇴근";
 
         /** 총 근무 시간 %%% 분 형식 (int)으로 만들기 */
         Duration workingDuration = Duration.between(LocalTime.of(8,55), endWork).minusHours(1);
         int totalWorkingHours = (int) workingDuration.toMinutes();
-
-        /** 총 근무 시간 %시간 %분 형식 (String)으로 변환하기 */
-
-//        int totalWorkingHoursValue = totalWorkingHours / 60;
-//        int totalWorkingMinutesValue = totalWorkingHours % 60;
-//
-//        String totalWorkingTimeString = String.format("%d시간 %d분", totalWorkingHoursValue, totalWorkingMinutesValue);
-//        System.out.println(totalWorkingTimeString);
 
         UpdateTimeOfCommuteDTO updateTimeOfCommute = new UpdateTimeOfCommuteDTO(
                 endWork,
@@ -112,10 +105,6 @@ public class CommuteServiceTests {
         /** 전체 출퇴근 내역 조회시 월간 조회에 사용할 변수들 */
         LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-        LocalDate preStartDayOfMonth = startDayOfMonth.minusMonths(1);
-        LocalDate preEndDayOfMonth = endDayOfMonth.minusMonths(1);
-        LocalDate nextStartDayOfMonth = startDayOfMonth.plusMonths(1);
-        LocalDate nextEndDayOfMonth = endDayOfMonth.plusMonths(1);
 
         //when
         List<CommuteDTO> departCommuteList = commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth);
@@ -130,16 +119,12 @@ public class CommuteServiceTests {
 //    @Transactional
     void testSelectCommuteListByMemberId() {
         //given
-        int memberId = 2024001001;
+        int memberId = 240401835;
         LocalDate date = LocalDate.now();
 
         /** 출퇴근 내역 조회시 주간 조회에 사용할 변수들 */
         LocalDate startWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endWeek = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-        LocalDate preStartWeek = startWeek.minusWeeks(1);
-        LocalDate preEndWeek = endWeek.minusWeeks(1);
-        LocalDate nextStartWeek = startWeek.plusWeeks(1);
-        LocalDate nextEndWeek = endWeek.plusWeeks(1);
 
         //when
         List<CommuteDTO> commuteList = commuteService.selectCommuteListByMemberId(memberId, startWeek, endWeek);
@@ -187,7 +172,7 @@ public class CommuteServiceTests {
     @Test
     void testUpdateProcessForCorrectByCorrNo() {
         //given
-        /** 정정 처리 - 승인 */
+        /** case 1. 정정 처리 - 승인 */
         int corrNo = 30;
         String corrStatus = "승인";
         LocalDate corrProcessingDate = LocalDate.now();
@@ -197,7 +182,7 @@ public class CommuteServiceTests {
                 corrProcessingDate
         );
 
-        /** 정정 처리 - 반려 */
+        /** case 2. 정정 처리 - 반려 */
 //        int corrNo = 30;
 //        String corrStatus = "반려";
 //        String reasonForRejection = "적절한 정정 사유에 해당하지 않습니다.";
@@ -265,6 +250,19 @@ public class CommuteServiceTests {
         //then
         Assertions.assertNotNull(correction);
         System.out.println("correction : " + correction);
+    }
+
+    @DisplayName("멤버별 가장 마지막 출퇴근 번호 찾기 테스트")
+    @Test
+    void testSearchLastCommuteNoByMemberId() {
+        //given
+        int memberId = 240401835;
+
+        //when
+        CommuteDTO lastCommute = commuteService.searchLastCommuteNoByMemberId(memberId);
+
+        //then
+        Assertions.assertEquals(memberId, lastCommute.getMemberId());
     }
 
 }
