@@ -109,7 +109,7 @@ public class TokenUtils {
         System.out.println("member 정보: " + memberDTO);
 
         /* 토큰을 통해서 쉽게 정보들을 꺼낼 수 있는 logic */
-        claims.put("departNo", memberDTO.getDepartmentDTO().getDepartNo());
+        claims.put("departNo", memberDTO.getDepartmentDTO().getDepartNo());         // 부서 번호
         claims.put("departName", memberDTO.getDepartmentDTO().getDepartName());     // 부서명
         claims.put("positionName", memberDTO.getPositionDTO().getPositionName());   // 직급명
         claims.put("imageUrl",memberDTO.getImageUrl());                             // 이미지 경로
@@ -141,7 +141,6 @@ public class TokenUtils {
         MemberDTO member = detailsMember.getMember();
         return member;
     }
-
 
 
     /*

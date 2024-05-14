@@ -72,16 +72,4 @@ public class Commute {
         this.totalWorkingHours = totalWorkingHours;
         this.commuteMember = commuteMember;
     }
-
-    public void setEndWork(LocalTime endWork) {
-        this.endWork = endWork;
-    }
-
-    public void setWorkingStatus(String workingStatus) {
-        this.workingStatus = workingStatus;
-    }
-
-    public void setTotalWorkingHours(int totalWorkingHours) {
-        this.totalWorkingHours = totalWorkingHours;
-    }
 }

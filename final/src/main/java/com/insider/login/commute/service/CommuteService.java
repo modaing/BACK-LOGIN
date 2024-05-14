@@ -28,10 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,6 +76,7 @@ public class CommuteService {
             result.put("result", false);
         }
 
+        log.info("[CommuteService] commuteNo : " + newCommute.getCommuteNo());
         log.info("[CommuteService] insertTimeOfCommute End ===========");
         return result;
     }
@@ -423,4 +421,29 @@ public class CommuteService {
 
         return correctionDTO;
     }
+
+    @Transactional
+    public CommuteDTO searchLastCommuteNoByMemberId(int memberId) {
+        log.info("[CommuteService] searchLastCommuteNoByMemberId");
+        log.info("[CommuteService] memberId : ", memberId);
+
+        CommuteMember findMemberByMemberId = commuteMemberRepository.findByMemberId(memberId);
+
+        List<Commute> findCommuteListByMember = findMemberByMemberId.getCommuteList();
+
+        Commute lastCommute = findCommuteListByMember.stream()
+                .max(Comparator.comparing(Commute::getStartWork))
+                .orElse(null);
+
+        CommuteDTO lastCommuteDTO = modelMapper.map(lastCommute, CommuteDTO.class);
+
+        log.info("lastCommuteNo : " + lastCommuteDTO.getCommuteNo());
+
+        if (lastCommuteDTO != null) {
+            return lastCommuteDTO;
+        } else {
+            return null;
+        }
+    }
+
 }

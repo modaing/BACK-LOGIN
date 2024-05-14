@@ -6,6 +6,7 @@ import com.insider.login.commute.dto.CommuteDTO;
 import com.insider.login.commute.dto.CorrectionDTO;
 import com.insider.login.commute.dto.UpdateProcessForCorrectionDTO;
 import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
+import com.insider.login.commute.entity.Commute;
 import com.insider.login.commute.service.CommuteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,6 +53,8 @@ public class CommuteController {
     public ResponseEntity<ResponseMessage> selectCommuteList(@RequestParam(value = "target") String target,
                                                              @RequestParam(value = "targetValue") String targetValue,
                                                              @RequestParam(value = "date") LocalDate date) {
+
+        System.out.println("date : " + date);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
@@ -153,6 +156,14 @@ public class CommuteController {
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
 
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/commutes/{memberId}")
+    public int searchLastCommuteNoByMemberId(@PathVariable("memberId") int memberId) {
+
+        CommuteDTO lastCommute = commuteService.searchLastCommuteNoByMemberId(memberId);
+
+        return lastCommute.getCommuteNo();
     }
 
 }

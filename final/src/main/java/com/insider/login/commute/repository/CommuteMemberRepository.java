@@ -12,4 +12,6 @@ public interface CommuteMemberRepository extends JpaRepository<CommuteMember, In
     List<CommuteMember> findByDepartNo(int departNo);
 
     List<CommuteMember> findByMemberRole(String admin);
+
+    CommuteMember findByMemberId(int memberId);
 }

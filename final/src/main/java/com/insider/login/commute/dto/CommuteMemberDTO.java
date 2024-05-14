@@ -20,7 +20,6 @@ public class CommuteMemberDTO {
     private String positionName;        // 직급명
     private LocalDate employedDate;     // 입사일
     private String address;             // 주소
-//    private int transferredId;          // 발령 아이디
     private String phoneNo;             // 전화 번호
     private String memberStatus;       // 현재 상태
     private String email;               // 이메일
