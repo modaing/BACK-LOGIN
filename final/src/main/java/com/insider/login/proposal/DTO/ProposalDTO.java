@@ -4,16 +4,25 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProposalDTO {
+    private int id;               // 건의 아이디
+    private String content;        // 건의 내용
+    private int memberId;          // 작성자 사번
+    private LocalDate proposalDate;  // 건의 등록일자
 
-    private int suggestId;          // 건의 아이디
-    private String title;           // 건의 제목
-    private String content;         // 건의 내용
-    private int memberId;           // 작성자 사번
-    private LocalDate suggestDate;  // 건의 등록일자
+    public ProposalDTO(String content, int memberId, LocalDate proposalDate) {
+        this.id = id;
+        this.content = content;
+        this.memberId = memberId;
+        this.proposalDate = proposalDate;
+    }
+    public int getId() {
+        return this.id;
+    }
+
+
 }
