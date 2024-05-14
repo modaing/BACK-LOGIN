@@ -12,25 +12,29 @@ import com.insider.login.position.entity.Position;
 import com.insider.login.transferredHistory.dto.TransferredHistoryDTO;
 import com.insider.login.transferredHistory.entity.TransferredHistory;
 import com.insider.login.transferredHistory.repository.TransferredHistoryRepository;
+import org.aspectj.util.FileUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class MemberService {
-
     private final ModelMapper modelMapper;
     private final MemberRepository memberRepository;
     private final DepartmentRepository departmentRepository;
@@ -64,17 +68,14 @@ public class MemberService {
     /* 구성원 등록 */
     @Transactional
     public Member saveMember(MemberDTO memberDTO) {
-
-        System.out.println("memberDTO 정보들: " + memberDTO);
         Member newMember = modelMapper.map(memberDTO, Member.class);
-        System.out.println("member에 들어간 정보: " + newMember);
-        Department department = modelMapper.map(memberDTO.getDepartmentDTO(), Department.class);
-        Position position = modelMapper.map(memberDTO.getPositionDTO(), Position.class);
-        newMember.setDepartment(department);
-        newMember.setPosition(position);
-        System.out.println("newMember에 저장된 department : " + newMember.getDepartment() + ", and position: " + newMember.getPosition());
+        System.out.println("new member: " + newMember);
+//        Department department = modelMapper.map(memberDTO.getDepartmentDTO(), Department.class);
+//        Position position = modelMapper.map(memberDTO.getPositionDTO(), Position.class);
+//        newMember.setDepartment(department);
+//        newMember.setPosition(position);
         Member savedMember = memberRepository.save(newMember);
-        System.out.println("확인용: " + savedMember);
+        System.out.println("구성원 등록 성공: " + savedMember);
         return savedMember;
     }
 
@@ -258,5 +259,11 @@ public class MemberService {
             return null;
         }
 
+    }
+
+    public MemberDTO getProfilePicture(int memberId) {
+        Member memberDetail = memberRepository.findById(memberId).orElse(null);
+        MemberDTO currentMember = modelMapper.map(memberDetail, MemberDTO.class);
+        return currentMember;
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentService {
@@ -69,6 +70,14 @@ public class DepartmentService {
         DepartmentDTO foundDepartName = modelMapper.map(existingDepartName, DepartmentDTO.class);
 
         return foundDepartName.getDepartName();
+    }
+
+    public List<DepartmentDTO> findDepartments() {
+        List<Department> departmentInfos = departmentRepository.findAll();
+        List<DepartmentDTO> allDepartList = departmentInfos.stream()
+                .map(department -> modelMapper.map(department, DepartmentDTO.class))
+                .collect(Collectors.toList());
+        return allDepartList;
     }
 
 //    public DepartmentDTO findDepartment(int departNo) {

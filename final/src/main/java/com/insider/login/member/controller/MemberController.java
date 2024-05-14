@@ -1,8 +1,7 @@
 package com.insider.login.member.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.insider.login.auth.model.dto.LoginDTO;
+import com.insider.login.config.YmlConfig;
 import com.insider.login.department.service.DepartmentService;
 import com.insider.login.member.dto.MemberDTO;
 import com.insider.login.member.dto.UpdatePasswordRequestDTO;
@@ -10,13 +9,12 @@ import com.insider.login.member.entity.Member;
 import com.insider.login.member.service.MemberService;
 import com.insider.login.position.service.PositionService;
 import com.insider.login.transferredHistory.service.TransferredHistoryService;
-import org.apache.coyote.Response;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -26,15 +24,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.imageio.ImageIO;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.*;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,8 +53,7 @@ import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
 @CrossOrigin(origins = "http://localhost:3000")
 public class MemberController {
 
-    @Value("${jwt.key}")
-    private String jwtSecret;
+    private final YmlConfig ymlConfig;
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TransferredHistoryService transferredHistoryService;
@@ -56,7 +62,7 @@ public class MemberController {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoders;
 
-    public MemberController(MemberService memberService, BCryptPasswordEncoder passwordEncoder, TransferredHistoryService transferredHistoryService, PositionService positionService, DepartmentService departmentService, ModelMapper modelMapper, PasswordEncoder passwordEncoders) {
+    public MemberController(MemberService memberService, BCryptPasswordEncoder passwordEncoder, TransferredHistoryService transferredHistoryService, PositionService positionService, DepartmentService departmentService, ModelMapper modelMapper, PasswordEncoder passwordEncoders, YmlConfig ymlConfig) {
         this.memberService = memberService;
         this.passwordEncoder = passwordEncoder;
         this.transferredHistoryService = transferredHistoryService;
@@ -64,52 +70,50 @@ public class MemberController {
         this.departmentService = departmentService;
         this.modelMapper = modelMapper;
         this.passwordEncoders = passwordEncoders;
+        this.ymlConfig = ymlConfig;
     }
 
     /** 구성원 등록 */
     @PostMapping("/signUp")
-    public String signUp(@RequestBody MemberDTO memberDTO) {
+    public String signUp(@RequestPart("memberDTO") MemberDTO memberDTO, @RequestPart("memberProfilePicture") MultipartFile file) throws IOException {
 
-        // 2자릿수 년도
-        String twoDigitYear = Year.now().format(DateTimeFormatter.ofPattern("yy"));
-        System.out.println("2자릿수 년도: " + twoDigitYear);
-
-        // 2자릿수 월
-        String twoDigitMonth = String.format("%02d", YearMonth.now().getMonthValue());
-        System.out.println("2자릿수 월: " + twoDigitMonth);
-
-        // 2자릿수 부서번호
-        String departNo = String.valueOf(memberDTO.getDepartmentDTO().getDepartNo());
-        if (departNo.length() == 1) {
-            departNo = "0" + departNo;
-        }
-
-        // unique memberId 생성 (중복 X)
-        int setMemberId;
-        boolean existingId;
-        do {
-            Random random = new Random();
-            int randomNumber = random.nextInt(900) + 100;
-            setMemberId = Integer.parseInt(twoDigitYear + twoDigitMonth + departNo + randomNumber);
-
-            existingId = memberService.findExistingMemberId(setMemberId);
-        } while (existingId);
-
-        memberDTO.setMemberId(setMemberId);
-        memberDTO.setPassword("0000");
+        /* 비밀번호 암호화해서 설정 */
         String encodedPassword = passwordEncoder.encode(memberDTO.getPassword());
         memberDTO.setPassword(encodedPassword);
-        memberDTO.setMemberStatus("재직");
 
-        // JSON형식으로 LocalDate을 저장을 하기 위한 logic
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        LocalDate localDate = LocalDate.now();
-        memberDTO.setEmployedDate(localDate);               // 입사일
+        /* memberId가 존재하는지 확인하는 용도 */
+        int generatedMemberId = memberDTO.getMemberId();
+        boolean existingId;
 
+         /* 존재 한다면 새로운 memberId를 부여해서 setting을 해줄 것이다 */
+        do {
+            existingId = memberService.findExistingMemberId(generatedMemberId);
+            if (existingId) {
+                generatedMemberId = generateNewMemberId(generatedMemberId);
+            }
+        } while (existingId);
+        memberDTO.setMemberId(generatedMemberId); // 겹치는 memberId가 없다면 다시 setting 해준다
+
+        System.out.println("memberDTO: " + memberDTO);
+
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename(); // unique file name
+        String filePath = Paths.get("/Users/jee/Documents/Desktop/Personal Stuffs/", fileName).toString();
+
+        Path targetLocation = Paths.get(filePath);
+        System.out.println("targetLocation: " + targetLocation);
+        System.out.println("file input stream: " + file.getInputStream());
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/profilePictures")
+                .path(fileName)
+                .toUriString();
+
+        memberDTO.setImageUrl(fileUrl);
         Member savedMember = memberService.saveMember(memberDTO);
+//        return savedMember + "";
         System.out.println("회원 가입한 구성원 정보: " + savedMember);
-
+//
         // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
         transferredHistoryService.saveHistory(savedMember);
 
@@ -120,6 +124,19 @@ public class MemberController {
             System.out.println("회원가입 성공 🙂");
             return "회원 가입 성공!";
         }
+    }
+
+    /* memberId가 겹친다면 마지막 3자릿수를 다시 생성을 해서 되돌린다 */
+    private int generateNewMemberId(int memberId) {
+        int memberIdPrefix = memberId / 1000;
+
+        /* 무작위 3자릿수 생성*/
+        Random random = new Random();
+        int randomNumber = random.nextInt(900) + 100;
+
+        /* 뒤에 더한다 */
+        return memberIdPrefix * 1000 + randomNumber;
+
     }
 
 
@@ -340,12 +357,6 @@ public class MemberController {
         return workbook;
     }
 
-//    @PostMapping("/login")
-//    public void login(@RequestBody MemberDTO memberDTO) {
-//        System.out.println("controller 도착");
-//        memberService.loggedInMember(memberDTO);
-//    }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         System.out.println("inputted username: " + loginDTO.getMemberId());
@@ -361,4 +372,13 @@ public class MemberController {
             return ResponseEntity.ok("Login successful");
         }
     }
+
+//    @GetMapping("/getProfilePicture")
+//    public ResponseEntity<byte[]> getProfilePicture(@RequestParam("memberId") int memberId) {
+//        MemberDTO memberDetails = memberService.getProfilePicture(memberId);
+//
+//        // Return the response with the appropriate content type and image data
+//        MediaType contentType;
+//        return ResponseEntity.ok().contentType(contentType).body(memberDetails.getImageUrl());
+//    }
 }

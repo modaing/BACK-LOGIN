@@ -72,4 +72,10 @@ public class DepartmentController {
         int noOfMembersInDepartment = memberService.findNoOfMembers(departNo);
         return noOfMembersInDepartment;
     }
+
+    @GetMapping("/departmentDetails")
+    public List<DepartmentDTO> showDepartmentDetails() {
+        return departmentService.findDepartments();
+
+    }
 }

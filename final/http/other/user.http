@@ -1,8 +1,12 @@
 ## ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 ### 회원가입 (김지환)
 POST http://localhost:8080/signUp
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary=WebAppBoundary
 Accept: */*
+
+--WebAppBoundary
+Content-Disposition: form-data; name="memberDTO"
+Content-Type: application/json
 
 {
   "departmentDTO": {
@@ -21,6 +25,12 @@ Accept: */*
   "phoneNo": "01012341234",
   "role": "ADMIN"
 }
+
+--WebAppBoundary
+Content-Disposition: form-data; name="profilePictureImage"; filename="profilePicture.jpeg"
+
+< profilePicture.jpeg
+--WebAppBoundary--
 
 ### 로그인 (김지환)
 POST http://localhost:8080/login

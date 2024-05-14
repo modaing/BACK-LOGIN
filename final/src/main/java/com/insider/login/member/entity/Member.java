@@ -43,9 +43,8 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "position_name")
     private Position position;
-    @Column(name = "image_url")
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
-
     @OneToMany(mappedBy = "member")
     private List<EnteredRoom> enteredRoom = new ArrayList<>();
 
@@ -134,6 +133,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
 //    public void setCommutes(List<Commute> commutes) {
 //        this.commutes = commutes;
 //    }
+
 
     public String getImageUrl() {
         return imageUrl;
