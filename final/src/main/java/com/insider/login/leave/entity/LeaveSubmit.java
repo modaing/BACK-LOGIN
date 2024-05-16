@@ -16,7 +16,7 @@ public class LeaveSubmit {
     @Column(name = "REF_LEAVE_SUB_NO", nullable = true)
     private int refLeaveSubNo;                  // 상위 신청 번호 (취소 요청 시 사용)
 
-    @Column(name = "MEMBER_ID", nullable = false, columnDefinition = "VARCHAR(20)")
+    @Column(name = "MEMBER_ID", nullable = false)
     private int leaveSubApplicant;              // 신청자 사번 (사번으로 사원명 조회에서 DTO에 담기)
 
     @Column(name = "LEAVE_SUB_APPROVER", nullable = true)
@@ -28,7 +28,7 @@ public class LeaveSubmit {
     @Column(name = "LEAVE_SUB_END_DATE", nullable = false)  // YYYY-MM-DD
     private LocalDate  leaveSubEndDate;               // 휴가 종료일
 
-    @Column(name = "LEAVE_SUB_APPLY_DATE", nullable = false, columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
+    @Column(name = "LEAVE_SUB_APPLY_DATE", nullable = false) // YYYY-MM-DD
     private String leaveSubApplyDate;           // 신청 일자
 
     @Column(name = "LEAVE_SUB_TYPE", nullable = false, columnDefinition = "VARCHAR(12)") // 연차, 오전반차, 오후반차, 특별휴가
@@ -37,10 +37,10 @@ public class LeaveSubmit {
     @Column(name = "LEAVE_SUB_STATUS", nullable = false, columnDefinition = "VARCHAR(6)") // 승인, 반려, 대기
     private String leaveSubStatus;              // 처리 상태
 
-    @Column(name = "LEAVE_SUB_PROCESS_DATE", nullable = true , columnDefinition = "VARCHAR(10)") // YYYY-MM-DD
+    @Column(name = "LEAVE_SUB_PROCESS_DATE", nullable = true) // YYYY-MM-DD
     private String leaveSubProcessDate;         // 처리 일자
 
-    @Column(name = "LEAVE_SUB_REASON", nullable = true, columnDefinition = "VARCHAR(300)")
+    @Column(name = "LEAVE_SUB_REASON", nullable = true)
     private String leaveSubReason;              // 신청 사유
     protected LeaveSubmit() {
     }
