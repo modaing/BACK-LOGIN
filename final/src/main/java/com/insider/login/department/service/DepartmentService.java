@@ -3,7 +3,6 @@ package com.insider.login.department.service;
 import com.insider.login.department.dto.DepartmentDTO;
 import com.insider.login.department.entity.Department;
 import com.insider.login.department.repository.DepartmentRepository;
-import com.insider.login.member.dto.MemberDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
