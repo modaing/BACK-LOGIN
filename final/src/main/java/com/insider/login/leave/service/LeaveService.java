@@ -5,14 +5,12 @@ import com.insider.login.leave.entity.Leaves;
 import com.insider.login.leave.repository.LeaveMemberRepository;
 import com.insider.login.leave.util.LeaveUtil;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
-import com.insider.login.leave.dto.LeavesDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import com.insider.login.leave.entity.LeaveAccrual;
 import com.insider.login.leave.entity.LeaveSubmit;
 import com.insider.login.leave.repository.LeaveAccrualRepository;
 import com.insider.login.leave.repository.LeaveRepository;
 import com.insider.login.leave.repository.LeaveSubmitRepository;
-import com.insider.login.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -75,11 +73,15 @@ public class LeaveService extends LeaveUtil {
     }
 
     @Transactional
-    public String insertSubmit(LeaveSubmitDTO leaveSubmitDTO) {
+    public String insertSubmit(LeaveSubmitDTO DTO) {
         try {
-            leaveSubmitDTO.setLeaveSubStatus("대기");
+            if (DTO.getLeaveSubNo() != 0) {
+                DTO.setRefLeaveSubNo(DTO.getLeaveSubNo());
+                DTO.setLeaveSubNo(0);
+            }
 
-            LeaveSubmit leaveSubmit = modelMapper.map(leaveSubmitDTO, LeaveSubmit.class);
+            DTO.setLeaveSubStatus("대기");
+            LeaveSubmit leaveSubmit = modelMapper.map(DTO, LeaveSubmit.class);
 
             leaveSubmitRepository.save(leaveSubmit);
 
@@ -88,18 +90,6 @@ public class LeaveService extends LeaveUtil {
             return "신청 등록 실패";
         }
     }
-
-    @Transactional
-    public String deleteSubmit(int leaveSubNo) {
-        try {
-            leaveSubmitRepository.deleteById(leaveSubNo);
-
-            return "신청 취소 성공";
-        } catch (Exception e) {
-            return "신청 취소 실패";
-        }
-    }
-
     public String insertSubmitCancel(LeaveSubmitDTO DTO) {
         try {
             // 화면에서 받아온 정보를 취소 요청 등록 폼으로 수정

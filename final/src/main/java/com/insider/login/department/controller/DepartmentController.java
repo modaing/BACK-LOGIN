@@ -1,10 +1,12 @@
 package com.insider.login.department.controller;
 
 import com.insider.login.department.dto.DepartmentDTO;
+import com.insider.login.department.dto.DepartmentDetailsDTO;
 import com.insider.login.department.service.DepartmentService;
 import com.insider.login.member.service.MemberService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,17 +31,21 @@ public class DepartmentController {
 
     /** 부서 조회 */
     @GetMapping("/departments")
-    public String allDepartments() {
+    public List<DepartmentDetailsDTO> allDepartments() {
         List<DepartmentDTO> departmentDTOs = departmentService.searchAllDepartment();
+        List<DepartmentDetailsDTO> departmentDetailsDTOList = new ArrayList<>();
 
-        StringBuilder result = new StringBuilder();
-
-        /* 각 부서별 구성원 인원수 조회 */
         for (DepartmentDTO departmentDTO : departmentDTOs) {
             int noOfMembersInDepartment = membersInDepartments(departmentDTO.getDepartNo());
-            result.append("Department: ").append(departmentDTO.getDepartNo()).append(", Members: ").append(noOfMembersInDepartment).append("\n");
+            DepartmentDetailsDTO departmentDetailsDTO = new DepartmentDetailsDTO();
+
+            departmentDetailsDTO.setDepartName(departmentDTO.getDepartName());
+            departmentDetailsDTO.setDepartNo(departmentDTO.getDepartNo());
+            departmentDetailsDTO.setNoOfPeople(noOfMembersInDepartment);
+
+            departmentDetailsDTOList.add(departmentDetailsDTO);
         }
-        return result.toString();
+        return departmentDetailsDTOList;
     }
 
     /** 부서 수정 */
@@ -76,6 +82,5 @@ public class DepartmentController {
     @GetMapping("/departmentDetails")
     public List<DepartmentDTO> showDepartmentDetails() {
         return departmentService.findDepartments();
-
     }
 }

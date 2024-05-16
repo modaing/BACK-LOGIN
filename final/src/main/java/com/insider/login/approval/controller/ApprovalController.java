@@ -72,6 +72,7 @@ public class ApprovalController {
     public ResponseEntity<ResponseDTO> selectApprovalList(@RequestParam("fg") String fg,
                                                           @RequestParam(name="page",defaultValue = "0") String page,
                                                           @RequestParam(name="title", defaultValue = "") String title,
+                                                          @RequestParam(name="direction", defaultValue = "DESC") String direction,
                                                           @RequestHeader(value = "memberId", required = false) String memberIdstr){
         log.info("****컨트롤러 들어왔어");
 
@@ -93,9 +94,8 @@ public class ApprovalController {
 
         Map<String, Object> condition = new HashMap<>();
         condition.put("flag", fg);
-        condition.put("offset", 0);
         condition.put("limit", 10);
-        condition.put("direction", null);
+        condition.put("direction", direction);
         condition.put("title", title);
 
         int pageNo = Integer.parseInt(page);
@@ -104,6 +104,8 @@ public class ApprovalController {
 
 
         Page<ApprovalDTO> approvalDTOPage =  approvalService.selectApprovalList(memberId, condition, pageNo);
+
+        System.out.println("🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈Page 총 페이지 controller : " + approvalDTOPage.getTotalPages());
 //        log.info("approvalDTOPage : " + approvalDTOPage.getContent());
 
             ResponseDTO response = new ResponseDTO(HttpStatus.OK, "상신 목록 조회 성공", approvalDTOPage);

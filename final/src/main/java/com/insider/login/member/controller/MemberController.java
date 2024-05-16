@@ -4,12 +4,12 @@ import com.insider.login.auth.model.dto.LoginDTO;
 import com.insider.login.config.YmlConfig;
 import com.insider.login.department.service.DepartmentService;
 import com.insider.login.member.dto.MemberDTO;
+import com.insider.login.member.dto.ShowMemberDTO;
 import com.insider.login.member.dto.UpdatePasswordRequestDTO;
 import com.insider.login.member.entity.Member;
 import com.insider.login.member.service.MemberService;
 import com.insider.login.position.service.PositionService;
 import com.insider.login.transferredHistory.service.TransferredHistoryService;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -17,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,21 +28,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.*;
-
+import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -119,21 +121,21 @@ public class MemberController {
 
         memberDTO.setImageUrl(fileUrl);
 
-//        return "hi";
-        Member savedMember = memberService.saveMember(memberDTO);
-//        return savedMember + "";
-        System.out.println("회원 가입한 구성원 정보: " + savedMember);
+        return "hi";
+//        Member savedMember = memberService.saveMember(memberDTO);
+////        return savedMember + "";
+//        System.out.println("회원 가입한 구성원 정보: " + savedMember);
+////
+//        // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
+//        transferredHistoryService.saveHistory(savedMember);
 //
-        // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
-        transferredHistoryService.saveHistory(savedMember);
-
-        if(Objects.isNull(savedMember)) { // 비어있으면 실패
-            System.out.println("회원가입 실패 🥲");
-            return "회원가입 실패";
-        } else {                    // 다 작성을 했으면 구성원 가입 성공
-            System.out.println("회원가입 성공 🙂");
-            return "회원 가입 성공!";
-        }
+//        if(Objects.isNull(savedMember)) { // 비어있으면 실패
+//            System.out.println("회원가입 실패 🥲");
+//            return "회원가입 실패";
+//        } else {                    // 다 작성을 했으면 구성원 가입 성공
+//            System.out.println("회원가입 성공 🙂");
+//            return "회원 가입 성공!";
+//        }
     }
 
     /* memberId가 겹친다면 마지막 3자릿수를 다시 생성을 해서 되돌린다 */
@@ -252,23 +254,16 @@ public class MemberController {
 
     /** 구성원 전체 조회 */
     @GetMapping("/showAllMembersPage")
-    public List<MemberDTO> showAllMembersPage() {
-        System.out.println("show all member infos in the page");
+    public List<ShowMemberDTO> showAllMembersPage() {
         List<MemberDTO> memberLists = memberService.showAllMembers();
-        System.out.println("memberList: " + memberLists);
+        List<ShowMemberDTO> showMemberList = new ArrayList<>();
 
         for (MemberDTO member : memberLists) {
-            System.out.println("memberName: " + member.getName());
-            System.out.println("memberId: " + member.getMemberId());
-            System.out.println("member department name: " + member.getDepartmentDTO().getDepartName());
-            System.out.println("member position name: " + member.getPositionDTO().getPositionName());
-            System.out.println("employedDate: " + member.getEmployedDate());
-
             /* 근속년수 */
             LocalDate employedDate = member.getEmployedDate();
             LocalDate currentDate = LocalDate.now();
             Period period = Period.between(employedDate, currentDate);
-            System.out.println("period값: " + period); // 예시 P5D
+//            System.out.println("period값: " + period); // 예시 P5D
 
             int years = period.getYears();      // 년
             int months = period.getMonths();    // 개월
@@ -282,13 +277,20 @@ public class MemberController {
             } else if (years == 0 || months == 0) {
                 yearsMonthString += days + "일";
             }
-            System.out.println("근속년수: " + yearsMonthString);
 
-            System.out.println("member status: " + member.getMemberStatus());
+            ShowMemberDTO showMemberDTO = new ShowMemberDTO();
+            showMemberDTO.setName(member.getName());
+            showMemberDTO.setMemberId(member.getMemberId());
+            showMemberDTO.setDepartmentDTO(member.getDepartmentDTO());
+            showMemberDTO.setPositionDTO(member.getPositionDTO());
+            showMemberDTO.setEmployedDate(member.getEmployedDate());
+            showMemberDTO.setMemberStatus(member.getMemberStatus());
+            showMemberDTO.setPeriodOfWork(yearsMonthString);
 
+            showMemberList.add(showMemberDTO);
         }
         // 근속년수 작성할 것
-        return memberLists;
+        return showMemberList;
     }
     /** 구성원 비밀번호 초기화 */
     @PutMapping("/resetMemberPassword")
@@ -310,7 +312,7 @@ public class MemberController {
 
         Workbook workbook = createExcelFile();
 
-        String fileName = "전체-구성원-정보.xlsx";
+        String fileName = "memberListDownload";
         File file = new File(fileName);
         try (FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
@@ -332,7 +334,7 @@ public class MemberController {
 
         /* excel 파일 header 설정 */
         Row headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("구성원 ID");
+        headerRow.createCell(0).setCellValue("사번");
         headerRow.createCell(1).setCellValue("이름");
         headerRow.createCell(2).setCellValue("이메일");
         headerRow.createCell(3).setCellValue("주소");
@@ -351,7 +353,6 @@ public class MemberController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             String formattedEmployedDate = member.getEmployedDate().format(formatter);
-
 
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(member.getMemberId());

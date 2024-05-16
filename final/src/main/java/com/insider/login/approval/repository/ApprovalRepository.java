@@ -78,6 +78,8 @@ public class ApprovalRepository {
         List<Approval> resultList = query.getResultList();
 
         int total = getNotTempTotalCount(memberId, title);
+        System.out.println("전체 갯수 : " + total);
+
         return new PageImpl<>(resultList, pageable, total);
     }
 

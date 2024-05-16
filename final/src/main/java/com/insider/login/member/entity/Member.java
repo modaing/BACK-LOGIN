@@ -1,8 +1,6 @@
 package com.insider.login.member.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.insider.login.common.utils.MemberRole;
-import com.insider.login.commute.entity.Commute;
 import com.insider.login.department.entity.Department;
 import com.insider.login.position.entity.Position;
 import com.insider.login.webSocket.Cahtting.entity.EnteredRoom;
