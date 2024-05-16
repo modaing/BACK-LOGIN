@@ -550,6 +550,7 @@ public class ApprovalService {
                 //결재 상신함 (내가 기안자 / 임시저장 제외)
 
                 approvalPage = approvalRepository.findByMemberId(memberId, pageable, direction, title);
+                System.out.println("totalPage : " + approvalPage.getTotalPages());
 
                 approvalDTOList = ListToDTO(approvalPage);
 
@@ -626,7 +627,19 @@ public class ApprovalService {
 
         }
 
-        return new PageImpl<>(approvalDTOList, pageable, approvalPage.getTotalPages());
+        int totalPage =  approvalPage.getTotalPages();
+        long total = approvalPage.getTotalElements();
+
+        System.out.println("Service last totalPage : " + totalPage);
+
+        System.out.println("Service total 갯수 : " + total);
+
+        PageImpl<ApprovalDTO> appPage = new PageImpl<> (approvalDTOList, pageable, total);
+        System.out.println("new PageImpl getPageable: " + appPage.getSize());
+
+        System.out.println("new PageImpl totalPage : " + appPage.getTotalPages());
+
+        return appPage;
     }
 
     //Page를 DTO로 변환
