@@ -131,7 +131,7 @@ public class ApprovalRepository {
 
         Query query = manager.createNativeQuery(sql, Approval.class);
         query.setParameter(1, memberId)
-                .setParameter(2, title);
+                .setParameter(2, "%" + title + "%");
 
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
