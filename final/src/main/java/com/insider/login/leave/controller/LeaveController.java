@@ -82,29 +82,17 @@ public class LeaveController extends CommonController {
      */
     @PostMapping("/leaveSubmits")
     public ResponseEntity<String> insertSubmit(@RequestBody LeaveSubmitDTO leaveSubmitDTO) {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
         leaveSubmitDTO.setLeaveSubApplyDate(nowDate());
 
         String result = "";
 
-        if (leaveSubmitDTO.getLeaveSubNo() == 0) {
-            result = leaveService.insertSubmit(leaveSubmitDTO);
-        } else {
-            result = leaveService.insertSubmitCancel(leaveSubmitDTO);
-        }
+        result = leaveService.insertSubmit(leaveSubmitDTO);
 
         return ResponseEntity.ok().headers(headers).body(result);
-    }
-
-    /**
-     * 휴가 신청 취소 (삭제)
-     */
-    @DeleteMapping("/leaveSubmits/{LeaveSubNo}")
-    public ResponseEntity<String> deleteSubmit(@PathVariable("LeaveSubNo") int leaveSubNo) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        return ResponseEntity.ok().headers(headers).body(leaveService.deleteSubmit(leaveSubNo));
     }
 
     /**
