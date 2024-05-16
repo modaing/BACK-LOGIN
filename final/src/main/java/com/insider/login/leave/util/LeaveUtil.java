@@ -19,7 +19,7 @@ public class LeaveUtil {
         LocalDate endDate = leaveSubmit.getLeaveSubEndDate();
 
         // 두 날짜 사이의 일수 계산
-        return (int) ChronoUnit.DAYS.between(startDate, endDate);
+        return (int) (ChronoUnit.DAYS.between(startDate, endDate ) + 1);
     }
 
     public LeaveInfoDTO leaveInfoCalc(List<Leaves> memberLeaves) {

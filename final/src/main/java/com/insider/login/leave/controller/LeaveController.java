@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Slf4j
 public class LeaveController extends CommonController {
 
     private final LeaveService leaveService;
@@ -39,7 +40,7 @@ public class LeaveController extends CommonController {
     public ResponseEntity<ResponseMessage> selectSubmitList(@RequestParam(value = "page", defaultValue = "0") int pageNumber,
                                                             @RequestParam(value = "direction", defaultValue = "DESC") String direction,
                                                             @RequestParam(value = "properties", defaultValue = "leaveSubNo") String properties,
-                                                            @RequestParam(value = "memberid", defaultValue = "0") int memberId) {
+                                                            @RequestParam(value = "memberId", defaultValue = "0") int memberId) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
