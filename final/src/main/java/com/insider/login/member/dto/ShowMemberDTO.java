@@ -2,18 +2,11 @@ package com.insider.login.member.dto;
 
 import com.insider.login.common.utils.MemberRole;
 import com.insider.login.department.dto.DepartmentDTO;
-import com.insider.login.department.entity.Department;
 import com.insider.login.position.dto.PositionDTO;
-import com.insider.login.position.entity.Position;
-import com.insider.login.transferredHistory.dto.TransferredHistoryDTO;
-import com.insider.login.transferredHistory.entity.TransferredHistory;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-public class MemberDTO {
+public class ShowMemberDTO {
 
     private int memberId;
     private String name;
@@ -27,11 +20,12 @@ public class MemberDTO {
     private DepartmentDTO departmentDTO;
     private PositionDTO positionDTO;
     private String imageUrl;
+    private String periodOfWork;
 
-    public MemberDTO() {
+    public ShowMemberDTO() {
     }
 
-    public MemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl) {
+    public ShowMemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl, String periodOfWork) {
         this.memberId = memberId;
         this.name = name;
         this.password = password;
@@ -44,46 +38,7 @@ public class MemberDTO {
         this.departmentDTO = departmentDTO;
         this.positionDTO = positionDTO;
         this.imageUrl = imageUrl;
-    }
-
-//    public MemberDTO(Member member) {
-//        this.memberId = member.getMemberId();
-//        this.name = member.getName();
-//        this.password = member.getPassword();
-//        this.employedDate = member.getEmployedDate();
-//        this.address = member.getAddress();
-//        this.phoneNo = member.getPhoneNo();
-//        this.memberStatus = member.getMemberStatus();
-//        this.email = member.getEmail();
-//        this.role = member.getRole();
-//        this.imageUrl = member.getImageUrl();
-////        this.commutes = member.getCommutes();
-//        // Map Department and Position
-//        setDepartment(member.getDepartment());
-//        setPosition(member.getPosition());
-//    }
-
-    public static List<TransferredHistoryDTO> mapTransferredHistoryList(List<TransferredHistory> transferredHistoryList) {
-        List<TransferredHistoryDTO> transferredHistoryDTOList = new ArrayList<>();
-        for (TransferredHistory transferredHistory : transferredHistoryList) {
-            TransferredHistoryDTO transferredHistoryDTO = new TransferredHistoryDTO();
-            transferredHistoryDTO.setTransferredDate(transferredHistory.getTransferredDate());
-            transferredHistoryDTO.setNewPositionName(transferredHistory.getNewPositionName());
-            transferredHistoryDTO.setNewDepartNo(transferredHistory.getNewDepartNo());
-
-            transferredHistoryDTOList.add(transferredHistoryDTO);
-        }
-        return transferredHistoryDTOList;
-    }
-
-    public MemberDTO(MemberDTO memberDTO) {
-    }
-
-    public List<String> getRoleList() {
-        if (this.role != null && !this.role.getRole().isEmpty()) {
-            return Arrays.asList(this.role.getRole().split(","));
-        }
-        return new ArrayList<>();
+        this.periodOfWork = periodOfWork;
     }
 
     public int getMemberId() {
@@ -161,32 +116,17 @@ public class MemberDTO {
     public DepartmentDTO getDepartmentDTO() {
         return departmentDTO;
     }
+
     public void setDepartmentDTO(DepartmentDTO departmentDTO) {
         this.departmentDTO = departmentDTO;
     }
 
-    public void setDepartment(Department department) {
-        if (department != null) {
-            this.departmentDTO = new DepartmentDTO();
-            this.departmentDTO.setDepartNo(department.getDepartNo());
-            this.departmentDTO.setDepartName(department.getDepartName());
-        }
+    public PositionDTO getPositionDTO() {
+        return positionDTO;
     }
 
     public void setPositionDTO(PositionDTO positionDTO) {
         this.positionDTO = positionDTO;
-    }
-
-    public void setPosition(Position position) {
-        if (position != null) {
-            this.positionDTO = new PositionDTO();
-            this.positionDTO.setPositionName(position.getPositionName());
-            this.positionDTO.setPositionLevel(position.getPositionLevel());
-        }
-    }
-
-    public PositionDTO getPositionDTO() {
-        return positionDTO;
     }
 
     public String getImageUrl() {
@@ -197,9 +137,17 @@ public class MemberDTO {
         this.imageUrl = imageUrl;
     }
 
+    public String getPeriodOfWork() {
+        return periodOfWork;
+    }
+
+    public void setPeriodOfWork(String periodOfWork) {
+        this.periodOfWork = periodOfWork;
+    }
+
     @Override
     public String toString() {
-        return "MemberDTO{" +
+        return "showMemberDTO{" +
                 "memberId=" + memberId +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
@@ -212,8 +160,7 @@ public class MemberDTO {
                 ", departmentDTO=" + departmentDTO +
                 ", positionDTO=" + positionDTO +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", periodOfWork='" + periodOfWork + '\'' +
                 '}';
     }
 }
-
-

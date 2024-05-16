@@ -1,6 +1,5 @@
 package com.insider.login.position.service;
 
-import com.insider.login.department.dto.DepartmentDTO;
 import com.insider.login.position.dto.PositionDTO;
 import com.insider.login.position.entity.Position;
 import com.insider.login.position.repository.PositionRepository;
