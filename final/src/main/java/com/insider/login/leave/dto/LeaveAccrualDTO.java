@@ -10,6 +10,8 @@ public class LeaveAccrualDTO {
 
     private String recipientDepart;             // 대상자 부서
 
+    private String accrualDate;                 // 발생 일자
+
     private int leaveAccrualDays;               // 발생 일수
 
     private String leaveAccrualReason;          // 발생 사유
@@ -70,6 +72,14 @@ public class LeaveAccrualDTO {
         this.recipientDepart = recipientDepart;
     }
 
+    public String getAccrualDate() {
+        return accrualDate;
+    }
+
+    public void setAccrualDate(String accrualDate) {
+        this.accrualDate = accrualDate;
+    }
+
     public int getLeaveAccrualDays() {
         return leaveAccrualDays;
     }
@@ -109,6 +119,7 @@ public class LeaveAccrualDTO {
                 ", recipientId=" + recipientId +
                 ", recipientName='" + recipientName + '\'' +
                 ", recipientDepart='" + recipientDepart + '\'' +
+                ", accrualDate='" + accrualDate + '\'' +
                 ", leaveAccrualDays=" + leaveAccrualDays +
                 ", leaveAccrualReason='" + leaveAccrualReason + '\'' +
                 ", grantorId=" + grantorId +
