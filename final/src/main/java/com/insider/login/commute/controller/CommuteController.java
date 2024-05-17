@@ -109,10 +109,10 @@ public class CommuteController {
     @GetMapping("/corrections")
     public ResponseEntity<ResponseMessage> selectRequestForCorrectList(@RequestParam(value = "memberId", required = false) Integer memberId,
                                                                        @RequestParam(value = "date") LocalDate date,
-                                                                       @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                       @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                       @RequestParam(value = "sort", defaultValue = "sort") String sort,
-                                                                       @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
+                                                                       @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+                                                                       @RequestParam(value = "size", defaultValue = "10", required = false) int size,
+                                                                       @RequestParam(value = "sort", defaultValue = "sort", required = false) String sort,
+                                                                       @RequestParam(value = "direction", defaultValue = "DESC", required = false) String direction) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));

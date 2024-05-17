@@ -187,7 +187,7 @@ public class CommuteService {
                     correctionDTO.setReqStartWork(newCorrection.getReqStartWork());
 
                 /** 1-3. 퇴근 시간만 정정 요청 */
-                } else if(newCorrection.getReqStartWork() == null && newCorrection.getReqEndWork() != null) {
+                } else if(newCorrection.getReqEndWork() != null && newCorrection.getReqStartWork() == null) {
                     correctionDTO.setReqEndWork(newCorrection.getReqEndWork());
 
                 /** 1-4. 출퇴근 정정 요청 시간이 존재하지 않는 경우 */
