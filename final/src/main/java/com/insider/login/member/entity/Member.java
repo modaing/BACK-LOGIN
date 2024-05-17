@@ -39,7 +39,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     @JoinColumn(name = "depart_no")
     private Department department;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "position_name")
+    @JoinColumn(name = "position_level")
     private Position position;
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
