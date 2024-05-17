@@ -133,7 +133,11 @@ public class LeaveService extends LeaveUtil {
         try {
             LeaveAccrual leaveAccrual = modelMapper.map(accrualDTO, LeaveAccrual.class);
 
-            leaveAccrualRepository.save(leaveAccrual);
+            LeaveAccrual ett =  leaveAccrualRepository.save(leaveAccrual);
+
+            // 발생 등록한 정보에서 휴가 정보에 필요한 정보 추출 후 save
+            Leaves leaves = new Leaves(ett.getRecipientId(), ett.getLeaveAccrualDays(), "특별휴가");
+            leaveRepository.save(leaves);
 
             return "휴가발생 등록 성공";
         } catch (Exception e) {
