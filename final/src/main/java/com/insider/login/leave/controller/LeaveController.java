@@ -96,6 +96,16 @@ public class LeaveController extends CommonController {
     }
 
     /**
+     * 휴가 신청 취소 (삭제)
+     */
+    @DeleteMapping("/leaveSubmits/{LeaveSubNo}")
+    public ResponseEntity<String> deleteSubmit(@PathVariable("LeaveSubNo") int leaveSubNo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return ResponseEntity.ok().headers(headers).body(leaveService.deleteSubmit(leaveSubNo));
+    }
+
+    /**
      * 발생 내역 조회
      */
     @GetMapping("/leaveAccruals")

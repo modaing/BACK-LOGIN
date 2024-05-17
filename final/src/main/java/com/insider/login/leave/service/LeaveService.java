@@ -141,6 +141,16 @@ public class LeaveService extends LeaveUtil {
         }
     }
 
+    @Transactional
+    public String deleteSubmit(int leaveSubNo) {
+        try {
+            leaveSubmitRepository.deleteById(leaveSubNo);
+
+            return "신청 취소 성공";
+        } catch (Exception e) {
+            return "신청 취소 실패";
+        }
+    }
 
     public LeaveSubmitDTO selectSubmitByLeaveSubNo(int leaveSubNo) {
         try {
