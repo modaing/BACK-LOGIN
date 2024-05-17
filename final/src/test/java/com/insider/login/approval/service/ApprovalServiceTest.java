@@ -228,7 +228,7 @@ public class ApprovalServiceTest {
     //전자결재 상세조회 테스트
     @DisplayName("전자결재 상세조회 테스트")
     @ParameterizedTest
-    @CsvSource("2024-con00001")
+    @CsvSource("2024-abs00006")
     void testSelectApproval(String approvalNo){
         //given
 
