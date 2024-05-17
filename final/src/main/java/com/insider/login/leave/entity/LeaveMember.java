@@ -13,6 +13,9 @@ public class LeaveMember {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "depart_no", nullable = false)
+    private String departNo;
+
     public int getMemberId() {
         return memberId;
     }
@@ -21,11 +24,16 @@ public class LeaveMember {
         return name;
     }
 
+    public String getDepartNo() {
+        return departNo;
+    }
+
     @Override
     public String toString() {
         return "LeaveMember{" +
                 "memberId=" + memberId +
                 ", name='" + name + '\'' +
+                ", departNo='" + departNo + '\'' +
                 '}';
     }
 }

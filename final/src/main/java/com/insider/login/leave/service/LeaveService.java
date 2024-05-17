@@ -1,16 +1,17 @@
 package com.insider.login.leave.service;
 
+import com.insider.login.department.entity.Department;
+import com.insider.login.department.repository.DepartmentRepository;
 import com.insider.login.leave.dto.LeaveInfoDTO;
+import com.insider.login.leave.dto.LeaveMemberDTO;
+import com.insider.login.leave.entity.LeaveMember;
 import com.insider.login.leave.entity.Leaves;
-import com.insider.login.leave.repository.LeaveMemberRepository;
+import com.insider.login.leave.repository.*;
 import com.insider.login.leave.util.LeaveUtil;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import com.insider.login.leave.entity.LeaveAccrual;
 import com.insider.login.leave.entity.LeaveSubmit;
-import com.insider.login.leave.repository.LeaveAccrualRepository;
-import com.insider.login.leave.repository.LeaveRepository;
-import com.insider.login.leave.repository.LeaveSubmitRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -30,14 +31,16 @@ public class LeaveService extends LeaveUtil {
     private final LeaveRepository leaveRepository;
     private final LeaveSubmitRepository leaveSubmitRepository;
     private final ModelMapper modelMapper;
-    private final LeaveMemberRepository leaveMemberRepository;
+    private final LeaveMemberRepository memberRepository;
+    private final DepartmentRepository departmentRepository;
 
-    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper, LeaveMemberRepository leaveMemberRepository) {
+    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper, LeaveMemberRepository memberRepository, DepartmentRepository departmentRepository) {
         this.leaveAccrualRepository = leaveAccrualRepository;
         this.leaveRepository = leaveRepository;
         this.leaveSubmitRepository = leaveSubmitRepository;
         this.modelMapper = modelMapper;
-        this.leaveMemberRepository = leaveMemberRepository;
+        this.memberRepository = memberRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     public Page<LeaveSubmitDTO> selectLeaveSubmitList(int applicantId, Pageable pageable) {
@@ -55,11 +58,11 @@ public class LeaveService extends LeaveUtil {
                 LeaveSubmitDTO leaveSubmitDTO = modelMapper.map(submit, LeaveSubmitDTO.class);
 
 //                사번으로 사원명 조회해서 DTO에 넣기
-                leaveSubmitDTO.setApplicantName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApplicant()));
+                leaveSubmitDTO.setApplicantName(memberRepository.findNameByMemberId(submit.getLeaveSubApplicant()));
 
 //                승인자 사번이 존재할 경우 승인자 사번으로 사원명을 조회해서 DTO에 넣기
                 if (submit.getLeaveSubApprover() != 0) {
-                    leaveSubmitDTO.setApproverName(leaveMemberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
+                    leaveSubmitDTO.setApproverName(memberRepository.findNameByMemberId(submit.getLeaveSubApprover()));
                 }
 
                 DTOList.add(leaveSubmitDTO);
@@ -114,7 +117,7 @@ public class LeaveService extends LeaveUtil {
 
                 for (LeaveAccrual accrual : accrualList) {
                     LeaveAccrualDTO DTO = modelMapper.map(accrual, LeaveAccrualDTO.class);
-                    DTO.setRecipientName(leaveMemberRepository.findNameByMemberId(accrual.getRecipientId()));
+                    DTO.setRecipientName(memberRepository.findNameByMemberId(accrual.getRecipientId()));
                     DTOList.add(DTO);
                 }
 
@@ -142,6 +145,36 @@ public class LeaveService extends LeaveUtil {
             return "휴가발생 등록 성공";
         } catch (Exception e) {
             return "휴가발생 등록 실패";
+        }
+    }
+
+    public List<LeaveMemberDTO> selectMemberList(String name) {
+        try {
+            log.info("확인 서비스 입장 ==============================================");
+            log.info("확인 이름 확인 {}", name);
+            List<LeaveMember> leaveMembers = memberRepository.findByName(name);
+            log.info("확인 엔티티반환 확인 {}", leaveMembers );
+            List<LeaveMemberDTO> DTOList = memberRepository.findByName(name).stream()
+                    .map(leaveMember -> {
+                        LeaveMemberDTO dto = modelMapper.map(leaveMember, LeaveMemberDTO.class);
+                        return dto;
+                    }).toList();
+
+            log.info("결과검사 DTOList {}", DTOList);
+            // 조회된 부서 번호로 부서 이름 찾기
+            for (LeaveMemberDTO DTO : DTOList) {
+                Optional<Department> departmentOptional = departmentRepository.findById(DTO.getDepartNo());
+                if (departmentOptional.isPresent()) {
+                    Department department = departmentOptional.get();
+                    DTO.setDepartment(department.getDepartName());
+                } else {
+                    DTO.setDepartment("없음");
+                }
+            }
+
+            return DTOList;
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -222,8 +255,8 @@ public class LeaveService extends LeaveUtil {
             return null;
         }
     }
-
     // 사번을 매개변수로 주면 해당 사원의 휴가 정보를 DTO로 반환하는 메소드
+
     public LeaveInfoDTO getLeaveInfoById(int memberId) {
 
         List<Leaves> leavesList = leaveRepository.findByMemberId(memberId);
@@ -232,8 +265,8 @@ public class LeaveService extends LeaveUtil {
 
         return addLeaveInfo(info);
     }
-
     // leaveInfo DTO에 소진 일수와 잔여 일수를 추가해서 다시 반환하는 메소드
+
     public LeaveInfoDTO addLeaveInfo(LeaveInfoDTO DTO) {
 
         // 소진 일수 (사번으로 신청내역을 조회해서 신청일수를 모두 더함)
