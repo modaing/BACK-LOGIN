@@ -113,7 +113,9 @@ public class LeaveService extends LeaveUtil {
             if (accrualList != null) {
 
                 for (LeaveAccrual accrual : accrualList) {
-                    DTOList.add(modelMapper.map(accrual, LeaveAccrualDTO.class));
+                    LeaveAccrualDTO DTO = modelMapper.map(accrual, LeaveAccrualDTO.class);
+                    DTO.setRecipientName(leaveMemberRepository.findNameByMemberId(accrual.getRecipientId()));
+                    DTOList.add(DTO);
                 }
 
                 // DTOList를 기존 pageable 정보를 가진 새로운 페이지로 만들어서 반환
