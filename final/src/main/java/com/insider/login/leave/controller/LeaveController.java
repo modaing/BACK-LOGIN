@@ -4,6 +4,7 @@ import com.insider.login.common.CommonController;
 import com.insider.login.common.ResponseMessage;
 import com.insider.login.leave.dto.LeaveAccrualDTO;
 import com.insider.login.leave.dto.LeaveInfoDTO;
+import com.insider.login.leave.dto.LeaveMemberDTO;
 import com.insider.login.leave.dto.LeaveSubmitDTO;
 import com.insider.login.leave.entity.LeaveSubmit;
 import com.insider.login.leave.service.LeaveService;
@@ -151,6 +152,28 @@ public class LeaveController extends CommonController {
         // TODO: 처리자 사번 뽑아서 DTO에 담기
         leaveAccrualDTO.setAccrualDate(nowDate());
         return ResponseEntity.ok().headers(headers).body(leaveService.insertAccrual(leaveAccrualDTO));
+    }
+
+    @GetMapping("/leaveAccruals/{name}")
+    public ResponseEntity<ResponseMessage> selectMemberList(@PathVariable("name") String name) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        log.info("확인 입장 ================================================");
+        log.info("확인 이름 확인 {}", name);
+        List<LeaveMemberDTO> memberList = leaveService.selectMemberList(name);
+
+        if (memberList.isEmpty()) {
+            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
+            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
+            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
+        }
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("memberList", memberList);
+
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
+
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
     /**
