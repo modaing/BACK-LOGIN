@@ -40,10 +40,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -121,21 +118,21 @@ public class MemberController {
 
         memberDTO.setImageUrl(fileUrl);
 
-        return "hi";
-//        Member savedMember = memberService.saveMember(memberDTO);
-////        return savedMember + "";
-//        System.out.println("회원 가입한 구성원 정보: " + savedMember);
-////
-//        // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
-//        transferredHistoryService.saveHistory(savedMember);
+//        return "hi";
+        Member savedMember = memberService.saveMember(memberDTO);
+//        return savedMember + "";
+        System.out.println("회원 가입한 구성원 정보: " + savedMember);
 //
-//        if(Objects.isNull(savedMember)) { // 비어있으면 실패
-//            System.out.println("회원가입 실패 🥲");
-//            return "회원가입 실패";
-//        } else {                    // 다 작성을 했으면 구성원 가입 성공
-//            System.out.println("회원가입 성공 🙂");
-//            return "회원 가입 성공!";
-//        }
+        // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
+        transferredHistoryService.saveHistory(savedMember);
+
+        if(Objects.isNull(savedMember)) { // 비어있으면 실패
+            System.out.println("회원가입 실패 🥲");
+            return "회원가입 실패";
+        } else {                    // 다 작성을 했으면 구성원 가입 성공
+            System.out.println("회원가입 성공 🙂");
+            return "회원 가입 성공!";
+        }
     }
 
     /* memberId가 겹친다면 마지막 3자릿수를 다시 생성을 해서 되돌린다 */

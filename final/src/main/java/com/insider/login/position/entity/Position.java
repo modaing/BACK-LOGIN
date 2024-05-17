@@ -12,10 +12,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class Position {
 
     @Id
-    @Column(name = "position_name", nullable = false)
-    private String positionName;
     @Column(name = "position_level", nullable = false, unique = true)
     private String positionLevel;
+
+    @Column(name = "position_name", nullable = false, unique = true)
+    private String positionName;
 
     protected Position() {
     }
@@ -25,6 +26,10 @@ public class Position {
         this.positionLevel = positionLevel;
     }
 
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
     public String getPositionName() {
         return positionName;
     }
@@ -32,6 +37,7 @@ public class Position {
     public String getPositionLevel() {
         return positionLevel;
     }
+
     @Override
     public String toString() {
         return "Position{" +
@@ -40,3 +46,4 @@ public class Position {
                 '}';
     }
 }
+
