@@ -23,6 +23,12 @@ public class Leaves {
     protected Leaves() {
     }
 
+    public Leaves(int memberId, int leaveDays, String leaveType) {
+        this.memberId = memberId;
+        this.leaveDays = leaveDays;
+        this.leaveType = leaveType;
+    }
+
     public Leaves(int leaveNo, int memberId, int leaveDays, String leaveType) {
         this.leaveNo = leaveNo;
         this.memberId = memberId;
