@@ -18,10 +18,6 @@ public class ApprovalRepository {
     @PersistenceContext
     private EntityManager manager;
 
-    public void insertForm(Form newForm) {
-        manager.persist(newForm);
-    }
-
     public void save(Approval approval){
         manager.persist(approval);
     }
