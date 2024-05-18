@@ -8,7 +8,7 @@ public class MemberDTO {
     private int memberId;               //사번
     private String password;            //비밀번호
     private int departNo;               //부서번호
-    private String positionName;        //직급명
+    private String positionLevel;        //직급번호
     private Date employedDate;          //입사일
     private String address;             //주소
     private String phoneNo;             //연락처
@@ -18,14 +18,16 @@ public class MemberDTO {
     private String imageUrl;            //이미지url
     private String departName;          //부서명
 
+    private String positionName;        //직급명
+
     public MemberDTO(){}
 
-    public MemberDTO(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl, String departName) {
+    public MemberDTO(String name, int memberId, String password, int departNo, String positionLevel, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl, String departName) {
         this.name = name;
         this.memberId = memberId;
         this.password = password;
         this.departNo = departNo;
-        this.positionName = positionName;
+        this.positionLevel = positionLevel;
         this.employedDate = employedDate;
         this.address = address;
         this.phoneNo = phoneNo;
@@ -36,12 +38,12 @@ public class MemberDTO {
         this.departName = departName;
     }
 
-    public MemberDTO(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl) {
+    public MemberDTO(String name, int memberId, String password, int departNo, String positionLevel, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl) {
         this.name = name;
         this.memberId = memberId;
         this.password = password;
         this.departNo = departNo;
-        this.positionName = positionName;
+        this.positionLevel = positionLevel;
         this.employedDate = employedDate;
         this.address = address;
         this.phoneNo = phoneNo;
@@ -49,6 +51,23 @@ public class MemberDTO {
         this.email = email;
         this.memberRole = memberRole;
         this.imageUrl = imageUrl;
+    }
+
+    public MemberDTO(String name, int memberId, String password, int departNo, String positionLevel, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String imageUrl, String departName, String positionName) {
+        this.name = name;
+        this.memberId = memberId;
+        this.password = password;
+        this.departNo = departNo;
+        this.positionLevel = positionLevel;
+        this.employedDate = employedDate;
+        this.address = address;
+        this.phoneNo = phoneNo;
+        this.memberStatus = memberStatus;
+        this.email = email;
+        this.memberRole = memberRole;
+        this.imageUrl = imageUrl;
+        this.departName = departName;
+        this.positionName = positionName;
     }
 
     public String getName() {
@@ -83,12 +102,12 @@ public class MemberDTO {
         this.departNo = departNo;
     }
 
-    public String getPositionName() {
-        return positionName;
+    public String getPositionLevel() {
+        return positionLevel;
     }
 
-    public void setPositionName(String positionName) {
-        this.positionName = positionName;
+    public void setPositionLevel(String positionLevel) {
+        this.positionLevel = positionLevel;
     }
 
     public Date getEmployedDate() {
@@ -155,6 +174,14 @@ public class MemberDTO {
         this.departName = departName;
     }
 
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
     @Override
     public String toString() {
         return "MemberDTO{" +
@@ -162,7 +189,7 @@ public class MemberDTO {
                 ", memberId=" + memberId +
                 ", password='" + password + '\'' +
                 ", departNo=" + departNo +
-                ", positionName='" + positionName + '\'' +
+                ", positionLevel='" + positionLevel + '\'' +
                 ", employedDate=" + employedDate +
                 ", address='" + address + '\'' +
                 ", phoneNo='" + phoneNo + '\'' +
@@ -171,6 +198,7 @@ public class MemberDTO {
                 ", memberRole='" + memberRole + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", departName='" + departName + '\'' +
+                ", positionName='" + positionName + '\'' +
                 '}';
     }
 }

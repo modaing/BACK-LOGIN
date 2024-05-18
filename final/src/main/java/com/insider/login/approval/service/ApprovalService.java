@@ -47,6 +47,8 @@ public class ApprovalService {
     private ApprovalMemberRepository approvalMemberRepository;
     private ApprovalDepartmentRepository approvalDepartmentRepository;
 
+    private ApprovalPositionRepository approvalPositionRepository;
+
     private FormRepository formRepository;
 
     private final ModelMapper modelMapper;
@@ -58,6 +60,7 @@ public class ApprovalService {
 
                            ApprovalMemberRepository approvalMemberRepository,
                            ApprovalDepartmentRepository approvalDepartmentRepository,
+                           ApprovalPositionRepository approvalPositionRepository,
 
                            FormRepository formRepository,
                            ModelMapper modelMapper){
@@ -67,6 +70,7 @@ public class ApprovalService {
         this.referencerRepository = referencerRepository;
         this.approvalMemberRepository = approvalMemberRepository;
         this.approvalDepartmentRepository = approvalDepartmentRepository;
+        this.approvalPositionRepository = approvalPositionRepository;
         this.formRepository = formRepository;
         this.modelMapper = modelMapper;
     }
@@ -260,7 +264,7 @@ public class ApprovalService {
 
         List<DepartmentDTO> departmentDTOList = new ArrayList<>();
 
-        List<Department> departmentList = approvalDepartmentRepository.findAll();
+        List<Department> departmentList = approvalDepartmentRepository.findAllOrderedByDepartNo();
 
         for(int i = 0; i < departmentList.size(); i++){
             Department department = departmentList.get(i);
@@ -281,15 +285,18 @@ public class ApprovalService {
         // 부서정보 : 부서번호로 조회할 경우
         Department department = approvalDepartmentRepository.findById(departNo);
 
+
         //부서별 사원 목록
         List<Member> memberList = approvalMemberRepository.findByDepart(departNo);
         //한 부서의 멤버 목록 조회
         for(Member member : memberList){
+            Position position = approvalPositionRepository.findById(member.getPositionLevel()).orElse(null);
+
             MemberDTO memberDTO = new MemberDTO(member.getName(),
                                             member.getMemberId(),
                                             member.getPassword(),
                                             member.getDepartNo(),
-                                            member.getPositionName(),
+                                            member.getPositionLevel(),
                                             member.getEmployedDate(),
                                             member.getAddress(),
                                             member.getPhoneNo(),
@@ -298,7 +305,9 @@ public class ApprovalService {
                                             member.getMemberRole(),
                                             member.getImage_url(),
                                             //departName,
-                                            department.getDepartName());
+                                            department.getDepartName(),
+                                            position.getPositionName()
+                    );
 
             memberDTOList.add(memberDTO);
         }
@@ -310,14 +319,16 @@ public class ApprovalService {
     //한 전자결재 조회
     public ApprovalDTO selectApproval(String approvalNo){
 
-        log.info("service 들어왔다 : " + approvalNo);
-        System.out.println("service 들어왔다 : " + approvalNo);
         Approval approval = approvalRepository.findById(approvalNo);
 
         //기안자 정보 가져오기
         Member senderMember = approvalMemberRepository.findById(approval.getMemberId());
         //기안자의 부서 정보 가져오기
         Department senderDepart = approvalDepartmentRepository.findById(senderMember.getDepartNo());
+        //기안자의 직급 정보 가져오기
+        Position senderPosition = approvalPositionRepository.findById(senderMember.getPositionLevel()).orElse(null);
+
+
         //양식 정보 가져오기
         Form form = formRepository.findByFormNo(approval.getFormNo())
                 .orElseThrow(() -> new RuntimeException("양식을 찾을 수 없습니다. : " + approval.getFormNo()));
@@ -343,6 +354,8 @@ public class ApprovalService {
             //결재자 부서 정보 가져오기
             Department receiverDepart = approvalDepartmentRepository.findById(receiverMember.getDepartNo());
 
+            Position receiverPosition = approvalPositionRepository.findById(receiverMember.getPositionLevel()).orElse(null);
+
             String approverFormattedDateTime = "";
 
             if(approverList.get(i).getApproverDate() != null){
@@ -351,7 +364,7 @@ public class ApprovalService {
             }
             //날짜 포맷
 
-            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverMember.getPositionName(), receiverDepart.getDepartName(), approval.getRejectReason());
+            ApproverDTO approverDTO = new ApproverDTO(approverList.get(i).getApproverNo(), approverList.get(i).getApprovalNo(), approverList.get(i).getApproverOrder(), approverList.get(i).getApproverStatus(), approverFormattedDateTime, approverList.get(i).getMemberId(), receiverMember.getName(), receiverPosition.getPositionName(), receiverDepart.getDepartName(), approval.getRejectReason());
 
             approver.add(approverDTO);
 
@@ -367,7 +380,9 @@ public class ApprovalService {
             //참조자 부서 정보 가져오기
             Department referencerDepart = approvalDepartmentRepository.findById(referencerMember.getDepartNo());
 
-            ReferencerDTO referencerDTO = new ReferencerDTO(referencerList.get(i).getRefNo(), referencerList.get(i).getApprovalNo(), referencerList.get(i).getMemberId(), referencerList.get(i).getRefOrder(), referencerMember.getName(), referencerMember.getPositionName(), referencerDepart.getDepartName());
+            Position referencerPosition = approvalPositionRepository.findById(referencerMember.getPositionLevel()).orElse(null);
+
+            ReferencerDTO referencerDTO = new ReferencerDTO(referencerList.get(i).getRefNo(), referencerList.get(i).getApprovalNo(), referencerList.get(i).getMemberId(), referencerList.get(i).getRefOrder(), referencerMember.getName(), referencerPosition.getPositionName(), referencerDepart.getDepartName());
             referencer.add(referencerDTO);
         }
 
@@ -396,7 +411,7 @@ public class ApprovalService {
             standByMemberName = standByMember.getName();
         }
 
-        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), form.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderMember.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
+        ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), form.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderPosition.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
 
 
         log.info("service : " + approvalDTO);

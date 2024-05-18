@@ -24,8 +24,8 @@ public class Member {
     @Column(name="depart_no")
     private int departNo;               //부서번호
 
-    @Column(name="position_name")
-    private String positionName;        //직급이름
+    @Column(name="position_level")
+    private String positionLevel;        //직급이름
 
     @Column(name="employed_date")
     private Date employedDate;          //입사일자
@@ -50,12 +50,12 @@ public class Member {
 
     protected Member(){}
 
-    public Member(String name, int memberId, String password, int departNo, String positionName, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String image_url) {
+    public Member(String name, int memberId, String password, int departNo, String positionLevel, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String image_url) {
         this.name = name;
         this.memberId = memberId;
         this.password = password;
         this.departNo = departNo;
-        this.positionName = positionName;
+        this.positionLevel = positionLevel;
         this.employedDate = employedDate;
         this.address = address;
         this.phoneNo = phoneNo;
@@ -81,8 +81,8 @@ public class Member {
         return departNo;
     }
 
-    public String getPositionName() {
-        return positionName;
+    public String getPositionLevel() {
+        return positionLevel;
     }
 
     public Date getEmployedDate() {
@@ -120,7 +120,7 @@ public class Member {
                 ", memberId=" + memberId +
                 ", password='" + password + '\'' +
                 ", departNo=" + departNo +
-                ", positionName='" + positionName + '\'' +
+                ", positionName='" + positionLevel + '\'' +
                 ", employedDate=" + employedDate +
                 ", address='" + address + '\'' +
                 ", phoneNo='" + phoneNo + '\'' +

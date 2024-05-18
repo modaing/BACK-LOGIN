@@ -2,22 +2,14 @@ package com.insider.login.approval.dto;
 
 public class PositionDTO {
 
-    private String positionName;        //직급이름
     private String positionLevel;       //직급레벨
+    private String positionName;        //직급이름
 
     public PositionDTO() {
     }
 
-    public PositionDTO(String positionName, String positionLevel) {
-        this.positionName = positionName;
+    public PositionDTO(String positionLevel, String positionName) {
         this.positionLevel = positionLevel;
-    }
-
-    public String getPositionName() {
-        return positionName;
-    }
-
-    public void setPositionName(String positionName) {
         this.positionName = positionName;
     }
 
@@ -28,12 +20,20 @@ public class PositionDTO {
     public void setPositionLevel(String positionLevel) {
         this.positionLevel = positionLevel;
     }
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
 
     @Override
     public String toString() {
         return "PositionDTO{" +
-                "positionName='" + positionName + '\'' +
-                ", positionLevel='" + positionLevel + '\'' +
+                "positionLevel='" + positionLevel + '\'' +
+                ", positionName='" + positionName + '\'' +
                 '}';
     }
 }

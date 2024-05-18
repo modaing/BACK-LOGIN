@@ -10,11 +10,12 @@ import jakarta.persistence.Table;
 public class Position {
 
     @Id
+    @Column(name="position_level")
+    private String positionLevel;       //직급레벨
+
     @Column(name="position_name")
     private String positionName;        //직급이름
 
-    @Column(name="position_level")
-    private String positionLevel;       //직급레벨
 
     protected Position(){}
 
