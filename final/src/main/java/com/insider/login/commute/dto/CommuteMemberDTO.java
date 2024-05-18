@@ -17,7 +17,7 @@ public class CommuteMemberDTO {
     private String name;                // 구성원 이름
     private String password;            // 비밀번호
     private int departNo;               // 부서 번호
-    private String positionName;        // 직급명
+    private String positionLevel;        // 직급레벨
     private LocalDate employedDate;     // 입사일
     private String address;             // 주소
     private String phoneNo;             // 전화 번호
