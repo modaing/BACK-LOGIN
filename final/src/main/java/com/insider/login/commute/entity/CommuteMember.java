@@ -26,8 +26,8 @@ public class CommuteMember {
     @Column(name = "depart_no", nullable = false, insertable = false, updatable = false)
     private int departNo;               // 부서 번호
 
-    @Column(name = "position_name", nullable = false)
-    private String positionName;        // 직급명
+    @Column(name = "position_level", nullable = false)
+    private String positionLevel;        // 직급명
 
     @Column(name = "employed_date", nullable = false)
     private LocalDate employedDate;     // 입사일
