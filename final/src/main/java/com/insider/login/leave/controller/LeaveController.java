@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
+
 @RestController
 @Slf4j
 public class LeaveController extends CommonController {
@@ -149,7 +151,7 @@ public class LeaveController extends CommonController {
     public ResponseEntity<String> insertAccrual(@RequestBody LeaveAccrualDTO leaveAccrualDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        // TODO: 처리자 사번 뽑아서 DTO에 담기
+
         leaveAccrualDTO.setAccrualDate(nowDate());
         return ResponseEntity.ok().headers(headers).body(leaveService.insertAccrual(leaveAccrualDTO));
     }
@@ -158,8 +160,7 @@ public class LeaveController extends CommonController {
     public ResponseEntity<ResponseMessage> selectMemberList(@PathVariable("name") String name) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        log.info("확인 입장 ================================================");
-        log.info("확인 이름 확인 {}", name);
+
         List<LeaveMemberDTO> memberList = leaveService.selectMemberList(name);
 
         if (memberList.isEmpty()) {
@@ -209,8 +210,7 @@ public class LeaveController extends CommonController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        // TODO:시큐리티 안정화되면 토큰에서 승인자 사번 뽑아서 DTO에 담기 현재는 임시
-        leaveSubmitDTO.setLeaveSubApprover(200401023);
+        leaveSubmitDTO.setLeaveSubApprover(getTokenInfo().getMemberId());
 
         leaveSubmitDTO.setLeaveSubProcessDate(nowDate());
         return ResponseEntity.ok().headers(headers).body(leaveService.updateSubmit(leaveSubmitDTO));
