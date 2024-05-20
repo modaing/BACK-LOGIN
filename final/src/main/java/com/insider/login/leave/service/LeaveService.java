@@ -250,6 +250,9 @@ public class LeaveService extends LeaveUtil {
 
         LeaveInfoDTO info = leaveInfoCalc(leavesList);
 
+        String name = memberRepository.findNameByMemberId(memberId);
+        info.setName(name);
+
         return addLeaveInfo(info);
     }
 
