@@ -1,14 +1,11 @@
 package com.insider.login.position.service;
 
 import com.insider.login.position.dto.PositionDTO;
-import com.insider.login.position.dto.PositionDTOSecond;
 import com.insider.login.position.entity.Position;
 import com.insider.login.position.repository.PositionRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.TransactionScoped;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +46,7 @@ public class PositionService {
     }
 
     public PositionDTO findSpecificPosition(String positionName) {
-        Position gotSpecificPosition = positionRepository.findById(positionName).orElse(null);
+        Position gotSpecificPosition = positionRepository.findByPositionName(positionName).orElse(null);
         PositionDTO foundPosition = modelMapper.map(gotSpecificPosition, PositionDTO.class);
 
         return foundPosition;
@@ -84,8 +81,12 @@ public class PositionService {
             System.out.println("변경할 직급명: " + existingPositionName);
 
             // Retrieve the existing position entity from the database
-            Position currentPosition = positionRepository.findById(existingPositionName)
+//            Position currentPosition = positionRepository.findById(existingPositionName)
+//                    .orElseThrow(() -> new EntityNotFoundException("Position not found: " + existingPositionName));
+            Position currentPosition = positionRepository.findByPositionName(existingPositionName)
                     .orElseThrow(() -> new EntityNotFoundException("Position not found: " + existingPositionName));
+
+            System.out.println("current position: " + currentPosition);
 
             // Update the position entity with the new data
             currentPosition.setPositionName(inputtedPositionName);

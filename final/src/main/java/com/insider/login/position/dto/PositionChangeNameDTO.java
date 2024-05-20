@@ -2,15 +2,15 @@ package com.insider.login.position.dto;
 
 import com.insider.login.position.entity.Position;
 
-public class PositionDTOSecond {
+public class PositionChangeNameDTO {
     private String positionName;
     private String positionLevel;
     private String newPositionName;
 
-    public PositionDTOSecond() {
+    public PositionChangeNameDTO() {
     }
 
-    public PositionDTOSecond(String positionName, String positionLevel, String newPositionName) {
+    public PositionChangeNameDTO(String positionName, String positionLevel, String newPositionName) {
         this.positionName = positionName;
         this.positionLevel = positionLevel;
         this.newPositionName = newPositionName;
