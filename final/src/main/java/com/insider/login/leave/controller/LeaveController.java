@@ -213,14 +213,14 @@ public class LeaveController extends CommonController {
         leaveSubmitDTO.setLeaveSubApprover(getTokenInfo().getMemberId());
 
         leaveSubmitDTO.setLeaveSubProcessDate(nowDate());
+        // TODO:: 취소 요청 시 처리 로직 고민
         return ResponseEntity.ok().headers(headers).body(leaveService.updateSubmit(leaveSubmitDTO));
-
     }
 
     /**
      * 휴가 보유 내역 조회
      */
-    @PostMapping("/leaves")
+    @GetMapping("/leaves")
     public ResponseEntity<ResponseMessage> selectLeavesList(@RequestParam(value = "page", defaultValue = "0") int pageNumber,
                                                             @RequestParam(value = "direction", defaultValue = "DESC") String direction,
                                                             @RequestParam(value = "properties", defaultValue = "leaveSubNo") String properties) {
