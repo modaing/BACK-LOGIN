@@ -51,7 +51,7 @@ public class CommuteController {
     /** 출퇴근 내역 조회 (부서별, 회원별) */
     @GetMapping("/commutes")
     public ResponseEntity<ResponseMessage> selectCommuteList(@RequestParam(value = "target") String target,
-                                                             @RequestParam(value = "targetValue") String targetValue,
+                                                             @RequestParam(value = "targetValue", required = false) String targetValue,
                                                              @RequestParam(value = "date") LocalDate date) {
 
         System.out.println("date : " + date);
@@ -118,31 +118,26 @@ public class CommuteController {
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
         Pageable pageable = CommonController.getPageable(page, size, sort, direction);
-        Page<CorrectionDTO> correctionList;
+        Map<String, Object> responseMap;
 
         LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
 
         if(memberId != null) {
 
-            correctionList = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
+            responseMap = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
 
         } else {
 
-            correctionList = commuteService.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
+            responseMap = commuteService.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
         }
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("result", correctionList.getContent());
-        responseMap.put("currentPage", correctionList.getNumber());
-        responseMap.put("totalItems", correctionList.getTotalElements());
-        responseMap.put("totalPages", correctionList.getTotalPages());
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
 
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
+    /** 출퇴근 시간 정정 요청 상세 조회 */
     @GetMapping("/corrections/{corrNo}")
     public ResponseEntity<ResponseMessage> selectRequestForCorrectByCorrNo(@PathVariable("corrNo") int corrNo) {
         HttpHeaders headers = new HttpHeaders();
@@ -158,12 +153,20 @@ public class CommuteController {
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
-    @GetMapping("/commutes/{memberId}")
-    public int searchLastCommuteNoByMemberId(@PathVariable("memberId") int memberId) {
+    /** 출퇴근 내역 상세 조회 */
+    @GetMapping("/commutes/{commuteNo}")
+    public ResponseEntity<ResponseMessage> selectCommuteDetailByCommuteNo(@PathVariable("commuteNo") int commuteNo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        CommuteDTO lastCommute = commuteService.searchLastCommuteNoByMemberId(memberId);
+        CommuteDTO commute = commuteService.selectCommuteDetailByCommuteNo(commuteNo);
 
-        return lastCommute.getCommuteNo();
+        Map<String, Object> result = new HashMap<>();
+        result.put("result", commute);
+
+        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
+
+        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
 }

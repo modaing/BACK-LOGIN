@@ -202,7 +202,7 @@ public class CommuteControllerTests {
     @Test
     void testInsertRequestForCorrect() throws Exception {
         //given
-        int commuteNo = 140;
+        int commuteNo = 17;
         String reqStartWork = "09:00";
         String reqStartEnd = null;
         String reasonForCorr = "시스템 오류로 인해 지각으로 처리되었습니다.";
@@ -367,20 +367,22 @@ public class CommuteControllerTests {
 
     @DisplayName("멤버별 가장 마지막 출퇴근 번호 찾기 테스트")
     @Test
-    void testSearchLastCommuteNoByMemberId() throws Exception {
+    void testSelectCommuteDetailByCommuteNo() throws Exception {
         //given
-        int memberId = 240401835;
+        int commuteNo = 1;
 
         //when
-        MockHttpServletRequestBuilder request = get("/commutes/{memberId}", memberId)
+        MockHttpServletRequestBuilder request = get("/commutes/{commuteNo}", commuteNo)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(memberId))
+                .content(new ObjectMapper().writeValueAsString(commuteNo))
                 .header("Authorization", getTokenByMember());
 
         //then
         MvcResult result = mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isNumber())
+                .andExpect(jsonPath("$.httpStatusCode").value(200))
+                .andExpect(jsonPath("$.message").value("조회 성공"))
+                .andExpect(jsonPath("$.results").exists())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();

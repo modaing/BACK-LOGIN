@@ -195,8 +195,7 @@ public class CommuteServiceTests {
 //        );
 
         //when
-        Map<String, Object> result = new HashMap<>();
-        result = commuteService.updateProcessForCorrectByCorrNo(corrNo, updateProcessForCorrection);
+        Map<String, Object> result = commuteService.updateProcessForCorrectByCorrNo(corrNo, updateProcessForCorrection);
 
         //then
         Assertions.assertTrue((Boolean) result.get("result"));
@@ -212,11 +211,10 @@ public class CommuteServiceTests {
         Pageable pageable = Pageable.ofSize(10);
 
         //when
-        Page<CorrectionDTO> correctionList = commuteService.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
+        Map<String, Object> result = commuteService.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
 
         //then
-        Assertions.assertNotNull(correctionList);
-        correctionList.forEach(correction -> System.out.println("correction : " + correction));
+        Assertions.assertTrue(!result.isEmpty());
     }
 
     @DisplayName("멤버별 출퇴근 시간 정정 내역 조회 테스트")
@@ -230,12 +228,10 @@ public class CommuteServiceTests {
         Pageable pageable = Pageable.ofSize(10);
 
         //when
-        Page<CorrectionDTO> correctionList = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
+        Map<String, Object> result = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
 
         //then
-        Assertions.assertTrue(!correctionList.isEmpty());
-        Assertions.assertNotNull(correctionList);
-        correctionList.forEach(correction -> System.out.println("correction : " + correction));
+        Assertions.assertTrue(!result.isEmpty());
     }
 
     @DisplayName("출퇴근 시간 정정 요청 상세 조회 테스트")
@@ -252,17 +248,18 @@ public class CommuteServiceTests {
         System.out.println("correction : " + correction);
     }
 
-    @DisplayName("멤버별 가장 마지막 출퇴근 번호 찾기 테스트")
+    @DisplayName("출퇴근 내역 상세 조회 테스트")
     @Test
-    void testSearchLastCommuteNoByMemberId() {
+    void testSelectCommuteDetailByCommuteNo() {
         //given
-        int memberId = 240401835;
+        int commuteNo = 1;
 
         //when
-        CommuteDTO lastCommute = commuteService.searchLastCommuteNoByMemberId(memberId);
+        CommuteDTO commute = commuteService.selectCommuteDetailByCommuteNo(commuteNo);
 
         //then
-        Assertions.assertEquals(memberId, lastCommute.getMemberId());
+        Assertions.assertEquals(commuteNo, commute.getCommuteNo());
+        System.out.println("commute : " + commute);
     }
 
 }
