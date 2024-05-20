@@ -3,7 +3,7 @@ package com.insider.login.member.entity;
 import com.insider.login.common.utils.MemberRole;
 import com.insider.login.department.entity.Department;
 import com.insider.login.position.entity.Position;
-import com.insider.login.webSocket.Cahtting.entity.EnteredRoom;
+import com.insider.login.webSocket.Cahtting.entity.ChatRoom;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
