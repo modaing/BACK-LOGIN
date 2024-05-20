@@ -44,7 +44,7 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
     @OneToMany(mappedBy = "member")
-    private List<EnteredRoom> enteredRoom = new ArrayList<>();
+    private List<ChatRoom> enteredRoom = new ArrayList<>();
 
 
     protected Member() {}
