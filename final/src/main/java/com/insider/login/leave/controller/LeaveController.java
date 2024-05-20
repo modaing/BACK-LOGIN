@@ -55,9 +55,9 @@ public class LeaveController extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
-        Page<LeaveSubmitDTO> submitPage = leaveService.selectLeaveSubmitList(memberId, pageable);
+        Page<LeaveSubmitDTO> page = leaveService.selectLeaveSubmitList(memberId, pageable);
 
-        if (submitPage.isEmpty()) {
+        if (page.isEmpty()) {
             String errorMessage = "신청된 휴가 내역이 없습니다.";
             ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
@@ -65,7 +65,7 @@ public class LeaveController extends CommonController {
 
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("submitPage", submitPage);
+        responseMap.put("page", page);
 
         // 멤버 아이디가 있다면 개인 내역 조회이기 때문에 요청자의 휴가 보유 내역도 같이 전달함
         if (memberId != 0) {
@@ -125,17 +125,17 @@ public class LeaveController extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
-        Page<LeaveAccrualDTO> accrualPage = leaveService.selectAccrualList(pageable);
+        Page<LeaveAccrualDTO> page = leaveService.selectAccrualList(pageable);
 
 
-        if (accrualPage.isEmpty()) {
+        if (page.isEmpty()) {
             String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
             ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
         }
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("accrualPage", accrualPage);
+        responseMap.put("page", page);
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
 
@@ -237,16 +237,16 @@ public class LeaveController extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
-        Page<LeaveInfoDTO> leavesList = leaveService.selectLeavesList(pageable);
+        Page<LeaveInfoDTO> page = leaveService.selectLeavesList(pageable);
 
-        if (leavesList.isEmpty()) {
+        if (page.isEmpty()) {
             String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
             ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
         }
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("leavesList", leavesList);
+        responseMap.put("page", page);
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
 
