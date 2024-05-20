@@ -43,10 +43,10 @@ public class TokenUtils {
     }
 
     public static boolean isValidToken(String token) {
-        System.out.println("token만 잘 가져왔는지: " + token); // 확인용
+//        System.out.println("token만 잘 가져왔는지: " + token); // 확인용
         try {
             Claims claims = getClaimsFromToken(token);     // 정상적으로 작동이 되면
-            System.out.println("Claims에 담은 정보들: " + claims);
+//            System.out.println("Claims에 담은 정보들: " + claims);
             return true;
         } catch (ExpiredJwtException e) {
             e.printStackTrace();
@@ -65,7 +65,7 @@ public class TokenUtils {
                 .setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey)) // secret key를 넣어서 복호화 setting해주고
                 .parseClaimsJws(token)                                            // 값을 제대로 받았으면 -> header, payload, signature로 분리를 한다
                 .getBody();
-        System.out.println("Claims: " + claims);
+//        System.out.println("Claims: " + claims);
         return claims;
     }
 
