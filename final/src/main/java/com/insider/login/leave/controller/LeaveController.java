@@ -204,16 +204,14 @@ public class LeaveController extends CommonController {
     /**
      * 휴가 신청 처리
      */
-    @PutMapping("/leaveSubmits/{leaveSubNo}")
-    public ResponseEntity<String> updateSubimt(@PathVariable("leaveSubNo") int leaveSubNo,
-                                               @RequestBody LeaveSubmitDTO leaveSubmitDTO) {
+    @PutMapping("/leaveSubmits")
+    public ResponseEntity<String> updateSubimt(@RequestBody LeaveSubmitDTO leaveSubmitDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
         // TODO:시큐리티 안정화되면 토큰에서 승인자 사번 뽑아서 DTO에 담기 현재는 임시
         leaveSubmitDTO.setLeaveSubApprover(200401023);
 
-        leaveSubmitDTO.setLeaveSubNo(leaveSubNo);
         leaveSubmitDTO.setLeaveSubProcessDate(nowDate());
         return ResponseEntity.ok().headers(headers).body(leaveService.updateSubmit(leaveSubmitDTO));
 
