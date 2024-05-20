@@ -1,9 +1,10 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql.coffit.today:3306/insider
-    username: hikdt2312
-    password: hikdt2312
+#    url: jdbc:mysql://mysql.coffit.today:3306/insider
+    url: jdbc:mysql://localhost:3306/insider
+    username: jeehwan1228
+    password: jeehwan1228
 
   jpa:
     show-sql: true

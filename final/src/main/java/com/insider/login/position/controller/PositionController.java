@@ -1,16 +1,14 @@
 package com.insider.login.position.controller;
 
-import com.insider.login.department.dto.DepartmentDTO;
 import com.insider.login.position.dto.PositionDTO;
-import com.insider.login.position.dto.PositionDTOSecond;
-import com.insider.login.position.entity.Position;
+import com.insider.login.position.dto.PositionChangeNameDTO;
 import com.insider.login.position.service.PositionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class PositionController {
@@ -22,11 +20,22 @@ public class PositionController {
     }
 
     /** 직급 등록 */
-    @PostMapping("/registPosition")
-    public String registPosition(@RequestBody PositionDTO positionDTO) {
-        positionService.insertPosition(positionDTO);
-
-        return "registered position";
+    @PostMapping("/position")
+    public ResponseEntity<String> registPosition(@RequestBody Map<String, String> body) {
+        try {
+            String newPositionName = body.get("newPositionName");
+            String positionLevelInString = body.get("positionLevel");
+//            int positionLevel = Integer.parseInt(positionLevelInString);
+            System.out.println("inputted position name: " + newPositionName);
+            System.out.println("inputted position level: " + positionLevelInString);
+            PositionDTO insertNewPositionInfo = new PositionDTO();
+            insertNewPositionInfo.setPositionLevel(positionLevelInString);
+            insertNewPositionInfo.setPositionName(newPositionName);
+            positionService.insertPosition(insertNewPositionInfo);
+            return ResponseEntity.ok().body("Position successfully registered");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to register new position name: " + e.getMessage());
+        }
     }
 
     /** 직급 조회 */
@@ -62,7 +71,7 @@ public class PositionController {
 //    }
 
     @PutMapping("/position/{positionName}")
-    public ResponseEntity<String> updatePositionName(@PathVariable("positionName") String positionName, @RequestBody PositionDTOSecond inputtedPositionNameDTO) {
+    public ResponseEntity<String> updatePositionName(@PathVariable("positionName") String positionName, @RequestBody PositionChangeNameDTO inputtedPositionNameDTO) {
         try {
             /* 기존에 있는 직급 이름 */
             System.out.println("position name to be changed: " + positionName);
@@ -80,7 +89,7 @@ public class PositionController {
 
             boolean positionNameExists = listOfPositions.stream().map(PositionDTO::getPositionName).anyMatch(name -> name.equals(inputtedPositionName));
             if (!positionNameExists) {
-                System.out.println("new position name doesn't exist,updating...");
+                System.out.println("new position name doesn't exist, updating...");
 //                positionService.updatePositionName(positionToBeAltered, inputtedPositionName);
                 positionService.updatePositionName(positionName, inputtedPositionName);
                 return ResponseEntity.ok().body("Position name has been successfully updated");
