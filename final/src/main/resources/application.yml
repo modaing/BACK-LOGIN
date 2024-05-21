@@ -1,11 +1,14 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/insider
-    username: ohgiraffers
-    password: ohgiraffers
+    username: root
+    password: minsup
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#     username: ohgiraffers
+#     password: ohgiraffers
 
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     database: mysql
     generate-ddl: false

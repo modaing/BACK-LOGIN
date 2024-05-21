@@ -3,6 +3,7 @@ package com.insider.login.department.service;
 import com.insider.login.department.dto.DepartmentDTO;
 import com.insider.login.department.entity.Department;
 import com.insider.login.department.repository.DepartmentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,30 @@ public class DepartmentService {
                 .map(department -> modelMapper.map(department, DepartmentDTO.class))
                 .collect(Collectors.toList());
         return allDepartList;
+    }
+
+    @Transactional
+    public void updateDepartmentName(int departNo, String inputDepartName) {
+        try {
+            System.out.println("변경할 부서명: " + departNo);
+
+            Department currentDepartment = departmentRepository.findById(departNo).orElseThrow(() -> new EntityNotFoundException("Department not found: " + departNo));
+
+            System.out.println("current department: " + currentDepartment);
+
+            currentDepartment.setDepartName(inputDepartName);
+
+            Department savedDepartData = departmentRepository.save(currentDepartment);
+
+            System.out.println("변경된 department 저장 완료: " + savedDepartData);
+        } catch (Exception e) {
+            System.out.println("Failed to update department name: " + e.getMessage());
+            throw new RuntimeException("Failed to update department name", e);
+        }
+    }
+
+    public Department findDepartByName(String departName) {
+        return departmentRepository.findByDepartName(departName);
     }
 
 //    public DepartmentDTO findDepartment(int departNo) {

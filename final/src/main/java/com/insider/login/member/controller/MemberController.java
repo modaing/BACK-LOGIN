@@ -75,7 +75,7 @@ public class MemberController {
     /** 구성원 등록 */
     @PostMapping("/signUp")
     public String signUp(@RequestPart("memberDTO") MemberDTO memberDTO, @RequestPart("memberProfilePicture") MultipartFile file) throws IOException {
-
+        System.out.println("signUp method 도착");
         /* 비밀번호 암호화해서 설정 */
         String encodedPassword = passwordEncoder.encode(memberDTO.getPassword());
         memberDTO.setPassword(encodedPassword);
@@ -84,7 +84,7 @@ public class MemberController {
         int generatedMemberId = memberDTO.getMemberId();
         boolean existingId;
 
-         /* 존재 한다면 새로운 memberId를 부여해서 setting을 해줄 것이다 */
+        /* 존재 한다면 새로운 memberId를 부여해서 setting을 해줄 것이다 */
         do {
             existingId = memberService.findExistingMemberId(generatedMemberId);
             if (existingId) {
@@ -95,45 +95,45 @@ public class MemberController {
 
         System.out.println("memberDTO: " + memberDTO);
 
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename(); // unique file name
-        String filePath = Paths.get("/Users/jee/Documents/Desktop/Personal Stuffs/", fileName).toString();
+        String fileName = memberDTO.getMemberId() + "_" + file.getOriginalFilename();
+        String directoryPath = "../final_clone2/FRONT-LOGIN/public/img";
+        String filePath = directoryPath + "/" + fileName;
 
         Path targetLocation = Paths.get(filePath);
-        System.out.println("targetLocation: " + targetLocation);
-        System.out.println("file input stream: " + file.getInputStream());
-        System.out.println("file info1: " + file.getSize());
-        System.out.println("file info3: " + file.getName());
-        System.out.println("file info4: " + file.getOriginalFilename());
-        System.out.println("file info5: " + file.getClass());
-        System.out.println("file info6: " + file.getResource());
-        System.out.println("file info7: " + file.getBytes());
-        System.out.println("file info8: " + file.getContentType());
 
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        // Copy the file to the target location
+        try {
+            Files.createDirectories(targetLocation.getParent()); // Create directories if they don't exist
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "File upload failed";
+        }
 
-        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/profilePictures")
-                .path(fileName)
-                .toUriString();
+//        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+//                .path("/profilePictures")
+//                .path(fileName)
+//                .toUriString();
 
+        String fileUrl = fileName;
         memberDTO.setImageUrl(fileUrl);
 
-//        return "hi";
         Member savedMember = memberService.saveMember(memberDTO);
-//        return savedMember + "";
+
         System.out.println("회원 가입한 구성원 정보: " + savedMember);
-//
+
         // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
         transferredHistoryService.saveHistory(savedMember);
 
-        if(Objects.isNull(savedMember)) { // 비어있으면 실패
+        if (Objects.isNull(savedMember)) { // 비어있으면 실패
             System.out.println("회원가입 실패 🥲");
             return "회원가입 실패";
-        } else {                    // 다 작성을 했으면 구성원 가입 성공
+        } else { // 다 작성을 했으면 구성원 가입 성공
             System.out.println("회원가입 성공 🙂");
             return "회원 가입 성공!";
         }
     }
+
 
     /* memberId가 겹친다면 마지막 3자릿수를 다시 생성을 해서 되돌린다 */
     private int generateNewMemberId(int memberId) {
