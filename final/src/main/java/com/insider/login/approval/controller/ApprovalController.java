@@ -250,4 +250,20 @@ public class ApprovalController {
                 approvalService.approvalDelete(approvalNo)));
     }
 
+
+    @GetMapping("/approvals/members/{memberId}")
+    public ResponseEntity<ResponseDTO> selectMember(@PathVariable(name="memberId") int memberId){
+
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "사원 조회 성공",
+                approvalService.selectMember(memberId)));
+    }
+
+    @GetMapping("/approvals/members")
+    public ResponseEntity<ResponseDTO> selectAllMembers(){
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전 사원 부서순 조회 성공",
+                approvalService.selectAllMemberList()));
+
+
+
+    }
 }
