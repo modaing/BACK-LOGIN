@@ -16,4 +16,14 @@ public class InsiteService {
 
         return insiteRepository.selectDepartmentMemberCounts();
     }
+
+    public List<Object[]> selectLeaveMemberCounts() {
+
+        return insiteRepository.selectLeaveMemberCounts();
+    }
+
+    public List<Object[]> selectCommuteMemberCounts() {
+
+        return insiteRepository.selectCommuteMemberCounts();
+    }
 }
