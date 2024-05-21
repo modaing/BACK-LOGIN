@@ -1,7 +1,5 @@
 package com.insider.login.survey.dto;
 
-import jakarta.persistence.Column;
-
 import java.time.LocalDate;
 
 public class SurveyDTO {
@@ -15,6 +13,10 @@ public class SurveyDTO {
 
     private LocalDate surveyEndDate;
 
+    private String name;
+
+    private boolean surveyCompleted;
+
     public SurveyDTO() {
     }
 
@@ -25,12 +27,14 @@ public class SurveyDTO {
         this.surveyEndDate = surveyEndDate;
     }
 
-    public SurveyDTO(int surveyNo, String surveyTitle, String surveyApplyDate, LocalDate surveyStartDate, LocalDate surveyEndDate) {
+    public SurveyDTO(int surveyNo, String surveyTitle, String surveyApplyDate, LocalDate surveyStartDate, LocalDate surveyEndDate, String name, boolean surveyCompleted) {
         this.surveyNo = surveyNo;
         this.surveyTitle = surveyTitle;
         this.surveyApplyDate = surveyApplyDate;
         this.surveyStartDate = surveyStartDate;
         this.surveyEndDate = surveyEndDate;
+        this.name = name;
+        this.surveyCompleted = surveyCompleted;
     }
 
     public int getSurveyNo() {
@@ -73,6 +77,22 @@ public class SurveyDTO {
         this.surveyEndDate = surveyEndDate;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isSurveyCompleted() {
+        return surveyCompleted;
+    }
+
+    public void setSurveyCompleted(boolean surveyCompleted) {
+        this.surveyCompleted = surveyCompleted;
+    }
+
     @Override
     public String toString() {
         return "SurveyDTO{" +
@@ -81,6 +101,8 @@ public class SurveyDTO {
                 ", surveyApplyDate='" + surveyApplyDate + '\'' +
                 ", surveyStartDate=" + surveyStartDate +
                 ", surveyEndDate=" + surveyEndDate +
+                ", name='" + name + '\'' +
+                ", surveyCompleted=" + surveyCompleted +
                 '}';
     }
 }

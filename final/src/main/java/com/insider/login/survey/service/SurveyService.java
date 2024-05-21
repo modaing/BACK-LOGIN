@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,13 +37,26 @@ public class SurveyService {
         this.modelMapper = modelMapper;
     }
 
-    public Page<SurveyDTO> selectSurveyList(Pageable pageable) {
+    public Page<SurveyDTO> selectSurveyList(Pageable pageable, int memberId) {
         try {
             Page<Survey> surveyPage = surveyRepository.findAll(pageable);
 
             List<SurveyDTO> DTOList = new ArrayList<>();
             for (Survey survey : surveyPage) {
-                DTOList.add(modelMapper.map(survey, SurveyDTO.class));
+                SurveyDTO surveyDTO = modelMapper.map(survey, SurveyDTO.class);
+
+                // 해당 설문 조사의 답변들을 리스트로 받아옴
+                List<SurveyAnswer> answerList = surveyAnswerRepository.findBySurveyNo(survey.getSurveyNo());
+
+                // 답변들에서 답변 번호만 리스트로 추려냄
+                List<Integer> answerNoList = answerList.stream()
+                        .map(SurveyAnswer::getAnswerNo)
+                        .collect(Collectors.toList());
+
+                // 해당 사번이 답변을 등록한 내역이 존재여부 dto에 삽입
+                surveyDTO.setSurveyCompleted(surveyResponseRepository.existsByMemberIdAndSurveyAnswerIn(memberId, answerNoList));
+                log.info("getCompleted {}", surveyDTO.isSurveyCompleted());
+                DTOList.add(surveyDTO);
             }
 
             // DTOList를 기존 pageable 정보를 가진 새로운 페이지로 만들어서 반환
@@ -93,6 +107,8 @@ public class SurveyService {
     public String insertResponse(int surveyAnswerNo, int memberId) {
         try {
             SurveyResponse surveyResponse = modelMapper.map(new SurveyResponseDTO(memberId, surveyAnswerNo), SurveyResponse.class);
+
+            surveyResponseRepository.save(surveyResponse);
 
             return "수요조사 응답 등록 성공";
         } catch (Exception e) {

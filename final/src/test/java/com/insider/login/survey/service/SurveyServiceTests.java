@@ -29,6 +29,7 @@ public class SurveyServiceTests extends CommonController {
     @DisplayName("수요조사 목록 조회")
     void testSelectSurveyList() {
         // given
+        int memberId = 241201001;
         //페이징 설정
         int pageNumber = 0;
         String properties = "surveyNo";
@@ -42,7 +43,7 @@ public class SurveyServiceTests extends CommonController {
         }
 
         // when
-        Page<SurveyDTO> results = surveyService.selectSurveyList(pageable);
+        Page<SurveyDTO> results = surveyService.selectSurveyList(pageable, memberId);
 
         // then
         // 조회한 페이지가 비어있지 않아야 함
@@ -74,6 +75,7 @@ public class SurveyServiceTests extends CommonController {
     @DisplayName("수요조사 등록")
     void testInsertsurvey() {
         // given
+        int memberId = 241201001;
         // 수요조사
         String surveyTitle = "치과예약이 있어";
         String surveyApplyDate = nowDate();
@@ -98,11 +100,11 @@ public class SurveyServiceTests extends CommonController {
 
         // when
 
-        Page<SurveyDTO> before = surveyService.selectSurveyList(pageable);
+        Page<SurveyDTO> before = surveyService.selectSurveyList(pageable, memberId);
 
         String result = surveyService.insertSurvey(new SurveyDTO(surveyTitle, surveyApplyDate, surveyStartDate, surveyEndDate), answers);
 
-        Page<SurveyDTO> after = surveyService.selectSurveyList(pageable);
+        Page<SurveyDTO> after = surveyService.selectSurveyList(pageable, memberId);
 
         // then
         // 삭제에 성공하면 수요조사 전체 목록의 요소 수가 등록 이전보다 증가해야 함
@@ -115,6 +117,7 @@ public class SurveyServiceTests extends CommonController {
     @DisplayName("수요조사 삭제")
     void testDeleteSurvey() {
         // given
+        int memberId = 241201001;
         int surveyNo = 5;
         //페이징 설정
         int pageNumber = 0;
@@ -130,11 +133,11 @@ public class SurveyServiceTests extends CommonController {
 
         // when
 
-        Page<SurveyDTO> before = surveyService.selectSurveyList(pageable);
+        Page<SurveyDTO> before = surveyService.selectSurveyList(pageable, memberId);
 
         String result = surveyService.deleteSurvey(surveyNo);
 
-        Page<SurveyDTO> after = surveyService.selectSurveyList(pageable);
+        Page<SurveyDTO> after = surveyService.selectSurveyList(pageable, memberId);
 
         // then
         // 삭제에 성공하면 수요조사 전체 목록의 요소 수가 삭제 이전보다 감소해야 함
