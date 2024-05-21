@@ -4,15 +4,13 @@ import com.insider.login.commute.dto.*;
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.commute.entity.CommuteDepartment;
 import com.insider.login.commute.entity.Correction;
-import com.insider.login.commute.repository.CommuteRepository;
-import com.insider.login.commute.repository.CorrectionRepository;
+import com.insider.login.commute.repository.*;
 
 import com.insider.login.commute.entity.CommuteMember;
 
-import com.insider.login.commute.repository.CommuteDepartmentRepository;
-import com.insider.login.commute.repository.CommuteMemberRepository;
 import com.insider.login.other.notice.dto.NoticeDTO;
 import com.insider.login.other.notice.service.NoticeService;
+import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -36,6 +34,7 @@ public class CommuteService {
     private final CorrectionRepository correctionRepository;
     private final CommuteDepartmentRepository commuteDepartmentRepository;
     private final CommuteMemberRepository commuteMemberRepository;
+    private final CorrectionAndCommuteRepository correctionAndCommuteRepository;
     private final NoticeService noticeService;
     private final CommuteMemberService commuteMemberService;
     private final ModelMapper modelMapper;
@@ -45,6 +44,7 @@ public class CommuteService {
                           CorrectionRepository correctionRepository,
                           CommuteDepartmentRepository commuteDepartmentRepository,
                           CommuteMemberRepository commuteMemberRepository,
+                          CorrectionAndCommuteRepository correctionAndCommuteRepository,
                           NoticeService noticeService,
                           CommuteMemberService commuteMemberService) {
 
@@ -53,6 +53,7 @@ public class CommuteService {
         this.correctionRepository = correctionRepository;
         this.commuteDepartmentRepository = commuteDepartmentRepository;
         this.commuteMemberRepository = commuteMemberRepository;
+        this.correctionAndCommuteRepository = correctionAndCommuteRepository;
         this.noticeService = noticeService;
         this.commuteMemberService = commuteMemberService;
     }
@@ -428,38 +429,77 @@ public class CommuteService {
         }
     }
 
+//    @Transactional
+//    public Map<String, Object> selectRequestForCorrectListByMemberId(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
+//        log.info("[CommuteService] selectRequestForCorrectListByMemberId");
+//        log.info("[CommuteService] memberId : ", memberId);
+//
+//        Page<Correction> correctionListByMemberId = correctionRepository.findByCommuteMemberIdAndCorrRegistrationDateBetween(memberId, startDayOfMonth, endDayOfMonth, pageable);
+//
+//        Page<CorrectionDTO> correctionList = correctionListByMemberId.map(correction -> modelMapper.map(correction, CorrectionDTO.class));
+//
+//        for(CorrectionDTO correction : correctionList) {
+//            System.out.println("correction" + correction);
+//        }
+//
+//        List<CommuteDTO> commuteList = new ArrayList<>();
+//
+//        /** 출퇴근 상세 조회 추가 */
+//        for (CorrectionDTO correction : correctionList) {
+//            System.out.println("commuteNo : " + correction.getCommuteNo());
+//            Commute findCommuteDetailByCommuteNo = commuteRepository.findByCommuteNo(correction.getCommuteNo());
+//            CommuteDTO commute = modelMapper.map(findCommuteDetailByCommuteNo, CommuteDTO.class);
+//            commuteList.add(commute);
+//            System.out.println("commute : " + commute);
+//        }
+//
+//        Map<String, Object> responseMap = new HashMap<>();
+//        responseMap.put("correction",correctionList.getContent());
+//        responseMap.put("currentPage", correctionList.getNumber());
+//        responseMap.put("totalItems", correctionList.getTotalElements());
+//        responseMap.put("totalPages", correctionList.getTotalPages());
+//        responseMap.put("commute", commuteList);
+//
+//        if(correctionListByMemberId != null) {
+//            return responseMap;
+//        } else {
+//            return null;
+//        }
+//    }
+
     @Transactional
     public Map<String, Object> selectRequestForCorrectListByMemberId(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
         log.info("[CommuteService] selectRequestForCorrectListByMemberId");
-        log.info("[CommuteService] memberId : ", memberId);
+        log.info("[CommuteService] memberId : {}", memberId);
 
-        Page<Correction> correctionListByMemberId = correctionRepository.findByCommuteMemberIdAndCorrRegistrationDateBetween(memberId, startDayOfMonth, endDayOfMonth, pageable);
+        Page<Object[]> results = correctionAndCommuteRepository.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
 
-        Page<CorrectionDTO> correctionList = correctionListByMemberId.map(correction -> modelMapper.map(correction, CorrectionDTO.class));
-
+        List<CorrectionDTO> correctionList = new ArrayList<>();
         List<CommuteDTO> commuteList = new ArrayList<>();
 
-        /** 출퇴근 상세 조회 추가 */
-        for (CorrectionDTO correction : correctionList) {
-            System.out.println("commuteNo : " + correction.getCommuteNo());
-            Commute findCommuteDetailByCommuteNo = commuteRepository.findByCommuteNo(correction.getCommuteNo());
-            CommuteDTO commute = modelMapper.map(findCommuteDetailByCommuteNo, CommuteDTO.class);
-            commuteList.add(commute);
-            System.out.println("commute : " + commute);
+        for (Object[] result : results) {
+            Correction correction = (Correction) result[0];
+            Commute commute = (Commute) result[1];
+
+            CorrectionDTO correctionDTO = modelMapper.map(correction, CorrectionDTO.class);
+            CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
+
+            correctionList.add(correctionDTO);
+            commuteList.add(commuteDTO);
         }
+
+        long totalCount = results.getTotalElements();
+        int totalPages = results.getTotalPages();
+        int currentPage = results.getNumber();
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("correction",correctionList.getContent());
-        responseMap.put("currentPage", correctionList.getNumber());
-        responseMap.put("totalItems", correctionList.getTotalElements());
-        responseMap.put("totalPages", correctionList.getTotalPages());
+        responseMap.put("correction", correctionList);
+        responseMap.put("currentPage", currentPage);
+        responseMap.put("totalItems", totalCount);
+        responseMap.put("totalPages", totalPages);
         responseMap.put("commute", commuteList);
 
-        if(correctionListByMemberId != null) {
-            return responseMap;
-        } else {
-            return null;
-        }
+        return responseMap;
     }
 
 
