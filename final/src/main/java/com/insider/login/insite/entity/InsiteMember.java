@@ -1,6 +1,6 @@
 package com.insider.login.insite.entity;
 
-import com.insider.login.insite.entity.memberDepart.InsiteDepartment;
+import com.insider.login.insite.entity.insiteDepart.InsiteDepartment;
 import jakarta.persistence.*;
 import lombok.ToString;
 

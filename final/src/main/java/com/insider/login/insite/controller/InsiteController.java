@@ -21,8 +21,13 @@ public class InsiteController {
     }
 
     @GetMapping("/leaves")
-    public void leaveMemberCounts() {
-        System.out.println(" 커밋용 ");
+    public List<Object[]> leaveMemberCounts() {
+        return insiteService.selectLeaveMemberCounts();
+    }
+
+    @GetMapping("/commutes")
+    public List<Object[]> commuteMemberCounts() {
+        return insiteService.selectCommuteMemberCounts();
     }
 
 }

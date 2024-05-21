@@ -1,4 +1,4 @@
-package com.insider.login.insite.entity.memberLeave;
+package com.insider.login.insite.entity.insiteLeave;
 
 import com.insider.login.insite.entity.InsiteMember;
 import jakarta.persistence.*;
