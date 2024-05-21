@@ -37,7 +37,8 @@ public class SurveyController extends CommonController {
     @GetMapping("/surveys")
     public ResponseEntity<ResponseMessage> selectSurveyList(@RequestParam(value = "page", defaultValue = "0") int pageNumber,
                                                             @RequestParam(value = "direction", defaultValue = "DESC") String direction,
-                                                            @RequestParam(value = "properties", defaultValue = "surveyNo") String properties) {
+                                                            @RequestParam(value = "properties", defaultValue = "surveyNo") String properties,
+                                                            @RequestParam("memberId") int memberId) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
@@ -50,16 +51,16 @@ public class SurveyController extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
-        Page<SurveyDTO> surveyPage = surveyService.selectSurveyList(pageable);
+        Page<SurveyDTO> page = surveyService.selectSurveyList(pageable, memberId);
 
-        if (surveyPage.isEmpty()) {
+        if (page.isEmpty()) {
             String errorMessage = "등록된 수요조사 항목이 없습니다.";
             ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
         }
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("submitPage", surveyPage);
+        responseMap.put("page", page);
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
 
