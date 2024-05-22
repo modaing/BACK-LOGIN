@@ -104,6 +104,10 @@ public class DepartmentService {
         return departmentRepository.findByDepartName(departName);
     }
 
+    public Department findDepartByDepartNo(int departNo) {
+        return departmentRepository.findById(departNo).orElse(null);
+    }
+
 //    public DepartmentDTO findDepartment(int departNo) {
 //        Department department = departmentRepository.findById(departNo).orElse(null);
 //        DepartmentDTO departmentDTO = modelMapper.map(department, DepartmentDTO.class);

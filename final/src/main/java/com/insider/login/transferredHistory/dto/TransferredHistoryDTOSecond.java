@@ -1,49 +1,66 @@
-package com.insider.login.transferredHistory.entity;
-import jakarta.persistence.*;
+package com.insider.login.transferredHistory.dto;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "transferred_history")
-public class TransferredHistory {
+public class TransferredHistoryDTOSecond {
 
-    @Id
-    @Column(name = "transferred_no")
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO INCREMENT
     private int transferredNo;                          // 식별자 번호
-    @Column(name = "new_depart_no", nullable = true)
     private int newDepartNo;
-    @Column(name = "new_position_name", nullable = true)
+    private String newDepartName;
     private String newPositionName;
-    @Column(name = "transferred_date", nullable = false)
     private LocalDate transferredDate;
-    @Column(name = "member_id", nullable = false)
     private int memberId;
 
-    protected TransferredHistory() {
+    public TransferredHistoryDTOSecond() {
     }
 
-    public TransferredHistory(int transferredNo, int newDepartNo, String newPositionName, LocalDate transferredDate) {
+    public TransferredHistoryDTOSecond(int transferredNo, int newDepartNo, String newDepartName, String newPositionName, LocalDate transferredDate, int memberId) {
         this.transferredNo = transferredNo;
         this.newDepartNo = newDepartNo;
+        this.newDepartName = newDepartName;
         this.newPositionName = newPositionName;
         this.transferredDate = transferredDate;
+        this.memberId = memberId;
     }
 
     public int getTransferredNo() {
         return transferredNo;
     }
 
+    public void setTransferredNo(int transferredNo) {
+        this.transferredNo = transferredNo;
+    }
+
     public int getNewDepartNo() {
         return newDepartNo;
+    }
+
+    public void setNewDepartNo(int newDepartNo) {
+        this.newDepartNo = newDepartNo;
+    }
+
+    public String getNewDepartName() {
+        return newDepartName;
+    }
+
+    public void setNewDepartName(String newDepartName) {
+        this.newDepartName = newDepartName;
     }
 
     public String getNewPositionName() {
         return newPositionName;
     }
 
+    public void setNewPositionName(String newPositionName) {
+        this.newPositionName = newPositionName;
+    }
+
     public LocalDate getTransferredDate() {
         return transferredDate;
+    }
+
+    public void setTransferredDate(LocalDate transferredDate) {
+        this.transferredDate = transferredDate;
     }
 
     public int getMemberId() {
@@ -54,15 +71,12 @@ public class TransferredHistory {
         this.memberId = memberId;
     }
 
-    public void setTransferredDate(LocalDate transferredDate) {
-        this.transferredDate = transferredDate;
-    }
-
     @Override
     public String toString() {
-        return "TransferredHistory{" +
+        return "TransferredHistoryDTOSecond{" +
                 "transferredNo=" + transferredNo +
                 ", newDepartNo=" + newDepartNo +
+                ", newDepartName='" + newDepartName + '\'' +
                 ", newPositionName='" + newPositionName + '\'' +
                 ", transferredDate=" + transferredDate +
                 ", memberId=" + memberId +

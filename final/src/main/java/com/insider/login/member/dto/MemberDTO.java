@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MemberDTO {
 
@@ -201,6 +202,36 @@ public class MemberDTO {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    /* 구성원 정보를 수정할 때 비교하는 logic */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        MemberDTO other = (MemberDTO) obj;
+        return memberId == other.memberId &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(password, other.password) &&
+                Objects.equals(employedDate, other.employedDate) &&
+                Objects.equals(address, other.address) &&
+                Objects.equals(phoneNo, other.phoneNo) &&
+                Objects.equals(memberStatus, other.memberStatus) &&
+                Objects.equals(email, other.email) &&
+                Objects.equals(role, other.role) &&
+                Objects.equals(departmentDTO, other.departmentDTO) &&
+                Objects.equals(positionDTO, other.positionDTO) &&
+                Objects.equals(imageUrl, other.imageUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(memberId, name, password, employedDate, address, phoneNo, memberStatus, email, role, departmentDTO, positionDTO, imageUrl);
+    }
+
 
     @Override
     public String toString() {

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
+
 @RestController
 @RequestMapping
 @CrossOrigin(origins = "http://localhost:3000")
@@ -28,19 +30,18 @@ public class DepartmentController {
         this.memberService = memberService;
     }
 
-    /** 특정 부서 가져오기 */
-//    @GetMapping("getDepartByName")
-////    public ResponseEntity<Integer> getSpecificDepartment(@RequestBody Map<String, String> body) {
-//    public ResponseEntity<Integer> getSpecificDepartment(@RequestParam String departName) {
-//        try {
-////            String departName = body.get("departName");
-//            System.out.println("삭제할 부서명: " + departName);
-//            Department department = departmentService.findDepartByName(departName);
-//            return ResponseEntity.ok(department.getDepartNo());
-//        } catch (EntityNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
-//    }
+
+    @GetMapping("/getDepartByNo/{departNo}")
+    public ResponseEntity<Department> getSpecificDepartmentByDepartName(@PathVariable("departNo") String departNo) {
+        int departNoInt = Integer.parseInt(departNo);
+        System.out.println("departNo: " + departNo);
+        try {
+            Department department = departmentService.findDepartByDepartNo(departNoInt);
+            return ResponseEntity.ok(department);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 
 //    @GetMapping("/getDepartByName")
 //    public ResponseEntity<Integer> getSpecificDepartment(@RequestParam String departName) {
@@ -55,6 +56,7 @@ public class DepartmentController {
 
     @GetMapping("/departmentAndPosition")
     public ResponseEntity<Integer> getSpecificDepartment(@RequestParam String departName) {
+        System.out.println("image url: " + getTokenInfo().getImageUrl());
         try {
             System.out.println("삭제할 부서명: " + departName);
             Department department = departmentService.findDepartByName(departName);
@@ -63,7 +65,6 @@ public class DepartmentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-
 
     /** 부서 등록 */
     @PostMapping("/departments")

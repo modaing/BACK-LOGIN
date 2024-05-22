@@ -1,7 +1,7 @@
 package com.insider.login.position.controller;
 
-import com.insider.login.position.dto.PositionDTO;
 import com.insider.login.position.dto.PositionChangeNameDTO;
+import com.insider.login.position.dto.PositionDTO;
 import com.insider.login.position.service.PositionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
