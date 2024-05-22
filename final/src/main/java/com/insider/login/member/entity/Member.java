@@ -124,6 +124,8 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         this.position = position;
     }
 
+
+
 //    public List<Commute> getCommutes() {
 //        return commutes;
 //    }

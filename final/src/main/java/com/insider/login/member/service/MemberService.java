@@ -95,21 +95,21 @@ public class MemberService {
     @Transactional
     public String updateMember(MemberDTO specificMember) {
         MemberDTO checkPositionOrDepartment = findSpecificMember(specificMember.getMemberId());
-        System.out.println("position name: " + checkPositionOrDepartment.getPositionDTO().getPositionName());
-        System.out.println("department name: " + checkPositionOrDepartment.getDepartmentDTO().getDepartName());
+        System.out.println("position name of 기존 구성원: " + checkPositionOrDepartment.getPositionDTO().getPositionName());
+        System.out.println("department name of 기존 구성원: " + checkPositionOrDepartment.getDepartmentDTO().getDepartName());
+
+        System.out.println("position name of specificMember: " + specificMember.getPositionDTO().getPositionName());
+        System.out.println("department name of specificMember: " + specificMember.getDepartmentDTO().getDepartName());
         int result = 0;
 
         try {
             Member updatedMember = modelMapper.map(specificMember, Member.class);
-            Member savedInfo = memberRepository.save(updatedMember);
-            System.out.println("바뀐 정보들: " + savedInfo);
-
             if (specificMember.getMemberStatus().equals("퇴직")) {
                 scheduleMemberDeletion(updatedMember.getMemberId());
-                System.out.println("현시간으로 3년뒤에 구성원 정보가 탈퇴됩니다");
+                System.out.println("3년뒤에 구성원 정보가 탈퇴됩니다");
             }
 
-            if (!specificMember.getDepartmentDTO().getDepartName().equals(checkPositionOrDepartment.getDepartmentDTO().getDepartName()) && !specificMember.getPositionDTO().getPositionName().equals(checkPositionOrDepartment.getPositionDTO().getPositionName())) {
+            if (!specificMember.getDepartmentDTO().getDepartName().equals(checkPositionOrDepartment.getDepartmentDTO().getDepartName()) || !specificMember.getPositionDTO().getPositionName().equals(checkPositionOrDepartment.getPositionDTO().getPositionName())) {
                 TransferredHistoryDTO transferredHistoryDTO = new TransferredHistoryDTO();
                 transferredHistoryDTO.setNewDepartNo(updatedMember.getDepartment().getDepartNo());
                 transferredHistoryDTO.setNewPositionName(updatedMember.getPosition().getPositionName());
@@ -118,8 +118,11 @@ public class MemberService {
                 TransferredHistory updatedTransferredHistoryRecord = modelMapper.map(transferredHistoryDTO, TransferredHistory.class);
                 transferredHistoryRepository.save(updatedTransferredHistoryRecord);
                 System.out.println("transferred history saved");
+            } else {
+                Member savedInfo = memberRepository.save(updatedMember);
+                System.out.println("바뀐 정보들: " + savedInfo);
             }
-//            if ()
+
             result = 1;
         } catch (Exception e) {
             result = 0;
