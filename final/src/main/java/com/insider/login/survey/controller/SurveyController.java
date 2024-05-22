@@ -98,6 +98,8 @@ public class SurveyController extends CommonController {
     @PostMapping("/surveys")
     public ResponseEntity<String> insertSurvey(@RequestBody SurveyInsertRequestDTO request) {
 
+        log.info("check 컨트롤러 진입");
+        log.info("check DTO 확인 {}", request);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         request.getSurveyDTO().setSurveyApplyDate(nowDate());
