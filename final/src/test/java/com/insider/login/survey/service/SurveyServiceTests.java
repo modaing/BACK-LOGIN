@@ -2,6 +2,7 @@ package com.insider.login.survey.service;
 
 import com.insider.login.common.CommonController;
 import com.insider.login.survey.dto.SurveyDTO;
+import com.insider.login.survey.dto.SurveyResponseDTO;
 import com.insider.login.survey.service.SurveyService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -152,9 +153,9 @@ public class SurveyServiceTests extends CommonController {
         // given
         int surveyAnswerNo = 10;
         int memberId = 241201001;
-
+        SurveyResponseDTO responseDTO = new SurveyResponseDTO(surveyAnswerNo, memberId);
         // when
-        String result = surveyService.insertResponse(surveyAnswerNo, memberId);
+        String result = surveyService.insertResponse(responseDTO);
 
         // then
         // 성공 메시지를 반환해야 함
