@@ -1,6 +1,7 @@
 package com.insider.login.survey.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class SurveyDTO {
     private int surveyNo;
@@ -15,6 +16,8 @@ public class SurveyDTO {
 
     private String name;
 
+    private List<SurveyAnswerDTO> answerList;
+
     private boolean surveyCompleted;
 
     public SurveyDTO() {
@@ -27,13 +30,14 @@ public class SurveyDTO {
         this.surveyEndDate = surveyEndDate;
     }
 
-    public SurveyDTO(int surveyNo, String surveyTitle, String surveyApplyDate, LocalDate surveyStartDate, LocalDate surveyEndDate, String name, boolean surveyCompleted) {
+    public SurveyDTO(int surveyNo, String surveyTitle, String surveyApplyDate, LocalDate surveyStartDate, LocalDate surveyEndDate, String name, List<SurveyAnswerDTO> answerList, boolean surveyCompleted) {
         this.surveyNo = surveyNo;
         this.surveyTitle = surveyTitle;
         this.surveyApplyDate = surveyApplyDate;
         this.surveyStartDate = surveyStartDate;
         this.surveyEndDate = surveyEndDate;
         this.name = name;
+        this.answerList = answerList;
         this.surveyCompleted = surveyCompleted;
     }
 
@@ -93,6 +97,14 @@ public class SurveyDTO {
         this.surveyCompleted = surveyCompleted;
     }
 
+    public List<SurveyAnswerDTO> getAnswerList() {
+        return answerList;
+    }
+
+    public void setAnswerList(List<SurveyAnswerDTO> answerList) {
+        this.answerList = answerList;
+    }
+
     @Override
     public String toString() {
         return "SurveyDTO{" +
@@ -102,6 +114,7 @@ public class SurveyDTO {
                 ", surveyStartDate=" + surveyStartDate +
                 ", surveyEndDate=" + surveyEndDate +
                 ", name='" + name + '\'' +
+                ", answerList=" + answerList +
                 ", surveyCompleted=" + surveyCompleted +
                 '}';
     }

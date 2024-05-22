@@ -48,6 +48,13 @@ public class SurveyService {
                 // 해당 설문 조사의 답변들을 리스트로 받아옴
                 List<SurveyAnswer> answerList = surveyAnswerRepository.findBySurveyNo(survey.getSurveyNo());
 
+                // SurveyAnswer 리스트를 SurveyAnswerDTO 리스트로 매핑 후 dto에 삽입
+                List<SurveyAnswerDTO> answerDTOList = answerList.stream()
+                        .map(answer -> modelMapper.map(answer, SurveyAnswerDTO.class))
+                        .collect(Collectors.toList());
+
+                surveyDTO.setAnswerList(answerDTOList);
+
                 // 답변들에서 답변 번호만 리스트로 추려냄
                 List<Integer> answerNoList = answerList.stream()
                         .map(SurveyAnswer::getAnswerNo)
@@ -55,7 +62,7 @@ public class SurveyService {
 
                 // 해당 사번이 답변을 등록한 내역이 존재여부 dto에 삽입
                 surveyDTO.setSurveyCompleted(surveyResponseRepository.existsByMemberIdAndSurveyAnswerIn(memberId, answerNoList));
-                log.info("getCompleted {}", surveyDTO.isSurveyCompleted());
+
                 DTOList.add(surveyDTO);
             }
 
@@ -104,10 +111,12 @@ public class SurveyService {
     }
 
     @Transactional
-    public String insertResponse(int surveyAnswerNo, int memberId) {
+    public String insertResponse(SurveyResponseDTO responseDTO) {
         try {
-            SurveyResponse surveyResponse = modelMapper.map(new SurveyResponseDTO(memberId, surveyAnswerNo), SurveyResponse.class);
+            log.info("check {}", responseDTO.getSurveyAnswer());
+            SurveyResponse surveyResponse = modelMapper.map(responseDTO, SurveyResponse.class);
 
+            log.info("check {}", surveyResponse.getSurveyAnswer());
             surveyResponseRepository.save(surveyResponse);
 
             return "수요조사 응답 등록 성공";

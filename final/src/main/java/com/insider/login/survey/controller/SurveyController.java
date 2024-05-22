@@ -4,7 +4,9 @@ import com.insider.login.common.CommonController;
 import com.insider.login.common.ResponseMessage;
 import com.insider.login.survey.dto.SurveyDTO;
 import com.insider.login.survey.dto.SurveyInsertRequestDTO;
+import com.insider.login.survey.dto.SurveyResponseDTO;
 import com.insider.login.survey.service.SurveyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@Slf4j
 public class SurveyController extends CommonController {
 
     private final SurveyService surveyService;
@@ -118,11 +121,10 @@ public class SurveyController extends CommonController {
      * 수요조사 응답 등록
      */
     @PostMapping("/surveyResponses")
-    public ResponseEntity<String> insertResponse(@RequestParam("surveyAnswerNo") int surveyAnswerNo) {
+    public ResponseEntity<String> insertResponse(@RequestBody SurveyResponseDTO responseDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        int memberId = 241201001; // TODO: 응답 제출자 사번 받아서 DTO에 담기 이건 임시
 
-        return ResponseEntity.ok().headers(headers).body(surveyService.insertResponse(surveyAnswerNo, memberId));
+        return ResponseEntity.ok().headers(headers).body(surveyService.insertResponse(responseDTO));
     }
 }
