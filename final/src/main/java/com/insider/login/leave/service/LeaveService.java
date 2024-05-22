@@ -150,17 +150,14 @@ public class LeaveService extends LeaveUtil {
 
     public List<LeaveMemberDTO> selectMemberList(String name) {
         try {
-            log.info("확인 서비스 입장 ==============================================");
-            log.info("확인 이름 확인 {}", name);
             List<LeaveMember> leaveMembers = memberRepository.findByName(name);
-            log.info("확인 엔티티반환 확인 {}", leaveMembers );
+
             List<LeaveMemberDTO> DTOList = memberRepository.findByName(name).stream()
                     .map(leaveMember -> {
                         LeaveMemberDTO dto = modelMapper.map(leaveMember, LeaveMemberDTO.class);
                         return dto;
                     }).toList();
 
-            log.info("결과검사 DTOList {}", DTOList);
             // 조회된 부서 번호로 부서 이름 찾기
             for (LeaveMemberDTO DTO : DTOList) {
                 Optional<Department> departmentOptional = departmentRepository.findById(DTO.getDepartNo());
