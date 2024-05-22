@@ -1,4 +1,4 @@
-package com.insider.login.insite.entity.memberDepart;
+package com.insider.login.insite.entity.insiteDepart;
 
 import jakarta.persistence.*;
 import lombok.ToString;

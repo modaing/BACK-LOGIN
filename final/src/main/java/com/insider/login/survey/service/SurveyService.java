@@ -1,5 +1,6 @@
 package com.insider.login.survey.service;
 
+import com.insider.login.leave.repository.LeaveMemberRepository;
 import com.insider.login.survey.dto.SurveyAnswerDTO;
 import com.insider.login.survey.dto.SurveyDTO;
 import com.insider.login.survey.dto.SurveyResponseDTO;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -27,22 +29,47 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final SurveyResponseRepository surveyResponseRepository;
+    private final LeaveMemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    public SurveyService(SurveyRepository surveyRepository, SurveyAnswerRepository surveyAnswerRepository, SurveyResponseRepository surveyResponseRepository, ModelMapper modelMapper) {
+    public SurveyService(SurveyRepository surveyRepository, SurveyAnswerRepository surveyAnswerRepository, SurveyResponseRepository surveyResponseRepository, LeaveMemberRepository memberRepository, ModelMapper modelMapper) {
         this.surveyRepository = surveyRepository;
         this.surveyAnswerRepository = surveyAnswerRepository;
         this.surveyResponseRepository = surveyResponseRepository;
+        this.memberRepository = memberRepository;
         this.modelMapper = modelMapper;
     }
 
-    public Page<SurveyDTO> selectSurveyList(Pageable pageable) {
+    public Page<SurveyDTO> selectSurveyList(Pageable pageable, int memberId) {
         try {
             Page<Survey> surveyPage = surveyRepository.findAll(pageable);
 
             List<SurveyDTO> DTOList = new ArrayList<>();
             for (Survey survey : surveyPage) {
-                DTOList.add(modelMapper.map(survey, SurveyDTO.class));
+                SurveyDTO surveyDTO = modelMapper.map(survey, SurveyDTO.class);
+
+                // 해당 설문 조사의 답변들을 리스트로 받아옴
+                List<SurveyAnswer> answerList = surveyAnswerRepository.findBySurveyNo(survey.getSurveyNo());
+
+                // SurveyAnswer 리스트를 SurveyAnswerDTO 리스트로 매핑 후 dto에 삽입
+                List<SurveyAnswerDTO> answerDTOList = answerList.stream()
+                        .map(answer -> modelMapper.map(answer, SurveyAnswerDTO.class))
+                        .collect(Collectors.toList());
+
+                surveyDTO.setAnswerList(answerDTOList);
+
+                // 답변들에서 답변 번호만 리스트로 추려냄
+                List<Integer> answerNoList = answerList.stream()
+                        .map(SurveyAnswer::getAnswerNo)
+                        .collect(Collectors.toList());
+
+                // 해당 사번이 답변을 등록한 내역이 존재여부 dto에 삽입
+                surveyDTO.setSurveyCompleted(surveyResponseRepository.existsByMemberIdAndSurveyAnswerIn(memberId, answerNoList));
+
+                // 수요조사 작성자의 사번으로 이름 조회 후 dto에 삽입
+                surveyDTO.setName(memberRepository.findNameByMemberId(surveyDTO.getMemberId()));
+
+                DTOList.add(surveyDTO);
             }
 
             // DTOList를 기존 pageable 정보를 가진 새로운 페이지로 만들어서 반환
@@ -64,6 +91,8 @@ public class SurveyService {
     @Transactional
     public String insertSurvey(SurveyDTO surveyDTO, List<String> answers) {
         try {
+            log.info("check surveyDTO {}", surveyDTO);
+            log.info("check answers {}", answers);
             int surveyNo = surveyRepository.save(modelMapper.map(surveyDTO, Survey.class)).getSurveyNo();
 
             int answerSequence = 1;
@@ -90,9 +119,13 @@ public class SurveyService {
     }
 
     @Transactional
-    public String insertResponse(int surveyAnswerNo, int memberId) {
+    public String insertResponse(SurveyResponseDTO responseDTO) {
         try {
-            SurveyResponse surveyResponse = modelMapper.map(new SurveyResponseDTO(memberId, surveyAnswerNo), SurveyResponse.class);
+            log.info("check {}", responseDTO.getSurveyAnswer());
+            SurveyResponse surveyResponse = modelMapper.map(responseDTO, SurveyResponse.class);
+
+            log.info("check {}", surveyResponse.getSurveyAnswer());
+            surveyResponseRepository.save(surveyResponse);
 
             return "수요조사 응답 등록 성공";
         } catch (Exception e) {

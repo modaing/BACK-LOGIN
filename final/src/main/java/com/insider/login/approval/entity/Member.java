@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.sql.Date;
+import java.util.Arrays;
 
 @Entity(name="ApprovalMember")
 @Table(name="member_info")
@@ -46,11 +47,11 @@ public class Member {
     private String memberRole;          //자격
 
     @Column(name="image_url")
-    private String image_url;          //이미지번호
+    private byte[] image_url;          //이미지번호
 
     protected Member(){}
 
-    public Member(String name, int memberId, String password, int departNo, String positionLevel, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, String image_url) {
+    public Member(String name, int memberId, String password, int departNo, String positionLevel, Date employedDate, String address, String phoneNo, String memberStatus, String email, String memberRole, byte[] image_url) {
         this.name = name;
         this.memberId = memberId;
         this.password = password;
@@ -109,7 +110,7 @@ public class Member {
         return memberRole;
     }
 
-    public String getImage_url() {
+    public byte[] getImage_url() {
         return image_url;
     }
 
@@ -120,14 +121,14 @@ public class Member {
                 ", memberId=" + memberId +
                 ", password='" + password + '\'' +
                 ", departNo=" + departNo +
-                ", positionName='" + positionLevel + '\'' +
+                ", positionLevel='" + positionLevel + '\'' +
                 ", employedDate=" + employedDate +
                 ", address='" + address + '\'' +
                 ", phoneNo='" + phoneNo + '\'' +
                 ", memberStatus='" + memberStatus + '\'' +
                 ", email='" + email + '\'' +
                 ", memberRole='" + memberRole + '\'' +
-                ", image_url='" + image_url + '\'' +
+                ", image_url=" + Arrays.toString(image_url) +
                 '}';
     }
 }

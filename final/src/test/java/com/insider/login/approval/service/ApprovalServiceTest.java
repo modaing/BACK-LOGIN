@@ -321,5 +321,26 @@ public class ApprovalServiceTest {
         Assertions.assertTrue(isDeleted);
     }
 
+    @Test
+    void testSelectMember(){
+        //given
+        int memberId = 240501629;
 
+        //when
+        //then
+        Assertions.assertNotNull(approvalService.selectMember(memberId));
+    }
+
+    @Test
+    void testSelectAllMemberList(){
+        //given
+        //when
+        List<MemberDTO> memberDTOList = approvalService.selectAllMemberList();
+        //then
+
+        Assertions.assertNotNull(memberDTOList);
+        for(int i = 0; i < memberDTOList.size(); i++){
+            System.out.println(memberDTOList.get(i).getDepartName() + ", " + memberDTOList.get(i).getMemberId() + ", " + memberDTOList.get(i).getName()+ ", " + memberDTOList.get(i).getPositionName());
+        }
+    }
 }

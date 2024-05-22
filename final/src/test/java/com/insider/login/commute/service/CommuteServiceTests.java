@@ -221,7 +221,7 @@ public class CommuteServiceTests {
     @Test
     void testSelectRequestForCorrectByMemberId() {
         //given
-        int memberId = 2024001001;
+        int memberId = 240401835;
         LocalDate date = LocalDate.now();
         LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());

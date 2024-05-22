@@ -18,9 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Array;
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -303,7 +306,7 @@ public class ApprovalService {
                                             member.getMemberStatus(),
                                             member.getEmail(),
                                             member.getMemberRole(),
-                                            member.getImage_url(),
+                                            new String(member.getImage_url(),StandardCharsets.UTF_8),
                                             //departName,
                                             department.getDepartName(),
                                             position.getPositionName()
@@ -753,5 +756,68 @@ public class ApprovalService {
         log.info("Service lastApprovalNo: " + lastApprovalNo);
 
         return lastApprovalNo;
+    }
+
+    //사원 정보 (기안자 정보 조회)
+    public MemberDTO selectMember(int memberId) {
+
+        Member member = approvalMemberRepository.findById(memberId);
+        Department department = approvalDepartmentRepository.findById(member.getDepartNo());
+        Position position = approvalPositionRepository.findById(member.getPositionLevel()).orElse(null);
+        MemberDTO memberDTO = new MemberDTO(member.getName(),
+                member.getMemberId(),
+                member.getPassword(),
+                member.getDepartNo(),
+                member.getPositionLevel(),
+                member.getEmployedDate(),
+                member.getAddress(),
+                member.getPhoneNo(),
+                member.getMemberStatus(),
+                member.getEmail(),
+                member.getMemberRole(),
+                new String(member.getImage_url(),StandardCharsets.UTF_8),
+                department.getDepartName(),
+                position.getPositionName());
+
+        log.info("memberDTO" + memberDTO);
+        return memberDTO;
+    }
+
+    //전 사원 정보 (결재자 참조자 라인 조회할때 : 부서별 순서)
+    public List<MemberDTO> selectAllMemberList() {
+
+        List<Object[]> results = approvalMemberRepository.findAllMembersWithDepartmentOrderedNative();
+
+        List<MemberDTO> memberDTOList = results.stream()
+                .map(this::convertToMemberDTO)
+                .collect(Collectors.toList());
+
+        for(MemberDTO memberDTO : memberDTOList){
+
+            Position position = approvalPositionRepository.findById(memberDTO.getPositionLevel()).orElse(null);
+
+            memberDTO.setPositionName(position.getPositionName());
+        }
+
+        return memberDTOList;
+    }
+
+    public MemberDTO convertToMemberDTO(Object[] result){
+
+        String name = (String) result[1];
+        int memberId = (int) result[2];
+        String password = (String) result[3];
+        int departNo = (int) result[4];
+        String positionLevel = (String) result[5];
+        Date employedDate = (java.sql.Date) result[6];
+        String address = (String) result[7];
+        String phoneNo = (String) result[8];
+        String memberStatus = (String) result[9];
+        String email = (String) result[10];
+        String memberRole = (String) result[11];
+        String imageUrl = new String((byte[]) result[12],StandardCharsets.UTF_8);;
+        String departName = (String) result[0];
+
+        return new MemberDTO(name, memberId, password, departNo, positionLevel, employedDate, address, phoneNo, memberStatus, email, memberRole, imageUrl, departName);
     }
 }
