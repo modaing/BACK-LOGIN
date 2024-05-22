@@ -14,6 +14,8 @@ public class SurveyDTO {
 
     private LocalDate surveyEndDate;
 
+    private int memberId;
+
     private String name;
 
     private List<SurveyAnswerDTO> answerList;
@@ -30,12 +32,13 @@ public class SurveyDTO {
         this.surveyEndDate = surveyEndDate;
     }
 
-    public SurveyDTO(int surveyNo, String surveyTitle, String surveyApplyDate, LocalDate surveyStartDate, LocalDate surveyEndDate, String name, List<SurveyAnswerDTO> answerList, boolean surveyCompleted) {
+    public SurveyDTO(int surveyNo, String surveyTitle, String surveyApplyDate, LocalDate surveyStartDate, LocalDate surveyEndDate, int memberId, String name, List<SurveyAnswerDTO> answerList, boolean surveyCompleted) {
         this.surveyNo = surveyNo;
         this.surveyTitle = surveyTitle;
         this.surveyApplyDate = surveyApplyDate;
         this.surveyStartDate = surveyStartDate;
         this.surveyEndDate = surveyEndDate;
+        this.memberId = memberId;
         this.name = name;
         this.answerList = answerList;
         this.surveyCompleted = surveyCompleted;
@@ -81,20 +84,20 @@ public class SurveyDTO {
         this.surveyEndDate = surveyEndDate;
     }
 
+    public int getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(int memberId) {
+        this.memberId = memberId;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isSurveyCompleted() {
-        return surveyCompleted;
-    }
-
-    public void setSurveyCompleted(boolean surveyCompleted) {
-        this.surveyCompleted = surveyCompleted;
     }
 
     public List<SurveyAnswerDTO> getAnswerList() {
@@ -105,6 +108,14 @@ public class SurveyDTO {
         this.answerList = answerList;
     }
 
+    public boolean isSurveyCompleted() {
+        return surveyCompleted;
+    }
+
+    public void setSurveyCompleted(boolean surveyCompleted) {
+        this.surveyCompleted = surveyCompleted;
+    }
+
     @Override
     public String toString() {
         return "SurveyDTO{" +
@@ -113,6 +124,7 @@ public class SurveyDTO {
                 ", surveyApplyDate='" + surveyApplyDate + '\'' +
                 ", surveyStartDate=" + surveyStartDate +
                 ", surveyEndDate=" + surveyEndDate +
+                ", memberId=" + memberId +
                 ", name='" + name + '\'' +
                 ", answerList=" + answerList +
                 ", surveyCompleted=" + surveyCompleted +

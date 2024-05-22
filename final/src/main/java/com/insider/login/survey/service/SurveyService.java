@@ -1,5 +1,6 @@
 package com.insider.login.survey.service;
 
+import com.insider.login.leave.repository.LeaveMemberRepository;
 import com.insider.login.survey.dto.SurveyAnswerDTO;
 import com.insider.login.survey.dto.SurveyDTO;
 import com.insider.login.survey.dto.SurveyResponseDTO;
@@ -28,12 +29,14 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final SurveyAnswerRepository surveyAnswerRepository;
     private final SurveyResponseRepository surveyResponseRepository;
+    private final LeaveMemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    public SurveyService(SurveyRepository surveyRepository, SurveyAnswerRepository surveyAnswerRepository, SurveyResponseRepository surveyResponseRepository, ModelMapper modelMapper) {
+    public SurveyService(SurveyRepository surveyRepository, SurveyAnswerRepository surveyAnswerRepository, SurveyResponseRepository surveyResponseRepository, LeaveMemberRepository memberRepository, ModelMapper modelMapper) {
         this.surveyRepository = surveyRepository;
         this.surveyAnswerRepository = surveyAnswerRepository;
         this.surveyResponseRepository = surveyResponseRepository;
+        this.memberRepository = memberRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -63,6 +66,9 @@ public class SurveyService {
                 // 해당 사번이 답변을 등록한 내역이 존재여부 dto에 삽입
                 surveyDTO.setSurveyCompleted(surveyResponseRepository.existsByMemberIdAndSurveyAnswerIn(memberId, answerNoList));
 
+                // 수요조사 작성자의 사번으로 이름 조회 후 dto에 삽입
+                surveyDTO.setName(memberRepository.findNameByMemberId(surveyDTO.getMemberId()));
+
                 DTOList.add(surveyDTO);
             }
 
@@ -85,6 +91,8 @@ public class SurveyService {
     @Transactional
     public String insertSurvey(SurveyDTO surveyDTO, List<String> answers) {
         try {
+            log.info("check surveyDTO {}", surveyDTO);
+            log.info("check answers {}", answers);
             int surveyNo = surveyRepository.save(modelMapper.map(surveyDTO, Survey.class)).getSurveyNo();
 
             int answerSequence = 1;
