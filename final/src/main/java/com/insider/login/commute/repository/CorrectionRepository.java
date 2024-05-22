@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface CorrectionRepository extends JpaRepository<Correction, Integer> {
@@ -17,7 +18,12 @@ public interface CorrectionRepository extends JpaRepository<Correction, Integer>
 
     Page<Correction> findAllByCorrRegistrationDateBetween(LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
 
-//    Page<Correction> findByCommuteMemberIdAndCorrRegistrationDateBetween(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
+    List<Correction> findByCommuteNo(int commuteNo);
+
+//    List<Correction> findByCommuteNoAndCorrRegistrationDateBetween(int commuteNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
+
+
+    Page<Correction> findByCommuteMemberIdAndCorrRegistrationDateBetween(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
 
 //    @Query("SELECT c, co " +
 //            "FROM Correction c " +

@@ -2,6 +2,8 @@ package com.insider.login.commute.repository;
 
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.commute.entity.CommuteMember;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,4 +20,6 @@ public interface CommuteRepository extends JpaRepository<Commute, Integer> {
     List<Commute> findByCommuteMemberAndWorkingDateBetween(CommuteMember commuteMember, LocalDate startDayOfMonth, LocalDate endDayOfMonth);
 
     Commute findMemberIdByCommuteNo(int commuteNo);
+
+    List<Commute> findByMemberId(int memberId);
 }
