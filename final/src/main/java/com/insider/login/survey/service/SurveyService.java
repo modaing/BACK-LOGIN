@@ -91,8 +91,6 @@ public class SurveyService {
     @Transactional
     public String insertSurvey(SurveyDTO surveyDTO, List<String> answers) {
         try {
-            log.info("check surveyDTO {}", surveyDTO);
-            log.info("check answers {}", answers);
             int surveyNo = surveyRepository.save(modelMapper.map(surveyDTO, Survey.class)).getSurveyNo();
 
             int answerSequence = 1;
@@ -121,10 +119,8 @@ public class SurveyService {
     @Transactional
     public String insertResponse(SurveyResponseDTO responseDTO) {
         try {
-            log.info("check {}", responseDTO.getSurveyAnswer());
             SurveyResponse surveyResponse = modelMapper.map(responseDTO, SurveyResponse.class);
 
-            log.info("check {}", surveyResponse.getSurveyAnswer());
             surveyResponseRepository.save(surveyResponse);
 
             return "수요조사 응답 등록 성공";
