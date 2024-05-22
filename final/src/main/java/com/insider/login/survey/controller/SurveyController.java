@@ -125,7 +125,6 @@ public class SurveyController extends CommonController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        return ResponseEntity.ok().headers(headers).body(surveyService.insertResponse(surveyAnswerNo, memberId));
         return ResponseEntity.ok().headers(headers).body(surveyService.insertResponse(responseDTO));
     }
 }
