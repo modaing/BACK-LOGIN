@@ -88,6 +88,7 @@ public class LeaveService extends LeaveUtil {
                 LeaveSubmit leaveSubmit = leaveSubmitRepository.findById(LeaveSubNo);
                 LeaveSubmitDTO updateDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
                 updateDTO.setLeaveSubStatus("취소신청");
+                leaveSubmitRepository.save(modelMapper.map(updateDTO,LeaveSubmit.class));
             }
 
             DTO.setLeaveSubStatus("대기");
@@ -259,8 +260,10 @@ public class LeaveService extends LeaveUtil {
         List<LeaveSubmit> submitList = leaveSubmitRepository.findByMemberId(DTO.getMemberId());
 
         int consumedDays = submitList.stream()
-                // 휴가 유형이 취소가 아닌 것들만 대상으로 함
+                // 제외할 대상 필터링
                 .filter(submit -> !"취소".equals(submit.getLeaveSubType()))
+                .filter(submit -> !"취소".equals(submit.getLeaveSubStatus()))
+                .filter(submit -> !"반려".equals(submit.getLeaveSubStatus()))
                 // 스트림의 각 요소마다 leaveDayCalc 메소드 실행 후 intStream으로 반환
                 .mapToInt(this::leaveDaysCalc)
                 // 스트림의 모든 요소를 더함
