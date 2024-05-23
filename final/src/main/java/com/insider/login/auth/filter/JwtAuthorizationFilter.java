@@ -53,8 +53,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         /* 응답의 Content-Type 헤더 설정 */
         response.setContentType("application/json; charset=UTF-8");
 
-        System.out.println("===== JwtAuthorizationFilter 도착 =====");
-        List<String> roleLessList = Arrays.asList("/signUp","/registDepart","/registPosition", "/login","/members/{memberId}","/showAllMembersPage", "/announces", "/announces/{ancNo}, /approvals", "/");
+//        System.out.println("===== JwtAuthorizationFilter 도착 =====");
+        List<String> roleLessList = Arrays.asList("/signUp","/registDepart","/registPosition", "/login","/members/{memberId}","/showAllMembersPage", "/announces", "/announces/{ancNo}, /approvals", "/resetMemberPassword/{memberId}", "/members/updateProfile/{memberId}", "/", "/wss/chatting");
 
         /* 인증은 했지만 권한이 필요 없는 resource들은 그냥 다음 동작으로 넘어간다... 하지만 권한이 필요한 resource면 -> SecurityContextHolder에 권한 정보를 같이 줘서, 거기에 접근을 할 수 있게 해줘야 한다 */
         if (roleLessList.contains((request.getRequestURI()))) {

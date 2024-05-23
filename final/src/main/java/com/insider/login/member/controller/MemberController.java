@@ -1,5 +1,7 @@
 package com.insider.login.member.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.insider.login.auth.model.dto.LoginDTO;
 import com.insider.login.config.YmlConfig;
 import com.insider.login.department.service.DepartmentService;
@@ -9,6 +11,8 @@ import com.insider.login.member.dto.UpdatePasswordRequestDTO;
 import com.insider.login.member.entity.Member;
 import com.insider.login.member.service.MemberService;
 import com.insider.login.position.service.PositionService;
+import com.insider.login.transferredHistory.dto.TransferredHistoryDTO;
+import com.insider.login.transferredHistory.entity.TransferredHistory;
 import com.insider.login.transferredHistory.service.TransferredHistoryService;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,7 +21,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,12 +29,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +41,10 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -74,8 +78,9 @@ public class MemberController {
 
     /** 구성원 등록 */
     @PostMapping("/signUp")
-    public String signUp(@RequestPart("memberDTO") MemberDTO memberDTO, @RequestPart("memberProfilePicture") MultipartFile file) throws IOException {
-
+    public String signUp(@RequestPart("memberDTO") MemberDTO memberDTO,
+                         @RequestPart("memberProfilePicture") MultipartFile file) throws IOException {
+        System.out.println("signUp method 도착");
         /* 비밀번호 암호화해서 설정 */
         String encodedPassword = passwordEncoder.encode(memberDTO.getPassword());
         memberDTO.setPassword(encodedPassword);
@@ -84,7 +89,7 @@ public class MemberController {
         int generatedMemberId = memberDTO.getMemberId();
         boolean existingId;
 
-         /* 존재 한다면 새로운 memberId를 부여해서 setting을 해줄 것이다 */
+        /* 존재 한다면 새로운 memberId를 부여해서 setting을 해줄 것이다 */
         do {
             existingId = memberService.findExistingMemberId(generatedMemberId);
             if (existingId) {
@@ -95,45 +100,63 @@ public class MemberController {
 
         System.out.println("memberDTO: " + memberDTO);
 
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename(); // unique file name
-        String filePath = Paths.get("/Users/jee/Documents/Desktop/Personal Stuffs/", fileName).toString();
+        String fileName = memberDTO.getMemberId() + "_" + file.getOriginalFilename();
+        String directoryPath = "../final_clone2/FRONT-LOGIN/public/img";
+        String filePath = directoryPath + "/" + fileName;
 
         Path targetLocation = Paths.get(filePath);
-        System.out.println("targetLocation: " + targetLocation);
-        System.out.println("file input stream: " + file.getInputStream());
-        System.out.println("file info1: " + file.getSize());
-        System.out.println("file info3: " + file.getName());
-        System.out.println("file info4: " + file.getOriginalFilename());
-        System.out.println("file info5: " + file.getClass());
-        System.out.println("file info6: " + file.getResource());
-        System.out.println("file info7: " + file.getBytes());
-        System.out.println("file info8: " + file.getContentType());
 
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        // Copy the file to the target location
+        try {
+            Files.createDirectories(targetLocation.getParent()); // Create directories if they don't exist
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "File upload failed";
+        }
 
-        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/profilePictures")
-                .path(fileName)
-                .toUriString();
+//        String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+//                .path("/profilePictures")
+//                .path(fileName)
+//                .toUriString();
 
+        String fileUrl = fileName;
         memberDTO.setImageUrl(fileUrl);
 
-//        return "hi";
         Member savedMember = memberService.saveMember(memberDTO);
-//        return savedMember + "";
+
         System.out.println("회원 가입한 구성원 정보: " + savedMember);
-//
+
         // 회원가입을 하면 최초로 구성원의 인사발령 내역을 저장을 해야하기 때문에 작성하는 코드
         transferredHistoryService.saveHistory(savedMember);
 
-        if(Objects.isNull(savedMember)) { // 비어있으면 실패
+        if (Objects.isNull(savedMember)) { // 비어있으면 실패
             System.out.println("회원가입 실패 🥲");
             return "회원가입 실패";
-        } else {                    // 다 작성을 했으면 구성원 가입 성공
+        } else { // 다 작성을 했으면 구성원 가입 성공
             System.out.println("회원가입 성공 🙂");
             return "회원 가입 성공!";
         }
     }
+
+    @PutMapping("/resetPassword/{memberId}")
+    public ResponseEntity<String> resetMemberPassword(@PathVariable("memberId") String memberId) {
+        System.out.println("비밀번호 초기화");
+        int memberIdToInt = Integer.parseInt(memberId);
+
+        try {
+            MemberDTO memberInfo = memberService.findSpecificMember(memberIdToInt);
+            String encodedPassword = passwordEncoder.encode("0000");
+            memberInfo.setPassword(encodedPassword);
+            memberService.resetPassword(memberInfo);
+            return ResponseEntity.ok("Password reset successfully");
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid memberId");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to reset password");
+        }
+    }
+
 
     /* memberId가 겹친다면 마지막 3자릿수를 다시 생성을 해서 되돌린다 */
     private int generateNewMemberId(int memberId) {
@@ -151,77 +174,173 @@ public class MemberController {
 
     /** 특정 구성원 정보 조회 */
     @GetMapping("/members/{memberId}")
-    public String getSpecificMemberById(@PathVariable("memberId") int memberId) {
+    public ResponseEntity<MemberDTO> getSpecificMemberById(@PathVariable("memberId") String memberId) {
+        int getMemberId = Integer.parseInt(memberId);
         System.out.println("받은 memberId: " + memberId);
-        MemberDTO foundMember = memberService.findSpecificMember(memberId);
+        MemberDTO foundMember = memberService.findSpecificMember(getMemberId);
         System.out.println("특정 구성원 정보 조회: " + foundMember);
 
         if (foundMember != null) {
-            return "foundMember: " + foundMember;
+            return ResponseEntity.ok().body(foundMember);
         } else {
-            return "memberNotFound";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     /** 구성원 정보 수정 */
+//    @PutMapping("/members/updateProfile/{memberId}")
+//    public ResponseEntity<String> updateSpecificMemberById(@PathVariable("memberId") String memberId , @RequestPart("memberDTO") MemberDTO memberDTO, @RequestPart("memberProfilePicture") MultipartFile file) {
+//        System.out.println("updateSpecificMemberById 도착😭😭😭😭😭😭😭😭😭😭😭😭😭😭");
+//        int memberIdInInt = Integer.parseInt(memberId);
+//        /* 수정을 하기전 구성원에 대한 정보를 가져온다 (비교를 하기 위해서) */
+//        MemberDTO specificMember = memberService.findSpecificMember(memberIdInInt);
+//        memberDTO.setPassword(specificMember.getPassword()); // 비밀번호는 그대로...
+//        System.out.println("specific member: " + specificMember);
+//        System.out.println("inputted member: " + memberDTO);
+//        System.out.println("file: " + file.getOriginalFilename());
+//
+//        String fileName1 = memberId + "_" + file.getOriginalFilename();
+//        if (!memberDTO.equals(specificMember) && !file.getOriginalFilename().equals("empty_file")){
+//            memberService.updateMember(memberDTO);
+//            return ResponseEntity.status(HttpStatus.OK).body("사진이랑 정보들이 정상적으로 변경 되었습니다");
+//        }
+//
+//        /* 이미지만 변경이 되었다면 */
+//        if (!specificMember.getImageUrl().equals(fileName1)) {
+//            String fileName = memberDTO.getMemberId() + "_" + file.getOriginalFilename();
+//            String directoryPath = "../final_clone2/FRONT-LOGIN/public/img";
+//            String filePath = directoryPath + "/" + fileName;
+//            Path targetLocation = Paths.get(filePath);
+//
+//            try {
+//                Files.createDirectories(targetLocation.getParent()); // Create directories if they don't exist
+//                Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("File upload failed");
+//            }
+//            memberDTO.setImageUrl(fileName);
+//            memberService.updateMember(memberDTO);
+//            return ResponseEntity.status(HttpStatus.OK).body("구성원 정보가 업데이트되었습니다");
+//        }
+//        /* 이미지는 변경 없지만 다른 정보들은 변경이 되었다면 */
+//        memberDTO.setImageUrl(specificMember.getImageUrl());
+//        if (!memberDTO.equals(specificMember) && file.getOriginalFilename().equals("empty_file")) {
+//            memberService.updateMember(memberDTO);
+//            return ResponseEntity.status(HttpStatus.OK).body("사진은 수정이 되지 않았지만 다른 정보들은 수정 성공");
+//        }
+//
+//        /* 이미지 변경이 있으면 */
+//        if (!specificMember.getImageUrl().equals(fileName1)) {
+//            String fileName = memberDTO.getMemberId() + "_" + file.getOriginalFilename();
+//            String directoryPath = "../final_clone2/FRONT-LOGIN/public/img";
+//            String filePath = directoryPath + "/" + fileName;
+//            Path targetLocation = Paths.get(filePath);
+//
+//            try {
+//                Files.createDirectories(targetLocation.getParent()); // Create directories if they don't exist
+//                Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("File upload failed");
+//            }
+//            memberDTO.setImageUrl(fileName);
+//            memberService.updateMember(memberDTO);
+//            return ResponseEntity.status(HttpStatus.OK).body("구성원 정보가 업데이트되었습니다");
+//        } else if (memberDTO.equals(specificMember)) {
+//            System.out.println("구성원의 정보가 똑같다");
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정할 정보가 없습니다");
+//        }
+//    }
+
     @PutMapping("/members/updateProfile/{memberId}")
-    public String updateSpecificMemberById(@PathVariable("memberId") int memberId, @RequestBody MemberDTO inputtedMemberInfo) {
-        /* 특정 구성원의 정보를 전부 가져온다 */
-        MemberDTO specificMember = memberService.findSpecificMember(memberId);
-        System.out.println("specificMember: " + specificMember); // 확인용
+    public ResponseEntity<String> updateSpecificMemberById(@PathVariable("memberId") String memberId,
+                                                           @RequestPart("memberDTO") MemberDTO memberDTO,
+                                                           @RequestPart(value = "memberProfilePicture", required = false) MultipartFile file) {
+        System.out.println("updateSpecificMemberById 도착😭😭😭😭😭😭😭😭😭😭😭😭😭😭");
+        int memberIdInInt = Integer.parseInt(memberId);
+        /* 수정을 하기전 구성원에 대한 정보를 가져온다 (비교를 하기 위해서) */
+        MemberDTO specificMember = memberService.findSpecificMember(memberIdInInt);
+        LocalDate originalEmployedDate = specificMember.getEmployedDate();
+        memberDTO.setPassword(specificMember.getPassword()); // 비밀번호는 그대로...
+        System.out.println("specific member: " + specificMember);
+        System.out.println("inputted member: " + memberDTO);
 
-        inputtedMemberInfo.setMemberId(memberId);
-        inputtedMemberInfo.setPassword(specificMember.getPassword());
-        inputtedMemberInfo.setEmployedDate(specificMember.getEmployedDate());
-        /*
-        inputtedMemberInfo.setAddress(specificMember.getAddress());
-        inputtedMemberInfo.setRole(specificMember.getRole());
-        inputtedMemberInfo.setImageUrl(specificMember.getImageUrl());
-        */
-        System.out.println("수정을 하기 전 구성원의 정보: " + specificMember);
-        System.out.println("입력 받은 값: " + inputtedMemberInfo);
+        if (file != null && !file.isEmpty()) {
+            // If profile picture is provided, update it
+            String fileName = memberId + "_" + file.getOriginalFilename();
+            String directoryPath = "../final_clone2/FRONT-LOGIN/public/img";
+            String filePath = directoryPath + "/" + fileName;
+            Path targetLocation = Paths.get(filePath);
 
-        /* 입력 받은 것을 덮어 쓴다 */
-        String result = memberService.updateMember(inputtedMemberInfo);
-        System.out.println("updated member info: " + result);
+            try {
+                Files.createDirectories(targetLocation.getParent()); // Create directories if they don't exist
+                Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("File upload failed");
+            }
+            memberDTO.setImageUrl(fileName);
+        } else {
+            // If no profile picture is provided, keep the existing one
+            memberDTO.setImageUrl(specificMember.getImageUrl());
+        }
 
-        /* 퇴직으로 바뀌면 바뀐 시점으로부터 3년 뒤에 삭제 */
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        if (!memberDTO.getEmployedDate().equals(originalEmployedDate)) {
+            List<TransferredHistoryDTO> transferredHistoriesDTO = transferredHistoryService.getTransferredHistoryRecord(memberIdInInt);
 
-        LocalDate currentDate = LocalDate.now();
+            if (!transferredHistoriesDTO.isEmpty()) {
+                TransferredHistoryDTO firstTransferredHistoryDTO = transferredHistoriesDTO.get(0);
+                firstTransferredHistoryDTO.setTransferredDate(memberDTO.getEmployedDate());
+                transferredHistoryService.updateTransferredHistory(firstTransferredHistoryDTO);
+            }
+        }
 
-        LocalDate deleteDate = currentDate.plus(3, ChronoUnit.YEARS);
-        long delay = ChronoUnit.DAYS.between(currentDate, deleteDate);
-
-        executorService.schedule(() -> {
-            memberService.deleteMemberById(memberId);
-            System.out.println("Member (" + memberId + ") will be deleted 3 years from now" );
-        }, delay, TimeUnit.DAYS);
-
-        executorService.shutdown();
-
-        return "updated member info: " + result;
+        if (!memberDTO.equals(specificMember)) {
+            // If member information is different, update it
+            memberService.updateMember(memberDTO);
+            return ResponseEntity.status(HttpStatus.OK).body("구성원 정보가 업데이트되었습니다");
+        } else {
+            // If no changes in member information
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정할 정보가 없습니다");
+        }
     }
 
+
     /** 구성원 본인 비밀번호 */
-    @PostMapping("/updateOwnPassword")
-    public String updateOwnPassword(@RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO) {
+    @PutMapping("/updateOwnPassword")
+    public ResponseEntity<String> updateOwnPassword(@RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO) {
 
         MemberDTO foundMember = memberService.findPasswordByMemberId(getTokenInfo().getMemberId());
         String existingPassword = foundMember.getPassword();
         System.out.println("기존에 있는 비밀번호: " + existingPassword);
+        System.out.println("받은 비밀번호 값들: " + updatePasswordRequestDTO);
+
+        if (updatePasswordRequestDTO.getNewPassword1() == null || updatePasswordRequestDTO.getCurrentPassword() == null) {
+            try {
+                MemberDTO memberInfo = memberService.findSpecificMember(getTokenInfo123().getMemberId());
+                String encodedPassword = passwordEncoder.encode("0000");
+                memberInfo.setPassword(encodedPassword);
+                memberService.resetPassword(memberInfo);
+                return ResponseEntity.ok("Password reset successfully");
+            } catch (NumberFormatException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid memberId");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to reset password");
+            }
+        }
 
         /* 입력한 현재 비밀번호가 일치하는지 확인하는 logic */
         if (!passwordEncoder.matches(updatePasswordRequestDTO.getCurrentPassword(), existingPassword)) {
             System.out.println("비밀번호가 틀렸습니다");
-            return "wrong password";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect current password");
         } else if (!updatePasswordRequestDTO.getNewPassword1().equals(updatePasswordRequestDTO.getNewPassword2())) {
             System.out.println("비밀번호가 일치하지 않습니다.");
-            return "password doesn't match";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New passwords do not match");
         } else {
             String hashedNewPassword = passwordEncoder.encode(updatePasswordRequestDTO.getNewPassword2());
             String result = memberService.changePassword(hashedNewPassword, getTokenInfo123().getMemberId());
-            return "successfully changed the password" + result;
+            return ResponseEntity.ok("Successfully changed the password");
         }
     }
 
@@ -288,20 +407,7 @@ public class MemberController {
         }
         // 근속년수 작성할 것
         return showMemberList;
-    }
-    /** 구성원 비밀번호 초기화 */
-    @PutMapping("/resetMemberPassword")
-    public String resetMemberPassword() {
-        MemberDTO memberInfo = memberService.findSpecificMember(getTokenInfo().getMemberId());
-        memberInfo.setPassword("0000");
-
-        memberInfo.setPassword("0000");
-        memberInfo.setPassword(passwordEncoder.encode(memberInfo.getPassword()));
-        memberService.resetPassword(memberInfo);
-
-        /* 아직 ing */
-        return null;
-    }
+    };
 
     /** 엑셀 파일로 구성원 정보 다운로드 */
     @GetMapping("/downloadMemberInfo")
@@ -380,13 +486,4 @@ public class MemberController {
             return ResponseEntity.ok("Login successful");
         }
     }
-
-//    @GetMapping("/getProfilePicture")
-//    public ResponseEntity<byte[]> getProfilePicture(@RequestParam("memberId") int memberId) {
-//        MemberDTO memberDetails = memberService.getProfilePicture(memberId);
-//
-//        // Return the response with the appropriate content type and image data
-//        MediaType contentType;
-//        return ResponseEntity.ok().contentType(contentType).body(memberDetails.getImageUrl());
-//    }
 }
