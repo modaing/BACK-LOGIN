@@ -18,11 +18,4 @@ public interface CorrectionRepository extends JpaRepository<Correction, Integer>
 
     Page<Correction> findAllByCorrRegistrationDateBetween(LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
 
-    Correction findByCorrNoAndCorrRegistrationDateBetween(int corrNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth);
-
-//    List<Correction> findByCommuteNo(int commuteNo);
-
-
-//    Page<Correction> findByCommuteMemberIdAndCorrRegistrationDateBetween(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
-
 }

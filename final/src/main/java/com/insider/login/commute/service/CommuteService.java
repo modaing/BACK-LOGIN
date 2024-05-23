@@ -10,10 +10,8 @@ import com.insider.login.commute.entity.CommuteMember;
 
 import com.insider.login.other.notice.dto.NoticeDTO;
 import com.insider.login.other.notice.service.NoticeService;
-import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +34,6 @@ public class CommuteService {
     private final CorrectionRepository correctionRepository;
     private final CommuteDepartmentRepository commuteDepartmentRepository;
     private final CommuteMemberRepository commuteMemberRepository;
-    private final CorrectionAndCommuteRepository correctionAndCommuteRepository;
     private final NoticeService noticeService;
     private final CommuteMemberService commuteMemberService;
     private final ModelMapper modelMapper;
@@ -46,7 +43,6 @@ public class CommuteService {
                           CorrectionRepository correctionRepository,
                           CommuteDepartmentRepository commuteDepartmentRepository,
                           CommuteMemberRepository commuteMemberRepository,
-                          CorrectionAndCommuteRepository correctionAndCommuteRepository,
                           NoticeService noticeService,
                           CommuteMemberService commuteMemberService) {
 
@@ -55,7 +51,6 @@ public class CommuteService {
         this.correctionRepository = correctionRepository;
         this.commuteDepartmentRepository = commuteDepartmentRepository;
         this.commuteMemberRepository = commuteMemberRepository;
-        this.correctionAndCommuteRepository = correctionAndCommuteRepository;
         this.noticeService = noticeService;
         this.commuteMemberService = commuteMemberService;
     }

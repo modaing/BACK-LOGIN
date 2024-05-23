@@ -11,6 +11,5 @@ import java.util.Set;
 @Repository
 public interface CommuteDepartmentRepository extends JpaRepository<CommuteDepartment, Integer> {
     CommuteDepartment findByDepartNo(int departNo);
-
     List<CommuteDepartment> findByDepartNoIn(Set<Integer> departNoSet);
 }
