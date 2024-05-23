@@ -9,19 +9,19 @@ Authorization: BEARER eyJkYXRlIjoxNzE1MjQ1NDAzMDgzLCJ0eXBlIjoiand0IiwiYWxnIjoiSF
 ### 휴가 신청
 POST http://localhost:8080/leaveSubmits
 Content-Type: application/json
-Authorization: BEARER eyJkYXRlIjoxNzE1MjQ1NDAzMDgzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA0MDE4MzUiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiJodHRwczovL2ltYWdlcy5jdGZhc3NldHMubmV0L2g2Z29vOWd3MWhoNi8yc05adEZBV09kUDFsbVEzM1Z3Uk4zLzI0ZTk1M2I5MjBhOWNkMGZmMmUxZDU4Nzc0MmEyNDcyLzEtaW50cm8tcGhvdG8tZmluYWwuanBnP3c9MTIwMCZoPTk5MiZmbD1wcm9ncmVzc2l2ZSZxPTcwJmZtPWpwZyIsIm5hbWUiOiLquYDsp4DtmZgiLCJtZW1iZXJTdGF0dXMiOiLsnqzsp4EiLCJleHAiOjE3MTUzMzE4MDMsImRlcGFydE5hbWUiOiLsnbjsgqztjIAiLCJtZW1iZXJJZCI6MjQwNDAxODM1fQ.NhYn5kZeFDQXjyOQAFms0nPGCejTrFXzmhzy9obyY0Y
+Authorization: BEARER eyJkYXRlIjoxNzE2NDQ2MTc0NDc5LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA0MDE4MzUiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiJodHRwczovL2ltYWdlcy5jdGZhc3NldHMubmV0L2g2Z29vOWd3MWhoNi8yc05adEZBV09kUDFsbVEzM1Z3Uk4zLzI0ZTk1M2I5MjBhOWNkMGZmMmUxZDU4Nzc0MmEyNDcyLzEtaW50cm8tcGhvdG8tZmluYWwuanBnP3c9MTIwMCZoPTk5MiZmbD1wcm9ncmVzc2l2ZSZxPTcwJmZtPWpwZyIsIm5hbWUiOiLquYDsp4DtmZgiLCJtZW1iZXJTdGF0dXMiOiLsnqzsp4EiLCJleHAiOjE3MTY1MzI1NzQsImRlcGFydE5hbWUiOiLsnbjsgqztjIAiLCJtZW1iZXJJZCI6MjQwNDAxODM1fQ.9bNnA1hzH-GFKboH6Clj5Tjbf0sKkeE-OCwm3XpSd_Q
 
 {
   "leaveSubApplicant": 241201001,
   "leaveSubStartDate": [
     2024,
-    4,
-    1
+    5,
+    31
   ],
   "leaveSubEndDate": [
     2024,
-    4,
-    3
+    6,
+    1
   ],
   "leaveSubType": "연차",
   "leaveSubReason": "휴가 테스트"

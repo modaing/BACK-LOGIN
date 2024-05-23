@@ -57,22 +57,18 @@ public class LeaveController extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
-        Page<LeaveSubmitDTO> page = leaveService.selectLeaveSubmitList(memberId, pageable);
-
-        if (page.isEmpty()) {
-            String errorMessage = "신청된 휴가 내역이 없습니다.";
-            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
-        }
-
-
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("page", page);
 
         // 멤버 아이디가 있다면 개인 내역 조회이기 때문에 요청자의 휴가 보유 내역도 같이 전달함
         if (memberId != 0) {
             LeaveInfoDTO leaveInfo = leaveService.getLeaveInfoById(memberId);
             responseMap.put("leaveInfo", leaveInfo);
+        }
+
+        Page<LeaveSubmitDTO> page = leaveService.selectLeaveSubmitList(memberId, pageable);
+
+        if (!page.isEmpty()) {
+            responseMap.put("page", page);
         }
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
@@ -178,31 +174,6 @@ public class LeaveController extends CommonController {
     }
 
     /**
-     * 상세 조회
-     */
-    @GetMapping("/leaveSubmits/{leaveSubNo}")
-    public ResponseEntity<ResponseMessage> selectSubmitByLeaveSubNo(@PathVariable("leaveSubNo") int leaveSubNo) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-
-        LeaveSubmitDTO submit = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
-
-        if (submit == null) {
-            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
-            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
-        }
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("submit", submit);
-
-        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
-
-        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
-    }
-
-    /**
      * 휴가 신청 처리
      */
     @PutMapping("/leaveSubmits")
@@ -210,10 +181,11 @@ public class LeaveController extends CommonController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
+        // 처리자 사번 삽입
         leaveSubmitDTO.setLeaveSubApprover(getTokenInfo().getMemberId());
 
         leaveSubmitDTO.setLeaveSubProcessDate(nowDate());
-        // TODO:: 취소 요청 시 처리 로직 고민
+
         return ResponseEntity.ok().headers(headers).body(leaveService.updateSubmit(leaveSubmitDTO));
     }
 
