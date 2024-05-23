@@ -1,6 +1,5 @@
 package com.insider.login.commute.entity;
 
-import com.insider.login.commute.builder.CommuteBuilder;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
