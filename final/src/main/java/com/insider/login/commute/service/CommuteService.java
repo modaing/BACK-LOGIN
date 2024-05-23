@@ -8,8 +8,8 @@ import com.insider.login.commute.repository.*;
 
 import com.insider.login.commute.entity.CommuteMember;
 
-import com.insider.login.other.notice.dto.NoticeDTO;
-import com.insider.login.other.notice.service.NoticeService;
+import com.insider.login.notice.dto.NoticeDTO;
+import com.insider.login.notice.service.NoticeService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
