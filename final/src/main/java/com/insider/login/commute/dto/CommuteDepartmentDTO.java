@@ -13,6 +13,6 @@ public class CommuteDepartmentDTO {
 
     private int departNo;               // 부서 번호
     private String departName;          // 부서명
-    private List<CommuteMemberDTO> memberList; // 구성원 리스트
+//    private List<CommuteMemberDTO> memberList; // 구성원 리스트
 
 }

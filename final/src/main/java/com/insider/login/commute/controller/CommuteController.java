@@ -59,7 +59,7 @@ public class CommuteController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        List<CommuteDTO> commuteList;
+        Map<String, Object> result = new HashMap<>();
 
         /** 멤버별 출퇴근 내역 조회시 주간 조회에 사용할 변수들 */
         LocalDate startWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
@@ -71,11 +71,11 @@ public class CommuteController {
 
         if("depart".equals(target)) {
             int departNo = Integer.parseInt(targetValue);
-            commuteList = commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth);   // 부서별
+            result.put("result", commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth));   // 부서별
 
         } else if("member".equals(target)) {
             int memberId = Integer.parseInt(targetValue);
-            commuteList = commuteService.selectCommuteListByMemberId(memberId, startWeek, endWeek);     // 회원별
+            result.put("result", commuteService.selectCommuteListByMemberId(memberId, startWeek, endWeek));     // 회원별
 
         } else {
             Map<String, Object> error = new HashMap<>();
@@ -85,8 +85,6 @@ public class CommuteController {
             return new ResponseEntity<>(responseMessage, headers, HttpStatus.BAD_REQUEST);
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("result", commuteList);
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", result);
 
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);

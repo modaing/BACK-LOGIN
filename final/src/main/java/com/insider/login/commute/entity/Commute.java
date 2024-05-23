@@ -1,5 +1,6 @@
 package com.insider.login.commute.entity;
 
+import com.insider.login.commute.builder.CommuteBuilder;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +21,8 @@ public class Commute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int commuteNo;                                  // 출퇴근 번호
 
-    @Column(name = "member_id", nullable = false)
-    private int memberId;                                   // 사번
+//    @Column(name = "member_id", nullable = false)
+//    private int memberId;                                   // 사번
 
     @Column(name = "working_date", nullable = false)
     private LocalDate workingDate;                          // 근무 일자
@@ -39,17 +40,49 @@ public class Commute {
     private int totalWorkingHours;                          // 총 근무 시간
 
     @ManyToOne
-    @JoinColumn(name = "member_id", insertable = false, updatable = false)
+    @JoinColumn(name = "member_id")
     private CommuteMember commuteMember;                    // 구성원
 
-    @OneToOne
-    @JoinColumn(name = "commute_no")
+    @OneToOne(mappedBy = "commute")
     private Correction correction;                          // 출퇴근 정정
+
+    public Commute commuteNo(int val) {
+        this.commuteNo = val;
+        return this;
+    }
+
+    public Commute workingDate(LocalDate val) {
+        this.workingDate = val;
+        return this;
+    }
+
+    public Commute startWork(LocalTime val) {
+        this.startWork = val;
+        return this;
+    }
+
+    public Commute endWork(LocalTime val) {
+        this.endWork = val;
+        return this;
+    }
+
+    public Commute workingStatus(String val) {
+        this.workingStatus = val;
+        return this;
+    }
+
+    public Commute totalWorkingHours(int val) {
+        this.totalWorkingHours = val;
+        return this;
+    }
+
+    public Commute builder() {
+        return new Commute(commuteNo, workingDate, startWork, endWork, workingStatus, totalWorkingHours);
+    }
 
     protected Commute() {}
 
-    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours) {
-        this.memberId = memberId;
+    public Commute(LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours) {
         this.workingDate = workingDate;
         this.startWork = startWork;
         this.endWork = endWork;
@@ -63,13 +96,29 @@ public class Commute {
         this.totalWorkingHours = totalWorkingHours;
     }
 
-    public Commute(int memberId, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours, CommuteMember commuteMember) {
-        this.memberId = memberId;
+    public Commute(LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours, CommuteMember commuteMember) {
         this.workingDate = workingDate;
         this.startWork = startWork;
         this.endWork = endWork;
         this.workingStatus = workingStatus;
         this.totalWorkingHours = totalWorkingHours;
         this.commuteMember = commuteMember;
+    }
+
+    public Commute(LocalDate workingDate, LocalTime startWork, String workingStatus, int totalWorkingHours, CommuteMember commuteMember) {
+        this.workingDate = workingDate;
+        this.startWork = startWork;
+        this.workingStatus = workingStatus;
+        this.totalWorkingHours = totalWorkingHours;
+        this.commuteMember = commuteMember;
+    }
+
+    public Commute(int commuteNo, LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours) {
+        this.commuteNo = commuteNo;
+        this.workingDate = workingDate;
+        this.startWork = startWork;
+        this.endWork = endWork;
+        this.workingStatus = workingStatus;
+        this.totalWorkingHours = totalWorkingHours;
     }
 }

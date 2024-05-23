@@ -24,6 +24,8 @@ public class BeanConfig {
         modelMapper.getConfiguration()
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
                 .setFieldMatchingEnabled(true);
+        modelMapper.getConfiguration()
+                .setAmbiguityIgnored(true);
 
         return modelMapper;
     }

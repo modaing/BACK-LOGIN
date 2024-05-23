@@ -18,23 +18,11 @@ public interface CorrectionRepository extends JpaRepository<Correction, Integer>
 
     Page<Correction> findAllByCorrRegistrationDateBetween(LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
 
-    List<Correction> findByCommuteNo(int commuteNo);
+    Correction findByCorrNoAndCorrRegistrationDateBetween(int corrNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth);
 
-//    List<Correction> findByCommuteNoAndCorrRegistrationDateBetween(int commuteNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
+//    List<Correction> findByCommuteNo(int commuteNo);
 
 
-    Page<Correction> findByCommuteMemberIdAndCorrRegistrationDateBetween(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
-
-//    @Query("SELECT c, co " +
-//            "FROM Correction c " +
-//            "LEFT JOIN c.commute co ON (c.commuteNo = co.commuteNo)" +
-//            "WHERE co.memberId = :memberId " +
-//            "AND c.corrRegistrationDate BETWEEN :startDayOfMonth AND :endDayOfMonth " +
-//            "ORDER BY c.corrRegistrationDate DESC")
-//    Page<Object[]> findCorrectionAndCommuteByMemberIdAndDates(@Param("memberId") int memberId,
-//                                                              @Param("startDayOfMonth") LocalDate startDayOfMonth,
-//                                                              @Param("endDayOfMonth") LocalDate endDayOfMonth,
-//                                                              Pageable pageable);
-
+//    Page<Correction> findByCommuteMemberIdAndCorrRegistrationDateBetween(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable);
 
 }

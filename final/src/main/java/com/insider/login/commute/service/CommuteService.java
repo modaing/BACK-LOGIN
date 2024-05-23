@@ -1,5 +1,6 @@
 package com.insider.login.commute.service;
 
+import com.insider.login.commute.builder.CommuteBuilder;
 import com.insider.login.commute.dto.*;
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.commute.entity.CommuteDepartment;
@@ -13,7 +14,9 @@ import com.insider.login.other.notice.service.NoticeService;
 import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,12 +65,22 @@ public class CommuteService {
     public Map<String, Object> insertTimeOfCommute(CommuteDTO newCommute) {
 
         log.info("[CommuteService] insertTimeOfCommute");
-        log.info("[CommuteService] CommuteDTO : " + newCommute);
+        log.info("[CommuteService] CommuteDTO : " + newCommute.getMemberId());
 
         Map<String, Object> result = new HashMap<>();
 
         try {
-            commuteRepository.save(modelMapper.map(newCommute, Commute.class));
+            CommuteMember commuteMember = commuteMemberRepository.findByMemberId(newCommute.getMemberId());
+            Commute commute = new Commute(
+                    newCommute.getWorkingDate(),
+                    newCommute.getStartWork(),
+                    newCommute.getWorkingStatus(),
+                    newCommute.getTotalWorkingHours(),
+                    commuteMember
+                        );
+
+            commuteRepository.save(commute);
+
             result.put("result", true);
 
         } catch (Exception e) {
@@ -78,7 +91,6 @@ public class CommuteService {
         log.info("[CommuteService] insertTimeOfCommute End ===========");
         return result;
     }
-
 
     @Transactional
     public Map<String, Object> updateTimeOfCommuteByCommuteNo(int commuteNo , UpdateTimeOfCommuteDTO updateTimeOfCommute) {
@@ -92,6 +104,7 @@ public class CommuteService {
         if(commute != null) {
             CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
 
+            commuteDTO.setCommuteNo(commuteNo);
             commuteDTO.setEndWork(updateTimeOfCommute.getEndWork());
             commuteDTO.setWorkingStatus(updateTimeOfCommute.getWorkingStatus());
             commuteDTO.setTotalWorkingHours(updateTimeOfCommute.getTotalWorkingHours());
@@ -106,33 +119,48 @@ public class CommuteService {
         } else {
             result.put("result", false);
         }
+
         return result;
     }
 
     @Transactional
-    public List<CommuteDTO> selectCommuteListByDepartNo(int departNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth) {
+    public Map<String, Object> selectCommuteListByDepartNo(int departNo, LocalDate startDayOfMonth, LocalDate endDayOfMonth) {
 
         log.info("[CommuteService] selectCommuteListByDepartNo");
         log.info("[CommuteService] departNo : ", departNo);
 
-        CommuteDepartment findCommuteDepartmentByDepartNo = commuteDepartmentRepository.findByDepartNo(departNo);
+        // 1. 부서 정보 조회
+        CommuteDepartment commuteDepartment = commuteDepartmentRepository.findByDepartNo(departNo);
 
-        List<CommuteMember> findCommuteMemberByDepartment = commuteMemberRepository.findByDepartNo(findCommuteDepartmentByDepartNo.getDepartNo());
+        // 2. 부서에 속한 구성원 정보 조회
+        List<CommuteMember> commuteMemberList = commuteDepartment.getCommuteMemberList();
 
-        List<Commute> findCommuteByMember = new ArrayList<>();
+        // 3. 구성원별 출퇴근 내역 조회
+        List<CommuteDTO> commuteDTOList = new ArrayList<>();
+        List<CommuteMemberDTO> commuteMemberDTOList = new ArrayList<>();
 
-        for(CommuteMember commuteMember : findCommuteMemberByDepartment) {
-            List<Commute> memberCommuteList = commuteRepository.findByCommuteMemberAndWorkingDateBetween(commuteMember, startDayOfMonth, endDayOfMonth);
-            findCommuteByMember.addAll(memberCommuteList);
+        for (CommuteMember commuteMember : commuteMemberList) {
+            List<Commute> commuteList = commuteMember.getCommuteList();
+            List<Commute> filteredCommuteList = commuteList.stream()
+                    .filter(c -> c.getWorkingDate().isAfter(startDayOfMonth.minusDays(1)) && c.getWorkingDate().isBefore(endDayOfMonth.plusDays(1)))
+                    .collect(Collectors.toList());
+
+            List<CommuteDTO> memberCommuteDTOList = filteredCommuteList.stream()
+                    .map(c -> modelMapper.map(c, CommuteDTO.class))
+                    .collect(Collectors.toList());
+            commuteDTOList.addAll(memberCommuteDTOList);
+
+            CommuteMemberDTO commuteMemberDTO = modelMapper.map(commuteMember, CommuteMemberDTO.class);
+            commuteMemberDTOList.add(commuteMemberDTO);
         }
 
-        List<CommuteDTO> commuteDTOList = findCommuteByMember.stream()
-                                            .map(commute -> modelMapper.map(commute, CommuteDTO.class))
-                                            .collect(Collectors.toList());
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("commute", commuteDTOList);
+        responseMap.put("department", modelMapper.map(commuteDepartment, CommuteDepartmentDTO.class));
+        responseMap.put("members", commuteMemberDTOList);
 
         log.info("[CommuteService] selectCommuteListByDepartNo End ==================");
-
-        return commuteDTOList;
+        return responseMap;
     }
 
     @Transactional
@@ -141,11 +169,18 @@ public class CommuteService {
         log.info("[CommuteService] selectCommuteListByMemberId");
         log.info("[CommuteService] memberId : " , memberId);
 
-        List<Commute> findCommuteByMember = commuteRepository.findByMemberIdAndWorkingDateBetween(memberId, startWeek, endWeek);
+        // 1. 멤버 정보 조회
+        CommuteMember findMemberByMemberId = commuteMemberRepository.findByMemberId(memberId);
 
-        List<CommuteDTO> commuteDTOList = findCommuteByMember.stream()
-                                            .map(commute -> modelMapper.map(commute, CommuteDTO.class))
-                                            .collect(Collectors.toList());
+        // 2. 해당 멤버의 출퇴근 내역 조회
+        List<Commute> commuteList = findMemberByMemberId.getCommuteList().stream()
+                .filter(commute -> commute.getWorkingDate().isAfter(startWeek.minusDays(1)) && commute.getWorkingDate().isBefore(endWeek.plusDays(1)))
+                .collect(Collectors.toList());
+
+        // 3. CommuteDTO 리스트로 변환
+        List<CommuteDTO> commuteDTOList = commuteList.stream()
+                .map(commute -> modelMapper.map(commute, CommuteDTO.class))
+                .collect(Collectors.toList());
 
         log.info("[CommuteService] selectCommuteListByMemberId End ================");
 
@@ -191,7 +226,7 @@ public class CommuteService {
 
                 /** 1-4. 출퇴근 정정 요청 시간이 존재하지 않는 경우 */
                 } else {
-                    System.out.println("출퇴근 정정 요청 시간 null !!!!!!!!!!!!!!");
+                    System.out.println("출퇴근 정정 요청 시간 null ! + 클라이언트 서버에서 경고 문구로 필터링 됨");
                 }
 
             /** 2. 출퇴근 내역에서 출근 시간만 존재하는 경우 */
@@ -201,14 +236,15 @@ public class CommuteService {
                 if(newCorrection.getReqStartWork() != null & newCorrection.getReqEndWork() == null) {
                     correctionDTO.setReqStartWork(newCorrection.getReqStartWork());
 
-                /** 2-2. 나머지 경우 */
+                /** 2-2. 나머지 경우 (퇴근 시간이 존재하지 않는데 퇴근 시간 정정 요청하는 경우, 출근 시간과 퇴근 시간을 모두 요청하는 경우) */
                 } else {
                     System.out.println("출퇴근 정정 요청 error !!!!!!!!!!!!!!!!!!");
                 }
 
-            /** 3. 출퇴근 내역이 존재하지 않는 경우 */
+            /** 3. 출퇴근 내역이 존재하지 않는 경우 => 해당 일자에 근무를 했지만, 실수로 출퇴근을 입력하지 않고 날짜가 지나간 경우에 필요 */
             } else {
-                System.out.println("출퇴근 시간이 null !!!!!!!!!");
+                correctionDTO.setReqStartWork(newCorrection.getReqStartWork());
+                correctionDTO.setReqEndWork(newCorrection.getReqEndWork());
             }
 
             correctionRepository.save(modelMapper.map(correctionDTO, Correction.class));
@@ -247,26 +283,26 @@ public class CommuteService {
     public Map<String, Object> updateProcessForCorrectByCorrNo(int corrNo, UpdateProcessForCorrectionDTO updateProcessForCorrection) {
 
         log.info("[CommuteService] updateProcessForCorrectByCorrNo");
-        log.info("[CommuteService] updateProcessForCorrection : ", updateProcessForCorrection);
+        log.info("[CommuteService] updateProcessForCorrection : {} ", updateProcessForCorrection);
 
         Map<String, Object> result = new HashMap<>();
 
         Correction correction = correctionRepository.findByCorrNo(corrNo);
 
-        int commuteNo = correction.getCommuteNo();
+        int commuteNo = correction.getCommute().getCommuteNo();
         Commute commute = commuteRepository.findByCommuteNo(commuteNo);
+
+        CorrectionDTO correctionDTO = modelMapper.map(correction, CorrectionDTO.class);
+
+        CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
 
         if(correction != null && commute != null) {
 
             /** 1. 출퇴근 정정 요청 내역 update */
-            CorrectionDTO correctionDTO = modelMapper.map(correction, CorrectionDTO.class);
-
             correctionDTO.setCorrStatus(updateProcessForCorrection.getCorrStatus());
             correctionDTO.setCorrProcessingDate(updateProcessForCorrection.getCorrProcessingDate());
 
             /** 2. 출퇴근 내역 update */
-            CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
-
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
             /** 1-1. 출퇴근 정정 처리 - 승인 */
@@ -332,12 +368,12 @@ public class CommuteService {
 
                     /** 1-1-2-4. 출퇴근 정정 요청 시간 모두 null */
                     } else {
-                        System.out.println("출퇴근 정정 요청 시간 모두 null !!!!");
+                        System.out.println("출퇴근 정정 요청 시간 모두 null ! + 클라이언트 서버에서 경고 문구로 필터링 됨");
                     }
 
                 /** 1-1-3. 출근시간, 퇴근시간 모두 존재하지 않을 때 */
                 } else {
-                    System.out.println("출퇴근 시간 모두 null !!!!!");
+                    System.out.println("출퇴근 시간 모두 null !!!!!!!!");
                 }
 
                 log.info("[CommuteService] Correction update 승인 처리 후 ");
@@ -359,9 +395,8 @@ public class CommuteService {
             log.info("[CommuteService] Commute update 후 ");
 
             /** 출퇴근 정정 처리 시 요청자에게 알림 */
-
             NoticeDTO newNotice = new NoticeDTO();
-            newNotice.setMemberId(commute.getMemberId());
+            newNotice.setMemberId(commuteDTO.getMemberId());
             newNotice.setNoticeType("출퇴근");
             newNotice.setNoticeContent("출퇴근 정정 요청이 처리되었습니다. 확인해주세요.");
             newNotice.setNoticeDateTime(LocalDateTime.now());
@@ -369,6 +404,7 @@ public class CommuteService {
             noticeService.insertNewNotice(newNotice);
 
             result.put("result", true);
+            result.put("notice", newNotice);
 
         } else {
             result.put("result", false);
@@ -381,236 +417,112 @@ public class CommuteService {
         return result;
     }
 
-    /** 내 원래 코드 jpa */
-//    @Transactional
-//    public Map<String, Object> selectRequestForCorrectList(LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
-//        log.info("[CommuteService] selectRequestForCorrectList");
-//
-//        Page<Correction> correctionList = correctionRepository.findAllByCorrRegistrationDateBetween(startDayOfMonth, endDayOfMonth, pageable);
-//
-//        Page<CorrectionDTO> correctionAll = correctionList.map(correction -> modelMapper.map(correction, CorrectionDTO.class));
-//
-//        List<CommuteDTO> commuteList = new ArrayList<>();
-//        List<CommuteMemberDTO> memberList = new ArrayList<>();
-//        List<CommuteDepartmentDTO> departList = new ArrayList<>();
-//
-//        /** 출퇴근 상세 조회 & 멤버 정보 조회 추가 */
-//        for (CorrectionDTO correction : correctionAll) {
-//            System.out.println("commuteNo : " + correction.getCommuteNo());
-//            Commute findCommuteDetailByCommuteNo = commuteRepository.findByCommuteNo(correction.getCommuteNo());
-//            CommuteDTO commute = modelMapper.map(findCommuteDetailByCommuteNo, CommuteDTO.class);
-//            commuteList.add(commute);
-//            System.out.println("commute : " + commute);
-//
-//            Commute findMemberIdByCommuteNo = commuteRepository.findMemberIdByCommuteNo(correction.getCommuteNo());
-//            CommuteMember findMemberDetailByMemberId = commuteMemberRepository.findByMemberId(findMemberIdByCommuteNo.getMemberId());
-//            CommuteMemberDTO member = modelMapper.map(findMemberDetailByMemberId, CommuteMemberDTO.class);
-//            memberList.add(member);
-//            System.out.println("member : " + member);
-//
-//            CommuteDepartment findDepartByDepartNo = commuteDepartmentRepository.findByDepartNo(member.getDepartNo());
-//            CommuteDepartmentDTO depart = modelMapper.map(findDepartByDepartNo, CommuteDepartmentDTO.class);
-//            departList.add(depart);
-//            System.out.println("depart : " + depart);
-//        }
-//
-//        Map<String, Object> responseMap = new HashMap<>();
-//        responseMap.put("correction",correctionAll);
-//        responseMap.put("currentPage", correctionList.getNumber());
-//        responseMap.put("totalItems", correctionList.getTotalElements());
-//        responseMap.put("totalPages", correctionList.getTotalPages());
-//        responseMap.put("commute", commuteList);
-//        responseMap.put("member", memberList);
-//        responseMap.put("depart", departList);
-//
-//        if(correctionList != null) {
-//            return responseMap;
-//        } else {
-//            return null;
-//        }
-//    }
-
-    /** jpql 을 활용한 코드 전체 조회 */
     @Transactional
     public Map<String, Object> selectRequestForCorrectList(LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
         log.info("[CommuteService] selectRequestForCorrectList");
 
-        Page<Object[]> results = correctionAndCommuteRepository.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
+        // 1. correction 데이터 조회 (페이징 적용)
+        Page<Correction> correctionPage = correctionRepository.findAllByCorrRegistrationDateBetween(startDayOfMonth, endDayOfMonth, pageable);
+        List<Correction> correctionList = correctionPage.getContent();
+        List<CorrectionDTO> correctionDTOList = correctionList.stream()
+                .map(correction -> modelMapper.map(correction, CorrectionDTO.class))
+                .collect(Collectors.toList());
+        System.out.println("correctionDTOList:");
+        correctionDTOList.forEach(System.out::println);
 
-        List<CorrectionDTO> correctionList = new ArrayList<>();
-        List<CommuteDTO> commuteList = new ArrayList<>();
-        List<CommuteMemberDTO> memberList = new ArrayList<>();
-        List<CommuteDepartmentDTO> departList = new ArrayList<>();
+        // 2. correction에 해당하는 commute 데이터 조회
+        List<Integer> commuteNoList = correctionDTOList.stream()
+                .map(CorrectionDTO::getCommuteNo)
+                .collect(Collectors.toList());
+        List<Commute> commuteList = commuteRepository.findByCommuteNoIn(commuteNoList);
+        List<CommuteDTO> commuteDTOList = commuteList.stream()
+                .map(commute -> modelMapper.map(commute, CommuteDTO.class))
+                .collect(Collectors.toList());
+        System.out.println("commuteDTOList:");
+        commuteDTOList.forEach(System.out::println);
 
-        for (Object[] result : results) {
-            System.out.println("results : " + result);
-            // Object 배열에서 Correction, Commute, CommuteMember, CommuteDepartment 엔티티 추출
-            Correction correction = (Correction) result[1];
-            Commute commute = (Commute) result[0];
-            CommuteMember member = (CommuteMember) result[2];
-            CommuteDepartment depart = (CommuteDepartment) result[3];
+        // 3. commute에 해당하는 멤버 정보 조회
+        Set<Integer> memberIds = commuteDTOList.stream()
+                .map(CommuteDTO::getMemberId)
+                .collect(Collectors.toSet());
+        List<CommuteMember> memberList = commuteMemberRepository.findByMemberIdIn(memberIds);
+        List<CommuteMemberDTO> memberDTOList = memberList.stream()
+                .map(member -> modelMapper.map(member, CommuteMemberDTO.class))
+                .collect(Collectors.toList());
+        System.out.println("memberDTOList:");
+        memberDTOList.forEach(System.out::println);
 
-            // Correction 엔티티를 DTO로 매핑하여 리스트에 추가
-            CorrectionDTO correctionDTO = modelMapper.map(correction, CorrectionDTO.class);
-            correctionList.add(correctionDTO);
-
-            // Commute 엔티티를 DTO로 매핑하여 리스트에 추가
-            CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
-            commuteList.add(commuteDTO);
-
-            // CommuteMember 엔티티를 DTO로 매핑하여 리스트에 추가
-            CommuteMemberDTO memberDTO = modelMapper.map(member, CommuteMemberDTO.class);
-            memberList.add(memberDTO);
-
-            // CommuteDepart 엔티티를 DTO로 매핑하여 리스트에 추가
-            CommuteDepartmentDTO departmentDTO = modelMapper.map(depart, CommuteDepartmentDTO.class);
-            departList.add(departmentDTO);
-        }
-
-        long totalCount = results.getTotalElements();
-        int totalPages = results.getTotalPages();
-        int currentPage = results.getNumber();
+        // 4. 멤버들의 부서 정보 조회
+        Set<Integer> departNoSet = memberDTOList.stream()
+                .map(CommuteMemberDTO::getCommuteDepartment)
+                .map(CommuteDepartmentDTO::getDepartNo)
+                .collect(Collectors.toSet());
+        List<CommuteDepartment> departList = commuteDepartmentRepository.findByDepartNoIn(departNoSet);
+        List<CommuteDepartmentDTO> departDTOList = departList.stream()
+                .map(depart -> modelMapper.map(depart, CommuteDepartmentDTO.class))
+                .collect(Collectors.toList());
+        System.out.println("departDTOList:");
+        departDTOList.forEach(System.out::println);
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("correction", correctionList);
-        responseMap.put("currentPage", currentPage);
-        responseMap.put("totalCount", totalCount);
-        responseMap.put("totalPages", totalPages);
-        responseMap.put("commute", commuteList);
-        responseMap.put("member", memberList);
-        responseMap.put("depart", departList);
+        responseMap.put("correction", correctionDTOList);
+        responseMap.put("currentPage", correctionPage.getNumber());
+        responseMap.put("totalItems", correctionPage.getTotalElements());
+        responseMap.put("totalPages", correctionPage.getTotalPages());
+        responseMap.put("commute", commuteDTOList);
+        responseMap.put("member", memberDTOList);
+        responseMap.put("depart", departDTOList);
 
         return responseMap;
     }
 
-    /** 원래 내 코드 jpa 이용 */
-//    @Transactional
-//    public Map<String, Object> selectRequestForCorrectListByMemberId(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
-//        log.info("[CommuteService] selectRequestForCorrectListByMemberId");
-//        log.info("[CommuteService] memberId : ", memberId);
-//
-//        Page<Correction> correctionListByMemberId = correctionRepository.findByCommuteMemberIdAndCorrRegistrationDateBetween(memberId, startDayOfMonth, endDayOfMonth, pageable);
-//
-//        Page<CorrectionDTO> correctionList = correctionListByMemberId.map(correction -> modelMapper.map(correction, CorrectionDTO.class));
-//
-//        for(CorrectionDTO correction : correctionList) {
-//            System.out.println("correction" + correction);
-//        }
-//
-//        List<CommuteDTO> commuteList = new ArrayList<>();
-//
-//        /** 출퇴근 상세 조회 추가 */
-//        for (CorrectionDTO correction : correctionList) {
-//            System.out.println("commuteNo : " + correction.getCommuteNo());
-//            Commute findCommuteDetailByCommuteNo = commuteRepository.findByCommuteNo(correction.getCommuteNo());
-//            CommuteDTO commute = modelMapper.map(findCommuteDetailByCommuteNo, CommuteDTO.class);
-//            commuteList.add(commute);
-//            System.out.println("commute : " + commute);
-//        }
-//
-//        Map<String, Object> responseMap = new HashMap<>();
-//        responseMap.put("correction",correctionList.getContent());
-//        responseMap.put("currentPage", correctionList.getNumber());
-//        responseMap.put("totalItems", correctionList.getTotalElements());
-//        responseMap.put("totalPages", correctionList.getTotalPages());
-//        responseMap.put("commute", commuteList);
-//
-//        if(correctionListByMemberId != null) {
-//            return responseMap;
-//        } else {
-//            return null;
-//        }
-//    }
-
-    /** jpa 를 활용한 다른 방식 코드 */
-//    @Transactional
-//    public Map<String, Object> selectRequestForCorrectListByMemberId(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
-//
-//        // 1. 먼저 memberId로 전체 Commute 엔티티를 조회
-//        List<Commute> commutes = commuteRepository.findByMemberId(memberId);
-//
-//        List<CorrectionDTO> correctionList = new ArrayList<>();
-//        List<CommuteDTO> commuteList = new ArrayList<>();
-//
-//        // 2. Commute 엔티티에서 commute_no 를 이용해 Correction 엔티티를 조회
-//        for (Commute commute : commutes) {
-//            List<Correction> corrections = correctionRepository.findByCommuteNoAndCorrRegistrationDateBetween(commute.getCommuteNo(), startDayOfMonth, endDayOfMonth, pageable);
-//
-//            for (Correction correction : corrections) {
-//                CorrectionDTO correctionDTO = modelMapper.map(correction, CorrectionDTO.class);
-//                correctionDTO.setCommute(modelMapper.map(commute, CommuteDTO.class));
-//                correctionList.add(correctionDTO);
-//            }
-//
-//            CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
-//            commuteList.add(commuteDTO);
-//        }
-//
-//        // 3. 페이징 처리를 위해 Correction 엔티티 리스트를 Page로 변환
-//        int totalCount = correctionList.size();
-//        int totalPages = (int) Math.ceil((double) totalCount / pageable.getPageSize());
-//        int currentPage = pageable.getPageNumber();
-//
-//        List<CorrectionDTO> paginatedCorrectionList = correctionList.stream()
-//                .skip(currentPage * pageable.getPageSize())
-//                .limit(pageable.getPageSize())
-//                .collect(Collectors.toList());
-//
-//        Map<String, Object> responseMap = new HashMap<>();
-//        responseMap.put("correction", paginatedCorrectionList);
-//        responseMap.put("currentPage", currentPage);
-//        responseMap.put("totalItems", totalCount);
-//        responseMap.put("totalPages", totalPages);
-//        responseMap.put("commute", commuteList);
-//
-//        return responseMap;
-//    }
-
-    /** jpql을 활용한 코드 */
     @Transactional
     public Map<String, Object> selectRequestForCorrectListByMemberId(int memberId, LocalDate startDayOfMonth, LocalDate endDayOfMonth, Pageable pageable) {
         log.info("[CommuteService] selectRequestForCorrectListByMemberId");
-        log.info("[CommuteService] memberId : {}", memberId);
+        log.info("[CommuteService] memberId : {} ", memberId);
 
-        Page<Object[]> results = correctionAndCommuteRepository.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
+        CommuteMember findMemberByMemberId = commuteMemberRepository.findByMemberId(memberId);
+        List<Commute> commuteList = findMemberByMemberId.getCommuteList();
 
-        List<CorrectionDTO> correctionList = new ArrayList<>();
-        List<CommuteDTO> commuteList = new ArrayList<>();
+        List<CommuteDTO> commuteDTOList = commuteList.stream()
+                .filter(commute -> commute.getWorkingDate().isAfter(startDayOfMonth.minusDays(1)) && commute.getWorkingDate().isBefore(endDayOfMonth.plusDays(1)))
+                .map(commute -> modelMapper.map(commute, CommuteDTO.class))
+                .collect(Collectors.toList());
 
-        for (Object[] result : results) {
-            System.out.println("results : " + result);
-            // Object 배열에서 Correction과 Commute 엔티티 추출
-            Correction correction = (Correction) result[0];
-            Commute commute = (Commute) result[1];
+        List<Correction> correctionList = commuteList.stream()
+                .map(Commute::getCorrection)
+                .filter(Objects::nonNull)
+                .filter(correction -> correction.getCorrRegistrationDate().isAfter(startDayOfMonth.minusDays(1)) && correction.getCorrRegistrationDate().isBefore(endDayOfMonth.plusDays(1)))
+                .collect(Collectors.toList());
 
-            // Correction 엔티티를 DTO로 매핑하여 리스트에 추가
-            CorrectionDTO correctionDTO = modelMapper.map(correction, CorrectionDTO.class);
-            correctionList.add(correctionDTO);
-
-            // Commute 엔티티를 DTO로 매핑하여 리스트에 추가
-            CommuteDTO commuteDTO = modelMapper.map(commute, CommuteDTO.class);
-            commuteList.add(commuteDTO);
-        }
-
-        long totalCount = results.getTotalElements();
-        int totalPages = results.getTotalPages();
-        int currentPage = results.getNumber();
+        Page<CorrectionDTO> correctionDTOPage = new PageImpl<>(
+                correctionList.stream()
+                        .map(correction -> modelMapper.map(correction, CorrectionDTO.class))
+                        .collect(Collectors.toList()),
+                pageable,
+                correctionList.size()
+        );
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("correction", correctionList);
-        responseMap.put("currentPage", currentPage);
-        responseMap.put("totalItems", totalCount);
-        responseMap.put("totalPages", totalPages);
-        responseMap.put("commute", commuteList);
 
-        return responseMap;
+        if (commuteList != null) {
+            responseMap.put("correction",correctionDTOPage.getContent());
+            responseMap.put("currentPage", correctionDTOPage.getNumber());
+            responseMap.put("totalItems", correctionDTOPage.getTotalElements());
+            responseMap.put("totalPages", correctionDTOPage.getTotalPages());
+            responseMap.put("commute", commuteDTOList);
+            return responseMap;
+
+        } else {
+            responseMap.put("result", false);
+            return responseMap;
+        }
     }
-
 
     @Transactional
     public CorrectionDTO selectRequestForCorrectByCorrNo(int corrNo) {
         log.info("[CommuteService] selectRequestForCorrectByCorrNo");
-        log.info("[CommuteService] corrNo : ", corrNo);
+        log.info("[CommuteService] corrNo : {} ", corrNo);
 
         Correction correction = correctionRepository.findByCorrNo(corrNo);
 
