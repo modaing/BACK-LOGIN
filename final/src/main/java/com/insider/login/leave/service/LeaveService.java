@@ -200,8 +200,10 @@ public class LeaveService extends LeaveUtil {
                 tempDTO.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
             }
 
-            if ("승인".equals(leaveSubmitDTO.getLeaveSubStatus())) {
-                LeaveSubmitDTO submitDTO = modelMapper.map(leaveSubmitRepository.findById(leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo()).getRefLeaveSubNo()), LeaveSubmitDTO.class);
+            if ("승인".equals(leaveSubmitDTO.getLeaveSubStatus()) && tempDTO.getRefLeaveSubNo() != 0) {
+
+                LeaveSubmitDTO submitDTO = modelMapper.map(leaveSubmitRepository.findById(tempDTO.getRefLeaveSubNo()), LeaveSubmitDTO.class);
+
                 submitDTO.setLeaveSubStatus("취소");
                 leaveSubmitRepository.save(modelMapper.map(submitDTO, LeaveSubmit.class));
             }

@@ -185,10 +185,11 @@ public class LeaveController extends CommonController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
+        // 처리자 사번 삽입
         leaveSubmitDTO.setLeaveSubApprover(getTokenInfo().getMemberId());
 
         leaveSubmitDTO.setLeaveSubProcessDate(nowDate());
-        // TODO:: 취소 요청 시 처리 로직 고민
+
         return ResponseEntity.ok().headers(headers).body(leaveService.updateSubmit(leaveSubmitDTO));
     }
 
