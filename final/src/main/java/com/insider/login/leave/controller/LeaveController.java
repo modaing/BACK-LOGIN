@@ -178,31 +178,6 @@ public class LeaveController extends CommonController {
     }
 
     /**
-     * 상세 조회
-     */
-    @GetMapping("/leaveSubmits/{leaveSubNo}")
-    public ResponseEntity<ResponseMessage> selectSubmitByLeaveSubNo(@PathVariable("leaveSubNo") int leaveSubNo) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-
-        LeaveSubmitDTO submit = leaveService.selectSubmitByLeaveSubNo(leaveSubNo);
-
-        if (submit == null) {
-            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요";
-            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
-        }
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("submit", submit);
-
-        ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
-
-        return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
-    }
-
-    /**
      * 휴가 신청 처리
      */
     @PutMapping("/leaveSubmits")

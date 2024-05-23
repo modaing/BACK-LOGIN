@@ -186,34 +186,24 @@ public class LeaveService extends LeaveUtil {
         }
     }
 
-    public LeaveSubmitDTO selectSubmitByLeaveSubNo(int leaveSubNo) {
-        try {
-            Optional<LeaveSubmit> leaveSubmit = leaveSubmitRepository.findById(leaveSubNo);
-
-            LeaveSubmitDTO leaveSubmitDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
-
-            return leaveSubmitDTO;
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     @Transactional
     public String updateSubmit(LeaveSubmitDTO leaveSubmitDTO) {
         try {
-            // 업데이트할 신청 번호로 해당 휴가 신청 정보 조회
-            Optional<LeaveSubmit> leaveSubmit = leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo());
-
             // 엔티티를 dto로 변환 후 변경할 정보 삽입
-            LeaveSubmitDTO tempDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
+            LeaveSubmitDTO tempDTO = modelMapper.map(leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo()), LeaveSubmitDTO.class);
             tempDTO.setLeaveSubApprover(leaveSubmitDTO.getLeaveSubApprover());
             tempDTO.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
             tempDTO.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
 
             // 반려시 반려 사유 세팅
-            if (leaveSubmitDTO.getLeaveSubStatus().equals("반려")) {
+            if ("반려".equals(leaveSubmitDTO.getLeaveSubStatus())) {
                 tempDTO.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
+            }
+
+            if ("승인".equals(leaveSubmitDTO.getLeaveSubStatus())) {
+                LeaveSubmitDTO submitDTO = modelMapper.map(leaveSubmitRepository.findById(leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo()).getRefLeaveSubNo()), LeaveSubmitDTO.class);
+                submitDTO.setLeaveSubStatus("취소");
+                leaveSubmitRepository.save(modelMapper.map(submitDTO, LeaveSubmit.class));
             }
 
             // update
@@ -260,6 +250,8 @@ public class LeaveService extends LeaveUtil {
         List<LeaveSubmit> submitList = leaveSubmitRepository.findByMemberId(DTO.getMemberId());
 
         int consumedDays = submitList.stream()
+                // 휴가 유형이 취소가 아닌 것들만 대상으로 함
+                .filter(submit -> !"취소".equals(submit.getLeaveSubType()))
                 // 스트림의 각 요소마다 leaveDayCalc 메소드 실행 후 intStream으로 반환
                 .mapToInt(this::leaveDaysCalc)
                 // 스트림의 모든 요소를 더함
