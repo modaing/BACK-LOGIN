@@ -46,40 +46,6 @@ public class Commute {
     @OneToOne(mappedBy = "commute")
     private Correction correction;                          // 출퇴근 정정
 
-    public Commute commuteNo(int val) {
-        this.commuteNo = val;
-        return this;
-    }
-
-    public Commute workingDate(LocalDate val) {
-        this.workingDate = val;
-        return this;
-    }
-
-    public Commute startWork(LocalTime val) {
-        this.startWork = val;
-        return this;
-    }
-
-    public Commute endWork(LocalTime val) {
-        this.endWork = val;
-        return this;
-    }
-
-    public Commute workingStatus(String val) {
-        this.workingStatus = val;
-        return this;
-    }
-
-    public Commute totalWorkingHours(int val) {
-        this.totalWorkingHours = val;
-        return this;
-    }
-
-    public Commute builder() {
-        return new Commute(commuteNo, workingDate, startWork, endWork, workingStatus, totalWorkingHours);
-    }
-
     protected Commute() {}
 
     public Commute(LocalDate workingDate, LocalTime startWork, LocalTime endWork, String workingStatus, int totalWorkingHours) {
