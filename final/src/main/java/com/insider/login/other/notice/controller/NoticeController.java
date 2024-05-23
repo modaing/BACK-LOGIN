@@ -17,25 +17,25 @@ public class NoticeController {
         this.noticeService = noticeService;
     }
 
-    /** 새로운 알림 수신 (등록) */
+    /** 새로운 알림 수신 (등록) 테스트 */
     @PostMapping("/notices")
     public ResponseEntity<ResponseMessage> insertNoticeOfReqForCorrect(@RequestBody NoticeDTO newNotice) {
         return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", noticeService.insertNewNotice(newNotice)));
     }
 
-    /** 수신한 알림 내역 조회 */
+    /** 수신한 알림 내역 조회 테스트 */
     @GetMapping("/notices")
     public ResponseEntity<ResponseMessage> selectNoticeListByMemberId(@RequestParam(value = "memberId") int memberId) {
         return ResponseEntity.ok().body(new ResponseMessage(200, "조회 성공", noticeService.selectNoticeListByMemberId(memberId)));
     }
 
-    /** 알림 선택 삭제 */
+    /** 알림 선택 삭제 테스트 */
     @DeleteMapping("/notices/{noticeNo}")
     public ResponseEntity<ResponseMessage> deleteNoticeByNoticeNo(@PathVariable(value = "noticeNo") int noticeNo) {
         return ResponseEntity.ok().body(new ResponseMessage(200, "선택 삭제 성공", noticeService.deleteNoticeByNoticeNo(noticeNo)));
     }
 
-    /** 알림 전체 삭제 */
+    /** 알림 전체 삭제 테스트 */
     @DeleteMapping("/members/{memberId}/notices")
     public ResponseEntity<ResponseMessage> deleteNoticeListByMemberId(@PathVariable(value = "memberId") int memberId) {
         return ResponseEntity.ok().body(new ResponseMessage(200, "전체 삭제 성공", noticeService.deleteNoticeListByMemberId(memberId)));
