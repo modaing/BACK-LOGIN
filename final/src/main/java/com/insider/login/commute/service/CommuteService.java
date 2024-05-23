@@ -1,6 +1,5 @@
 package com.insider.login.commute.service;
 
-import com.insider.login.commute.builder.CommuteBuilder;
 import com.insider.login.commute.dto.*;
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.commute.entity.CommuteDepartment;
