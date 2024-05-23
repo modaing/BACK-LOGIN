@@ -78,9 +78,16 @@ public class LeaveService extends LeaveUtil {
     @Transactional
     public String insertSubmit(LeaveSubmitDTO DTO) {
         try {
+            // 휴가 신청 번호를 클라이언트에서 받아왔으면 취소 신청 요청임
             if (DTO.getLeaveSubNo() != 0) {
+                int LeaveSubNo = DTO.getLeaveSubNo();
                 DTO.setRefLeaveSubNo(DTO.getLeaveSubNo());
                 DTO.setLeaveSubNo(0);
+
+                // 취소 신청 요청을 보낸 기존 신청의 처리 상태 변경 후 업데이트
+                LeaveSubmit leaveSubmit = leaveSubmitRepository.findById(LeaveSubNo);
+                LeaveSubmitDTO updateDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
+                updateDTO.setLeaveSubStatus("취소신청");
             }
 
             DTO.setLeaveSubStatus("대기");

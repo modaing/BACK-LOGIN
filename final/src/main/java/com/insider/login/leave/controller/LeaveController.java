@@ -57,22 +57,18 @@ public class LeaveController extends CommonController {
             pageable = PageRequest.of(pageNumber, 10, Sort.by(Sort.Direction.DESC, properties));
         }
 
-        Page<LeaveSubmitDTO> page = leaveService.selectLeaveSubmitList(memberId, pageable);
-
-        if (page.isEmpty()) {
-            String errorMessage = "신청된 휴가 내역이 없습니다.";
-            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
-        }
-
-
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("page", page);
 
         // 멤버 아이디가 있다면 개인 내역 조회이기 때문에 요청자의 휴가 보유 내역도 같이 전달함
         if (memberId != 0) {
             LeaveInfoDTO leaveInfo = leaveService.getLeaveInfoById(memberId);
             responseMap.put("leaveInfo", leaveInfo);
+        }
+
+        Page<LeaveSubmitDTO> page = leaveService.selectLeaveSubmitList(memberId, pageable);
+
+        if (!page.isEmpty()) {
+            responseMap.put("page", page);
         }
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
