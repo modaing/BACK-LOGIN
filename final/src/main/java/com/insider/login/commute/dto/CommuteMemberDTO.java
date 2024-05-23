@@ -25,4 +25,5 @@ public class CommuteMemberDTO {
     private String email;               // 이메일
     private String memberRole;            // 권한
     private List<CommuteDTO> commuteList;   // 출퇴근 리스트
+    private CommuteDepartmentDTO commuteDepartment;     // 부서
 }

@@ -112,7 +112,7 @@ public class CommuteControllerTests {
     @Test
     void testUpdateTimeOfCommute() throws Exception {
         //given
-        int commuteNo = 140;
+        int commuteNo = 23;
         LocalTime endWork = LocalTime.of(17, 50);
         String workingStatus = "퇴근";
         Duration workingDuration = Duration.between(LocalTime.of(8,55), endWork).minusHours(1);
@@ -147,7 +147,7 @@ public class CommuteControllerTests {
     void testSelectCommuteListByDepartNo() throws Exception {
         //given
         String target = "depart";
-        int targetValue = 1;
+        int targetValue = 2;
         LocalDate date = LocalDate.now();
 
         //when
@@ -175,7 +175,7 @@ public class CommuteControllerTests {
     void testSelectCommuteListByMemberId() throws Exception {
         //given
         String target = "member";
-        int targetValue = 240401835;
+        int targetValue = 240501544;
         LocalDate date = LocalDate.now();
 
         //when
@@ -202,7 +202,7 @@ public class CommuteControllerTests {
     @Test
     void testInsertRequestForCorrect() throws Exception {
         //given
-        int commuteNo = 17;
+        int commuteNo = 23;
         String reqStartWork = "09:00";
         String reqStartEnd = null;
         String reasonForCorr = "시스템 오류로 인해 지각으로 처리되었습니다.";
@@ -246,7 +246,7 @@ public class CommuteControllerTests {
 //        LocalDate corrProcessingDate = LocalDate.now();
 
         /** 정정 처리 - 반려 */
-        int corrNo = 72;
+        int corrNo = 131;
         String corrStatus = "반려";
         String reasonForRejection = "적절한 정정 사유에 해당하지 않습니다.";
         LocalDate corrProcessingDate = LocalDate.now();
@@ -345,7 +345,7 @@ public class CommuteControllerTests {
     @Test
     void testSelectRequestForCorrectByCorrNo() throws Exception {
         //given
-        int corrNo = 20;
+        int corrNo = 131;
 
         //when
         MockHttpServletRequestBuilder request = get("/corrections/{corrNo}", corrNo)
@@ -369,7 +369,7 @@ public class CommuteControllerTests {
     @Test
     void testSelectCommuteDetailByCommuteNo() throws Exception {
         //given
-        int commuteNo = 1;
+        int commuteNo = 23;
 
         //when
         MockHttpServletRequestBuilder request = get("/commutes/{commuteNo}", commuteNo)

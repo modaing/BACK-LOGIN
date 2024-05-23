@@ -23,8 +23,8 @@ public class CommuteMember {
     @Column(name = "password", nullable = false)
     private String password;            // 비밀번호
 
-    @Column(name = "depart_no", nullable = false, insertable = false, updatable = false)
-    private int departNo;               // 부서 번호
+//    @Column(name = "depart_no", nullable = false, insertable = false, updatable = false)
+//    private int departNo;               // 부서 번호
 
     @Column(name = "position_level", nullable = false)
     private String positionLevel;        // 직급명
@@ -52,7 +52,10 @@ public class CommuteMember {
 
     @ManyToOne
     @JoinColumn(name = "depart_no", nullable = false)
-    private CommuteDepartment department;      // 부서
+    private CommuteDepartment commuteDepartment;      // 부서
+
+//    @JoinColumn(name = "depart_no", nullable = false)
+//    private int departNo;               // 부서 번호
 
     protected CommuteMember() {}
 

@@ -22,7 +22,7 @@ public class CommuteDepartment {
     @Column(name = "depart_name", nullable = false)
     private String departName;      // 부서명
 
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "commuteDepartment")
     private List<CommuteMember> commuteMemberList;// 구성원 리스트
 
     protected CommuteDepartment() {}
