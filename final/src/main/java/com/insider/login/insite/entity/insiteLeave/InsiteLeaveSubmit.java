@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "InsiteLeaveSubmit")
 @Table(name = "LEAVE_SUBMIT")
-public class insiteLeave {
+public class InsiteLeaveSubmit {
 
     @Id
     @Column(name = "LEAVE_SUB_NO", nullable = false)
@@ -34,7 +34,7 @@ public class insiteLeave {
 
 
 
-    protected insiteLeave() {
+    protected InsiteLeaveSubmit() {
     }
 
 }
