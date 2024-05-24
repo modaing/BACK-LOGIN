@@ -417,8 +417,6 @@ public class ApprovalService {
         ApprovalDTO approvalDTO = new ApprovalDTO(approval.getApprovalNo(), approval.getMemberId(), approval.getApprovalTitle(), approval.getApprovalContent(), approvalFormattedDateTime, approval.getApprovalStatus(), approval.getRejectReason(), approval.getFormNo(), form.getFormName(), senderDepart.getDepartName(), senderMember.getName(), senderPosition.getPositionName(), attachment, approver, referencer, finalApproverDate, standByMemberName);
 
 
-        log.info("service : " + approvalDTO);
-
         return approvalDTO;
     }
 
