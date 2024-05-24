@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/insider
-    username: ohgiraffers
-    password: ohgiraffers
+    username: root
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 #     username: ohgiraffers
 #     password: ohgiraffers
@@ -19,7 +19,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
 
 
 server:

@@ -28,6 +28,8 @@ public class MemberDTO {
     private DepartmentDTO departmentDTO;
     private PositionDTO positionDTO;
     private String imageUrl;
+    private String gender;
+    private LocalDate birthday;
 
     public MemberDTO() {
     }
@@ -36,7 +38,7 @@ public class MemberDTO {
         this.memberId = memberId;
     }
 
-    public MemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl) {
+    public MemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl, String gender, LocalDate birthday) {
         this.memberId = memberId;
         this.name = name;
         this.password = password;
@@ -49,24 +51,9 @@ public class MemberDTO {
         this.departmentDTO = departmentDTO;
         this.positionDTO = positionDTO;
         this.imageUrl = imageUrl;
+        this.gender = gender;
+        this.birthday = birthday;
     }
-
-//    public MemberDTO(Member member) {
-//        this.memberId = member.getMemberId();
-//        this.name = member.getName();
-//        this.password = member.getPassword();
-//        this.employedDate = member.getEmployedDate();
-//        this.address = member.getAddress();
-//        this.phoneNo = member.getPhoneNo();
-//        this.memberStatus = member.getMemberStatus();
-//        this.email = member.getEmail();
-//        this.role = member.getRole();
-//        this.imageUrl = member.getImageUrl();
-////        this.commutes = member.getCommutes();
-//        // Map Department and Position
-//        setDepartment(member.getDepartment());
-//        setPosition(member.getPosition());
-//    }
 
     public static List<TransferredHistoryDTO> mapTransferredHistoryList(List<TransferredHistory> transferredHistoryList) {
         List<TransferredHistoryDTO> transferredHistoryDTOList = new ArrayList<>();
@@ -163,6 +150,21 @@ public class MemberDTO {
         this.role = role;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
 
     public DepartmentDTO getDepartmentDTO() {
         return departmentDTO;
@@ -232,7 +234,6 @@ public class MemberDTO {
         return Objects.hash(memberId, name, password, employedDate, address, phoneNo, memberStatus, email, role, departmentDTO, positionDTO, imageUrl);
     }
 
-
     @Override
     public String toString() {
         return "MemberDTO{" +
@@ -248,6 +249,8 @@ public class MemberDTO {
                 ", departmentDTO=" + departmentDTO +
                 ", positionDTO=" + positionDTO +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
                 '}';
     }
 }
