@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,13 @@ public class CalendarService {
 
     public List<CalendarDTO> selectCalendar(String department) {
 
-        List<Calendar> calendars = calendarRepository.findBydepartment(department);
+        List<Calendar> calendars = new ArrayList<>();
+
+        if ("전체".equals(department)) {
+            calendars = calendarRepository.findAll();
+        } else {
+            calendars = calendarRepository.findBydepartment(department);
+        }
 
         return calendars.stream()
                 .map(calendar -> modelMapper.map(calendar, CalendarDTO.class))
