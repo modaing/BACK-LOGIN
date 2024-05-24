@@ -104,6 +104,7 @@ public class MemberService {
 
         try {
             Member updatedMember = modelMapper.map(specificMember, Member.class);
+            System.out.println("updatedMember: " + updatedMember);
             if (specificMember.getMemberStatus().equals("퇴직")) {
                 scheduleMemberDeletion(updatedMember.getMemberId());
                 System.out.println("3년뒤에 구성원 정보가 탈퇴됩니다");
@@ -117,7 +118,14 @@ public class MemberService {
                 transferredHistoryDTO.setTransferredDate(LocalDate.now());
                 TransferredHistory updatedTransferredHistoryRecord = modelMapper.map(transferredHistoryDTO, TransferredHistory.class);
                 transferredHistoryRepository.save(updatedTransferredHistoryRecord);
-                System.out.println("transferred history saved");
+                Member memberDetails = memberRepository.findById(specificMember.getMemberId()).orElse(null);
+                MemberDTO detailsToChange = modelMapper.map(memberDetails, MemberDTO.class);
+                detailsToChange.setDepartmentDTO(specificMember.getDepartmentDTO());
+                detailsToChange.setPositionDTO(specificMember.getPositionDTO());
+                Member detailsToSave = modelMapper.map(detailsToChange, Member.class);
+                memberRepository.save(detailsToSave);
+                //                memberDetails.setDepartment(specificMember.getDepartmentDTO());
+                System.out.println("transferred history saved and changed department or position data");
             } else {
                 Member savedInfo = memberRepository.save(updatedMember);
                 System.out.println("바뀐 정보들: " + savedInfo);
@@ -180,8 +188,13 @@ public class MemberService {
         return memberDTOList;
     }
 
-    public int findNoOfMembers(int departNo) {
+    public int findNoOfMembersInDepart(int departNo) {
         List<Member> members = memberRepository.findByDepartment_DepartNo(departNo);
+        return members.size();
+    }
+
+    public int findNoOfMembersInPosition(String positionLevel) {
+        List<Member> members = memberRepository.findByPosition_PositionLevel(positionLevel);
         return members.size();
     }
 

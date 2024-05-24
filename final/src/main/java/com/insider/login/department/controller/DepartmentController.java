@@ -72,6 +72,14 @@ public class DepartmentController {
         try {
             String newDepartName = body.get("newDepartName");
             System.out.println("입력 받은 newDepartName: " + newDepartName);
+            List<DepartmentDTO> existingDepartments = showDepartmentDetails();
+
+            boolean exists = existingDepartments.stream().anyMatch(department -> department.getDepartName().equalsIgnoreCase(newDepartName));
+
+            if (exists) {
+                return ResponseEntity.badRequest().body("Department name already exists");
+            }
+
             DepartmentDTO insertDepartment = new DepartmentDTO();
             insertDepartment.setDepartName(newDepartName);
             departmentService.insertDepartment(insertDepartment);
@@ -147,7 +155,7 @@ public class DepartmentController {
     public int membersInDepartments(int departNo) {
         System.out.println("departNo: " + departNo);
 //        DepartmentDTO departmentInfo = departmentService.findDepartment(departNo);
-        int noOfMembersInDepartment = memberService.findNoOfMembers(departNo);
+        int noOfMembersInDepartment = memberService.findNoOfMembersInDepart(departNo);
         return noOfMembersInDepartment;
     }
 
