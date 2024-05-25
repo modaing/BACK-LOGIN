@@ -36,12 +36,6 @@ public class CalendarContorller {
 
         List<CalendarDTO> calendarList = calendarService.selectCalendar(department);
 
-        if (calendarList.isEmpty()) {
-            String errorMessage = "처리 과정에서 문제가 발생했습니다. 다시 시도해주세요.";
-            ResponseMessage responseMessage = new ResponseMessage(HttpStatus.NOT_FOUND.value(), errorMessage, null);
-            return new ResponseEntity<>(responseMessage, headers, HttpStatus.NOT_FOUND);
-        }
-
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("calendarList", calendarList);
 

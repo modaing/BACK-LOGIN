@@ -21,11 +21,13 @@ public class ShowMemberDTO {
     private PositionDTO positionDTO;
     private String imageUrl;
     private String periodOfWork;
+    private String gender;
+    private LocalDate birthday;
 
     public ShowMemberDTO() {
     }
 
-    public ShowMemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl, String periodOfWork) {
+    public ShowMemberDTO(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, DepartmentDTO departmentDTO, PositionDTO positionDTO, String imageUrl, String periodOfWork, String gender, LocalDate birthday) {
         this.memberId = memberId;
         this.name = name;
         this.password = password;
@@ -39,6 +41,8 @@ public class ShowMemberDTO {
         this.positionDTO = positionDTO;
         this.imageUrl = imageUrl;
         this.periodOfWork = periodOfWork;
+        this.gender = gender;
+        this.birthday = birthday;
     }
 
     public int getMemberId() {
@@ -145,9 +149,25 @@ public class ShowMemberDTO {
         this.periodOfWork = periodOfWork;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
     @Override
     public String toString() {
-        return "showMemberDTO{" +
+        return "ShowMemberDTO{" +
                 "memberId=" + memberId +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
@@ -161,6 +181,8 @@ public class ShowMemberDTO {
                 ", positionDTO=" + positionDTO +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", periodOfWork='" + periodOfWork + '\'' +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
                 '}';
     }
 }

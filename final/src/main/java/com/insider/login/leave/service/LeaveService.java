@@ -88,7 +88,7 @@ public class LeaveService extends LeaveUtil {
                 LeaveSubmit leaveSubmit = leaveSubmitRepository.findById(LeaveSubNo);
                 LeaveSubmitDTO updateDTO = modelMapper.map(leaveSubmit, LeaveSubmitDTO.class);
                 updateDTO.setLeaveSubStatus("취소신청");
-                leaveSubmitRepository.save(modelMapper.map(updateDTO,LeaveSubmit.class));
+                leaveSubmitRepository.save(modelMapper.map(updateDTO, LeaveSubmit.class));
             }
 
             DTO.setLeaveSubStatus("대기");
@@ -101,6 +101,7 @@ public class LeaveService extends LeaveUtil {
             return "신청 등록 실패";
         }
     }
+
     public String insertSubmitCancel(LeaveSubmitDTO DTO) {
         try {
             // 화면에서 받아온 정보를 취소 요청 등록 폼으로 수정
@@ -144,7 +145,7 @@ public class LeaveService extends LeaveUtil {
         try {
             LeaveAccrual leaveAccrual = modelMapper.map(accrualDTO, LeaveAccrual.class);
 
-            LeaveAccrual ett =  leaveAccrualRepository.save(leaveAccrual);
+            LeaveAccrual ett = leaveAccrualRepository.save(leaveAccrual);
 
             // 발생 등록한 정보에서 휴가 정보에 필요한 정보 추출 후 save
             Leaves leaves = new Leaves(ett.getRecipientId(), ett.getLeaveAccrualDays(), "특별휴가");
@@ -198,27 +199,32 @@ public class LeaveService extends LeaveUtil {
     public String updateSubmit(LeaveSubmitDTO leaveSubmitDTO) {
         try {
             // 엔티티를 dto로 변환 후 변경할 정보 삽입
-            LeaveSubmitDTO tempDTO = modelMapper.map(leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo()), LeaveSubmitDTO.class);
-            tempDTO.setLeaveSubApprover(leaveSubmitDTO.getLeaveSubApprover());
-            tempDTO.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
-            tempDTO.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
+            LeaveSubmitDTO newSubmit = modelMapper.map(leaveSubmitRepository.findById(leaveSubmitDTO.getLeaveSubNo()), LeaveSubmitDTO.class);
+            newSubmit.setLeaveSubApprover(leaveSubmitDTO.getLeaveSubApprover());
+            newSubmit.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
+            newSubmit.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
 
-            // 반려시 반려 사유 세팅
+                // 반려시 반려 사유 세팅
             if ("반려".equals(leaveSubmitDTO.getLeaveSubStatus())) {
-                tempDTO.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
+                newSubmit.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
             }
 
-            if ("승인".equals(leaveSubmitDTO.getLeaveSubStatus()) && tempDTO.getRefLeaveSubNo() != 0) {
+            if (newSubmit.getRefLeaveSubNo() != 0) {
 
-                LeaveSubmitDTO submitDTO = modelMapper.map(leaveSubmitRepository.findById(tempDTO.getRefLeaveSubNo()), LeaveSubmitDTO.class);
+                LeaveSubmitDTO refSubmit = modelMapper.map(leaveSubmitRepository.findById(newSubmit.getRefLeaveSubNo()), LeaveSubmitDTO.class);
 
-                submitDTO.setLeaveSubStatus("취소");
-                leaveSubmitRepository.save(modelMapper.map(submitDTO, LeaveSubmit.class));
+                if ("승인".equals(leaveSubmitDTO.getLeaveSubStatus())) {
+                    // 취소 신청 승인 시 상위 신청 번호의 처리 상태를 취소로 변경
+                    refSubmit.setLeaveSubStatus("취소승인");
+                } else {
+                    // 취소 신청 반려 시 상위 신청 번호의 처리 상태를 승인으로 복구
+                    refSubmit.setLeaveSubStatus("취소반려");
+                }
+                leaveSubmitRepository.save(modelMapper.map(refSubmit, LeaveSubmit.class));
             }
 
-            // update
-            LeaveSubmit newSubmit = modelMapper.map(tempDTO, LeaveSubmit.class);
-            leaveSubmitRepository.save(newSubmit);
+            //신청 업데이트
+            leaveSubmitRepository.save(modelMapper.map(newSubmit, LeaveSubmit.class));
 
             return "휴가처리 성공";
         } catch (Exception e) {

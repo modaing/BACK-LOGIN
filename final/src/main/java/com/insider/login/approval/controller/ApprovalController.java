@@ -125,12 +125,12 @@ public class ApprovalController {
 
     @Tag(name = "전자결재 기안", description = "기안")
     @PostMapping("/approvals")
-    public ResponseEntity<ResponseDTO> insertApproval(@ModelAttribute ApprovalDTO approvalDTO,
-                                                      @RequestParam("multipartFile") List<MultipartFile> multipartFile,
+    public ResponseEntity<ResponseDTO> insertApproval(@RequestPart("approvalDTO") ApprovalDTO approvalDTO,
+                                                      @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile,
                                                       @RequestHeader(name = "memberId", required = false) String memberIdstr){
 
         log.info("****컨트롤러 들어왔어");
-        System.out.println("*****컨트롤러 들어왔어");
+        System.out.println("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉컨트롤러 들어왔어");
 
         //전자결재 번호(연도+_양식번호+순번)
         int Year = LocalDate.now().getYear();
@@ -221,10 +221,16 @@ public class ApprovalController {
             }
             approvalDTO.setAttachment(attachmentDTOList);
         }
+        Object result = null;
 
+        try{
+            result = approvalService.insertApproval(approvalDTO, multipartFile);
+            return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 기안 성공", result));
 
-        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 기안 성공",
-                approvalService.insertApproval(approvalDTO, multipartFile)));
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(new ResponseDTO(HttpStatus.OK, e.getMessage(), result));
+        }
+
     }
 
     @Tag(name = "전자결재 처리", description = "결재처리")

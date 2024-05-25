@@ -21,31 +21,20 @@ public class LeaveUtil {
     public LeaveInfoDTO leaveInfoCalc(List<Leaves> memberLeaves) {
         int memberId = memberLeaves.get(0).getMemberId();
         int annualLeave = 0;        // 연차
-        int vacationLeave = 0;      // 공가
-        int familyEventLeave = 0;   // 경조사 휴가
         int specialLeave = 0;       // 특별휴가
 
         // 해당 사번을 키로 가진 휴가 리스트를 for문을 통해 유형별 총 일수를 구함
         for (Leaves leaves : memberLeaves) {
-            switch (leaves.getLeaveType()) {
-                case "연차":
-                    annualLeave += leaves.getLeaveDays();
-                    break;
-                case "공가":
-                    vacationLeave += leaves.getLeaveDays();
-                    break;
-                case "경조사":
-                    familyEventLeave += leaves.getLeaveDays();
-                    break;
-                default:
-                    specialLeave += leaves.getLeaveDays();
-                    break;
+            if ("연차".equals(leaves.getLeaveType())) {
+                annualLeave += leaves.getLeaveDays();
+            } else {
+                specialLeave += leaves.getLeaveDays();
             }
         }
 
         // 총 부여 일수
-        int totalDays = annualLeave + vacationLeave + familyEventLeave + specialLeave;
+        int totalDays = annualLeave + specialLeave;
 
-        return new LeaveInfoDTO(memberId, annualLeave, vacationLeave, familyEventLeave, specialLeave, totalDays);
+        return new LeaveInfoDTO(memberId, annualLeave, specialLeave, totalDays);
     }
 }

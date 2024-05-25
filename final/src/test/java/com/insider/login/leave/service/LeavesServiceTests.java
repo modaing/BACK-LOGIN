@@ -141,6 +141,20 @@ public class LeavesServiceTests extends CommonController {
     }
 
     @Test
+    @DisplayName("휴가 신청 취소(삭제)")
+    void testDeleteSubmit() {
+        // given
+        int leaveSubNo = 1;
+
+        // when
+        String result = leaveService.deleteSubmit(leaveSubNo);
+
+        // then
+        // 성공 결과 메시지를 반환해야함
+        Assertions.assertEquals(result, "신청 취소 성공");
+    }
+
+    @Test
     @DisplayName("휴가 취소 요청")
     void testInsertSubmitCancel() {
         // given
@@ -237,6 +251,42 @@ public class LeavesServiceTests extends CommonController {
         // 성공 메시지를 반환해야 함
         Assertions.assertEquals(result, "휴가발생 등록 성공");
 
+    }
+
+    @Test
+    @DisplayName("휴가 신청 처리 - 승인")
+    void testUpdateSubimtOk() {
+        // given
+        int leaveSubNo = 6;
+        String decision = "승인";
+        int approverId = 200401023;
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate());
+
+        // when
+        String result = leaveService.updateSubmit(leaveSubmitDTO);
+
+        // then
+        // 성공메시지를 반환해야함
+        Assertions.assertEquals(result, "휴가처리 성공");
+
+    }
+
+    @Test
+    @DisplayName("휴가 신청 처리 - 반려")
+    void testUpdateSubimtNo() {
+        // given
+        int leaveSubNo = 9;
+        String decision = "반려";
+        int approverId = 200401023;
+        String reason = "반려사유";
+        LeaveSubmitDTO leaveSubmitDTO = new LeaveSubmitDTO(leaveSubNo, approverId, decision, nowDate(), reason);
+
+        // when
+        String result = leaveService.updateSubmit(leaveSubmitDTO);
+
+        // then
+        // 성공메시지를 반환해야함
+        Assertions.assertEquals(result, "휴가처리 성공");
     }
 
 

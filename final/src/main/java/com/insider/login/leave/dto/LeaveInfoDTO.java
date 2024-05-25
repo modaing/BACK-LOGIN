@@ -5,8 +5,6 @@ public class LeaveInfoDTO {
     private int memberId;                     // 사번
     private String name;                      // 이름
     private int annualLeave;                  // 연차
-    private int vacationLeave;                // 공가
-    private int familyEventLeave;             // 경조사 휴가
     private int specialLeave;                 // 특별휴가
     private int totalDays;                    // 총 부여 일수
     private int consumedDays;                 // 소진 일수
@@ -15,21 +13,17 @@ public class LeaveInfoDTO {
     public LeaveInfoDTO() {
     }
 
-    public LeaveInfoDTO(int memberId, int annualLeave, int vacationLeave, int familyEventLeave, int specialLeave, int totalDays) {
+    public LeaveInfoDTO(int memberId, int annualLeave, int specialLeave, int totalDays) {
         this.memberId = memberId;
         this.annualLeave = annualLeave;
-        this.vacationLeave = vacationLeave;
-        this.familyEventLeave = familyEventLeave;
         this.specialLeave = specialLeave;
         this.totalDays = totalDays;
     }
 
-    public LeaveInfoDTO(int memberId, String name, int annualLeave, int vacationLeave, int familyEventLeave, int specialLeave, int totalDays, int consumedDays, int remainingDays) {
+    public LeaveInfoDTO(int memberId, String name, int annualLeave, int specialLeave, int totalDays, int consumedDays, int remainingDays) {
         this.memberId = memberId;
         this.name = name;
         this.annualLeave = annualLeave;
-        this.vacationLeave = vacationLeave;
-        this.familyEventLeave = familyEventLeave;
         this.specialLeave = specialLeave;
         this.totalDays = totalDays;
         this.consumedDays = consumedDays;
@@ -58,22 +52,6 @@ public class LeaveInfoDTO {
 
     public void setAnnualLeave(int annualLeave) {
         this.annualLeave = annualLeave;
-    }
-
-    public int getVacationLeave() {
-        return vacationLeave;
-    }
-
-    public void setVacationLeave(int vacationLeave) {
-        this.vacationLeave = vacationLeave;
-    }
-
-    public int getFamilyEventLeave() {
-        return familyEventLeave;
-    }
-
-    public void setFamilyEventLeave(int familyEventLeave) {
-        this.familyEventLeave = familyEventLeave;
     }
 
     public int getSpecialLeave() {
@@ -114,8 +92,6 @@ public class LeaveInfoDTO {
                 "memberId=" + memberId +
                 ", name='" + name + '\'' +
                 ", annualLeave=" + annualLeave +
-                ", vacationLeave=" + vacationLeave +
-                ", familyEventLeave=" + familyEventLeave +
                 ", specialLeave=" + specialLeave +
                 ", totalDays=" + totalDays +
                 ", consumedDays=" + consumedDays +
