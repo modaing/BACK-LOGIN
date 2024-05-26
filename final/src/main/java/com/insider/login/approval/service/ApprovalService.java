@@ -9,10 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,7 +42,6 @@ public class ApprovalService {
     private ApproverRepository approverRepository;
     private AttachmentRepository attachmentRepository;
     private ReferencerRepository referencerRepository;
-
     private ApprovalMemberRepository approvalMemberRepository;
     private ApprovalDepartmentRepository approvalDepartmentRepository;
 
@@ -56,10 +51,11 @@ public class ApprovalService {
 
     private final ModelMapper modelMapper;
 
-    public ApprovalService(ApprovalRepository approvalRepository,
+    public ApprovalService(
+                           ApprovalRepository approvalRepository2,
                            ApproverRepository approverRepository,
                            AttachmentRepository attachmentRepository,
-                           ReferencerRepository referencerRepository,
+                           ReferencerRepository referencerRepository2,
 
                            ApprovalMemberRepository approvalMemberRepository,
                            ApprovalDepartmentRepository approvalDepartmentRepository,
@@ -67,10 +63,10 @@ public class ApprovalService {
 
                            FormRepository formRepository,
                            ModelMapper modelMapper){
-        this.approvalRepository = approvalRepository;
+        this.approvalRepository = approvalRepository2;
         this.approverRepository = approverRepository;
         this.attachmentRepository = attachmentRepository;
-        this.referencerRepository = referencerRepository;
+        this.referencerRepository = referencerRepository2;
         this.approvalMemberRepository = approvalMemberRepository;
         this.approvalDepartmentRepository = approvalDepartmentRepository;
         this.approvalPositionRepository = approvalPositionRepository;
@@ -118,7 +114,7 @@ public class ApprovalService {
 
     //전자결재 기안(등록)
     @Transactional
-    public Object insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
+    public ApprovalDTO insertApproval(ApprovalDTO approvalDTO, List<MultipartFile> files) {
 
         int result = 0;
 
@@ -189,6 +185,8 @@ public class ApprovalService {
 
             List<Map<String, String>> fileList = new ArrayList<>();
 
+            log.info("첨부파일 비어있음? " + (files==null || files.isEmpty()));
+
             if(files != null && !files.isEmpty()){
                 try {
                     String savedName = "";
@@ -197,6 +195,7 @@ public class ApprovalService {
 
                     for(int i = 0; i < files.size(); i++)
                     {
+                        log.info("첨부파일 뭔데 : " + i + " : " + files.get(i));
                         MultipartFile file = files.get(i);
 
                         AttachmentDTO attachmentDTO = approvalDTO.getAttachment().get(i);
@@ -240,7 +239,6 @@ public class ApprovalService {
                         attachmentRepository.save(attachment);
 
                     }
-
                     result = 1;
 
                 } catch (IOException e) {
@@ -256,9 +254,13 @@ public class ApprovalService {
                         e.printStackTrace();
                     }
                 }
+
+
+            }else{
+                result = 1;
             }
 
-        return ( result > 0 ) ? "성공" : "실패";
+        return ( result > 0 ) ? selectApproval(approvalDTO.getApprovalNo()) : null;
     }
 
 
@@ -322,7 +324,7 @@ public class ApprovalService {
     //한 전자결재 조회
     public ApprovalDTO selectApproval(String approvalNo){
 
-        Approval approval = approvalRepository.findById(approvalNo);
+        Approval approval = approvalRepository.findById(approvalNo).orElse(null);
 
         //기안자 정보 가져오기
         Member senderMember = approvalMemberRepository.findById(approval.getMemberId());
@@ -347,7 +349,7 @@ public class ApprovalService {
         String approvalFormattedDateTime = approval.getApprovalDate().format(formatter);
 
 
-        List<Approver> approverList = approverRepository.findByApprovalId(approvalNo);
+        List<Approver> approverList = approverRepository.findByApprovalNo(approvalNo);
 //        log.info("*****selectApprover -- approverList " + approverList);
 
         for(int i = 0; i < approverList.size(); i++){
@@ -375,7 +377,7 @@ public class ApprovalService {
         }
 //        log.info("*****selectApproval -- Approver List " + approver );
 
-        List<Referencer> referencerList = referencerRepository.findByApprovalId(approvalNo);
+        List<Referencer> referencerList = referencerRepository.findByApprovalNo(approvalNo);
         for(int i = 0; i < referencerList.size(); i++){
 
             //참조자 정보 가져오기
@@ -389,7 +391,7 @@ public class ApprovalService {
             referencer.add(referencerDTO);
         }
 
-        List<Attachment> attachmentList = attachmentRepository.findByApprovalId(approvalNo);
+        List<Attachment> attachmentList = attachmentRepository.findByApprovalNo(approvalNo);
         for(int i = 0; i < attachmentList.size(); i++){
             AttachmentDTO attachmentDTO = new AttachmentDTO(attachmentList.get(i).getFileNo(), attachmentList.get(i).getFileOriname(), attachmentList.get(i).getFileSavepath(), attachmentList.get(i).getFileSavename(), attachmentList.get(i).getApprovalNo());
             attachment.add(attachmentDTO);
@@ -402,9 +404,17 @@ public class ApprovalService {
         if(approval.getApprovalStatus() == "승인" || approval.getApprovalStatus().equals("승인")){
             finalApproverDate = approverList.get(approverList.size()-1).getApproverDate().format(formatter);
         }
+        else if (approval.getApprovalStatus() == "반려" || approval.getApprovalStatus().equals("반려")){
+           // Optional<Approver> approverInfo = approverRepository.findByApprovalNoAndApprovalStatus(approvalNo, "반려"); //상태가 반려인 사람의 처리날짜
+
+          //  finalApproverDate = approverInfo.map(Approver::getApproverDate).orElse(null).format(formatter);
+        }
 
         //진행중인 사람
-        Approver standByApprover = approverRepository.findStatusById(approvalNo);
+        Approver standByApprover = null;
+        Pageable pageable = PageRequest.of(0,1);
+        List<Approver> approvers = approverRepository.findStandByApproversOrderAsc(approvalNo, pageable);
+        standByApprover = approvers.stream().findFirst().orElse(null);
 
         String standByMemberName = "";
 
@@ -420,10 +430,17 @@ public class ApprovalService {
         return approvalDTO;
     }
 
+    //전자결재 임시저장 재저장
+    @Transactional
+    public ApprovalDTO updateApproval(String approvalNo, ApprovalDTO approvalDTO, List<MultipartFile> files){
+        Approval approval = approvalRepository.findById(approvalNo).orElse(null);
+
+        return null;
+    }
 
     //전자결재 회수
     @Transactional
-    public ApprovalDTO updateApproval(String approvalNo) {
+    public ApprovalDTO updateApprovalStatus(String approvalNo) {
         //***** 나를 제외한 다른 사람이 한사람이라도 처리했을 경우 회수 불가능
 
         //수정하고자 하는 전자결재 정보 조회
@@ -440,7 +457,7 @@ public class ApprovalService {
         approval = new ApprovalBuilder(approval).approvalStatus("회수").builder();
 
         //db update
-        approvalRepository.update(approval);
+        approvalRepository.save(approval);
 
         //DTO도 변경
         approvalDTO.setApprovalStatus(approval.getApprovalStatus());
@@ -513,12 +530,12 @@ public class ApprovalService {
                     }
                 }
                 //db 결재자 update
-                approverRepository.update(approver);
+                approverRepository.save(approver);
                 approverDTO.setApproverStatus(status);
                 log.info("*****상태 : " + approverDTO.getApproverStatus());
 
                 //db 결재정보 update
-                approvalRepository.update(approval);
+                approvalRepository.save(approval);
 
 
                 log.info("***** Service 마지막 approverDTO : " + approverDTO);
@@ -552,12 +569,21 @@ public class ApprovalService {
 
         String direction = isNull(condition.get("direction")) ? "" : condition.get("direction").toString();
 
+        Sort sort = Sort.by("approvalDate");
+        if("ASC".equalsIgnoreCase(direction)){
+            sort = sort.ascending();
+        }else{
+            sort = sort.descending();
+        }
 
         log.info("*****서비스 들어옴 : memberId : " + memberId + ", flag : " + flag + ", title : " + title + ", pageNo : " + pageNo);
         System.out.println("*****서비스 들어옴 : memberId : " + memberId + ", flag : " + flag + ", title : " + title + ", pageNo : " + pageNo);
 
 
         Pageable pageable = PageRequest.of(pageNo, limit);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+
 
         Page<Approval> approvalPage = null;
 
@@ -565,7 +591,8 @@ public class ApprovalService {
             case "given": {
                 //결재 상신함 (내가 기안자 / 임시저장 제외)
 
-                approvalPage = approvalRepository.findByMemberId(memberId, pageable, direction, title);
+
+                approvalPage = approvalRepository.findByMemberIdAndTitle(memberId, title, sortedPageable);
                 System.out.println("totalPage : " + approvalPage.getTotalPages());
 
                 approvalDTOList = ListToDTO(approvalPage);
@@ -575,7 +602,7 @@ public class ApprovalService {
             case "tempGiven" : {
                 // 임시저장함 (내가 기안자 / 임시저장만)
 
-                approvalPage = approvalRepository.findTempByMemberId(memberId, pageable, direction, title);
+                approvalPage = approvalRepository.findTempByMemberIdAndTitle(memberId, title, sortedPageable);
 
                 approvalDTOList = ListToDTO(approvalPage);
 
@@ -594,7 +621,7 @@ public class ApprovalService {
                 //- 단, approvalStatus = 처리중 일때
 
                 //approvalStatus = "처리 중", approverStatus = "대기" 인 approver 중 가장 낮은 approver_order의 approver 목록 가져오기
-                List<Approver> approverList = approverRepository.findByStandById(title);
+                List<Approver> approverList = approverRepository.findStandByApprovalsByTitleNative(title);
 
                 if(approverList.size() > 0 || !approverList.isEmpty()){
                     for(int i = 0; i < approverList.size(); i++){
@@ -603,7 +630,7 @@ public class ApprovalService {
                         //가장 낮은 approver_order의 approver의 memberId 가 나와 같다면
                         if((approver.getMemberId() == memberId)){
                             //해당 전자결재 번호의 전자결재 정보를 가져오기
-                            Approval approval = approvalRepository.findById(approver.getApprovalNo());
+                            Approval approval = approvalRepository.findById(approver.getApprovalNo()).orElse(null);
 
                             ApprovalDTO approvalDTO = selectApproval(approval.getApprovalNo());
 
@@ -634,7 +661,9 @@ public class ApprovalService {
             case "receivedRef" : {
                 // 수신 참조내역 (내가 참조자 / 임시저장, 회수 제외)
 
-                approvalPage = referencerRepository.findByMemberId(memberId, pageable, direction, title);
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+                approvalPage = referencerRepository.findApprovalsByMemberIdAndTitle(memberId, title, pageable);
+
 
                 approvalDTOList = ListToDTO(approvalPage);
 
@@ -650,7 +679,7 @@ public class ApprovalService {
 
         System.out.println("Service total 갯수 : " + total);
 
-        PageImpl<ApprovalDTO> appPage = new PageImpl<> (approvalDTOList, pageable, total);
+        PageImpl<ApprovalDTO> appPage = new PageImpl<> (approvalDTOList, sortedPageable, total);
         System.out.println("new PageImpl getPageable: " + appPage.getSize());
 
         System.out.println("new PageImpl totalPage : " + appPage.getTotalPages());
@@ -691,7 +720,7 @@ public class ApprovalService {
 
         try{
 
-            List<Attachment> attachmentList = attachmentRepository.findByApprovalId(approvalNo);
+            List<Attachment> attachmentList = attachmentRepository.findByApprovalNo(approvalNo);
             List<Map<String, String>> fileList = new ArrayList<>();
             Map<String, String> attachMap = new HashMap<>();
 
@@ -702,11 +731,34 @@ public class ApprovalService {
 
             deleteFile(fileList);                           //첨부파일 삭제
 
-            attachmentRepository.deleteById(approvalNo);    //첨부파일 DB 삭제
+            if(!attachmentList.isEmpty())
+            {
+                try {
+                    attachmentRepository.deleteByApprovalNo(approvalNo);    //첨부파일 DB 삭제
+                }catch(Exception e){
+                    log.info("첨부파일 삭제 오류");
+                }
+            }
 
-            referencerRepository.deleteById(approvalNo);    //참조선 삭제
-            approverRepository.deleteById(approvalNo);      //결제선 삭제
-            approvalRepository.deleteById(approvalNo);      //전자결재 삭제
+            try {
+                referencerRepository.deleteByApprovalNo(approvalNo);    //참조선 삭제
+            }
+            catch(Exception e){
+                log.info("참조선 삭제 오류 " );
+            }
+
+            try{
+                approverRepository.deleteByApprovalNo(approvalNo); //결제선 삭제
+                log.info("결재선 삭제 완료" + isNull(approverRepository.findByApprovalNo(approvalNo)));
+            }catch(Exception e){
+                log.info("결재선 삭제 오류 ");
+            }
+
+            try {
+                approvalRepository.deleteById(approvalNo);      //전자결재 삭제
+            }catch( Exception e){
+                log.info("전자결재 삭제 오류 ");
+            }
 
             return true;
         }catch(IOException e){
@@ -715,6 +767,7 @@ public class ApprovalService {
             return false;
 
         }catch(Exception e){
+            e.printStackTrace();
             return false;
         }
 
@@ -750,7 +803,13 @@ public class ApprovalService {
     //가장 마지막 전자결재 번호 조회
     public String selectApprovalNo(String yearFormNo) {
 
-        String lastApprovalNo = approvalRepository.findByApprovalNo(yearFormNo);
+//        String lastApprovalNo = approvalRepository.findByApprovalNo(yearFormNo);
+
+        Pageable pageable = PageRequest.of(0, 1);
+        List<String> results = approvalRepository.findLastApprovalNo(yearFormNo, pageable);
+
+        String lastApprovalNo =  results.isEmpty() ? null : results.get(0);
+
         log.info("Service lastApprovalNo: " + lastApprovalNo);
 
         return lastApprovalNo;

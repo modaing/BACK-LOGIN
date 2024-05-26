@@ -210,11 +210,11 @@ public class ApprovalDTO {
                 "\n[departName='" + departName + "']" +
                 "\n[name='" + name + "']" +
                 "\n[positionName='" + positionName + "']" +
-                "\n[attachment=" + attachment + "']" +
-                "\n[approver=" + approver + "']" +
-                "\n[referencer=" + referencer + "']" +
-                "\n[approverDate=" + finalApproverDate + "']" +
-                "\n[standByApprover=" + standByApprover + "']" +
+                "\n[attachment='" + attachment + "']" +
+                "\n[approver='" + approver + "']" +
+                "\n[referencer='" + referencer + "']" +
+                "\n[approverDate='" + finalApproverDate + "']" +
+                "\n[standByApprover='" + standByApprover + "']" +
                 '\n'+'}';
     }
 }
