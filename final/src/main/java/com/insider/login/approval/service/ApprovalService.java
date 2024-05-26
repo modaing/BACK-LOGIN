@@ -399,15 +399,15 @@ public class ApprovalService {
 //        log.info("***** formattedDateTime ***** " + approvalFormattedDateTime);
 
 
-        //최종 승인 날짜
+        //최종 승인/반려 날짜
         String finalApproverDate = "";
         if(approval.getApprovalStatus() == "승인" || approval.getApprovalStatus().equals("승인")){
             finalApproverDate = approverList.get(approverList.size()-1).getApproverDate().format(formatter);
         }
         else if (approval.getApprovalStatus() == "반려" || approval.getApprovalStatus().equals("반려")){
-           // Optional<Approver> approverInfo = approverRepository.findByApprovalNoAndApprovalStatus(approvalNo, "반려"); //상태가 반려인 사람의 처리날짜
+            Optional<Approver> approverInfo = approverRepository.findByApprovalNoAndApprovalStatus(approvalNo, "반려"); //상태가 반려인 사람의 처리날짜
 
-          //  finalApproverDate = approverInfo.map(Approver::getApproverDate).orElse(null).format(formatter);
+            finalApproverDate = approverInfo.map(Approver::getApproverDate).orElse(null).format(formatter);
         }
 
         //진행중인 사람
