@@ -408,8 +408,9 @@ public class ApprovalService {
             Optional<Approver> approverInfo = approverRepository.findByApprovalNoAndApprovalStatus(approvalNo, "반려"); //상태가 반려인 사람의 처리날짜
 
             finalApproverDate = approverInfo.map(Approver::getApproverDate).orElse(null).format(formatter);
-        }
 
+        }
+        log.info("마지막 " + approval.getApprovalStatus() + " 날짜 :  " + finalApproverDate);
         //진행중인 사람
         Approver standByApprover = null;
         Pageable pageable = PageRequest.of(0,1);
