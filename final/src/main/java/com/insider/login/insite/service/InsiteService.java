@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +63,15 @@ public class InsiteService {
         }
 
         return leaveInfoList;
+    }
+
+    public List<Object[]> leavesCommuteMemberCounts() {
+        return insiteRepository.leavesCommuteMemberCounts();
+
+    }
+
+    public List<Object[]> birthdayCounts() {
+
+        return insiteRepository.birthdayCounts();
     }
 }
