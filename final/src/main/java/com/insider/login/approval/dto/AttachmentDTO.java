@@ -67,7 +67,7 @@ public class AttachmentDTO {
                 "fileNo='" + fileNo + '\'' +
                 ", fileOriname='" + fileOriname + '\'' +
                 ", fileSavepath='" + fileSavepath + '\'' +
-                ", fileSavenam='" + fileSavename + '\'' +
+                ", fileSavename='" + fileSavename + '\'' +
                 ", approvalNo='" + approvalNo + '\'' +
                 '}';
     }

@@ -244,12 +244,12 @@ public class ApprovalServiceTest {
     //전자결재 회수 테스트
     @DisplayName("전자결재 회수 테스트")
     @ParameterizedTest
-    @CsvSource("2024-abs00001")
+    @CsvSource("2024-abs00005")
     void testUpdateApproval (String approvalNo){
         //회수
 
         // when
-        ApprovalDTO approvalDTO = approvalService.updateApproval(approvalNo);
+        ApprovalDTO approvalDTO = approvalService.updateApprovalStatus(approvalNo);
 
         // then
         Assertions.assertEquals(approvalDTO.getApprovalStatus(), "회수");
@@ -257,7 +257,7 @@ public class ApprovalServiceTest {
 
     @DisplayName("전자결재 결재 테스트")
     @ParameterizedTest
-    @CsvSource("2024-con00003_apr002")
+    @CsvSource("2024-abs00006_apr002")
     void testUpdateApprover (String approverNo){
         //when
         //결재처리 / 반려
@@ -283,11 +283,11 @@ public class ApprovalServiceTest {
         int pageNo = 0;
 
         Map<String, Object> condition = new HashMap<>();
-        condition.put("flag", "given");
+        condition.put("flag", "received");
         condition.put("offset", 0);
         condition.put("limit", 10);
-        condition.put("direction", null);
-        condition.put("title", "경조금");
+        condition.put("direction", "DESC");
+        condition.put("title", "");
 
         //when
 //        List<ApprovalDTO> approvalList = approvalService.selectApprovalList(memberId, condition);
@@ -310,7 +310,7 @@ public class ApprovalServiceTest {
 
     @DisplayName("전자결재 삭제 테스트")
     @ParameterizedTest
-    @CsvSource("2024-exp00002")
+    @CsvSource("2024-ovt00007")
     void testDeleteApproval(String approvalNo){
         //given
         //when
@@ -342,5 +342,19 @@ public class ApprovalServiceTest {
         for(int i = 0; i < memberDTOList.size(); i++){
             System.out.println(memberDTOList.get(i).getDepartName() + ", " + memberDTOList.get(i).getMemberId() + ", " + memberDTOList.get(i).getName()+ ", " + memberDTOList.get(i).getPositionName());
         }
+    }
+
+    @DisplayName("전자결재 마지막 전자결재 번호 가져오기")
+    @Test
+    void testSelectApprovalNo(){
+        //given
+        String yearFormNo = "2024-con";
+
+        //when
+        String lastApproval = approvalService.selectApprovalNo(yearFormNo);
+
+        //then
+        Assertions.assertNotNull(lastApproval);
+        System.out.println(lastApproval);
     }
 }

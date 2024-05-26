@@ -1,189 +1,54 @@
 package com.insider.login.approval.repository;
 
 import com.insider.login.approval.entity.Approval;
-import com.insider.login.approval.entity.Form;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public class ApprovalRepository {
+public interface ApprovalRepository extends JpaRepository<Approval, String> {
 
-    @PersistenceContext
-    private EntityManager manager;
+    //내가 쓴 기안 목록
+    @Query("SELECT a FROM Approval a WHERE a.memberId = :memberId AND a.approvalStatus != '임시저장'")
+    List<Approval> findByMemberId(@Param("memberId") int memberId);
 
-    public void save(Approval approval){
-        manager.persist(approval);
-    }
+    //내가 쓴 기안 목록 제목 검색 + 페이지
+    @Query("SELECT a FROM Approval a " +
+            "WHERE a.memberId = :memberId " +
+            "AND a.approvalStatus != '임시저장' " +
+            "AND a.approvalTitle LIKE %:title%")
+    Page<Approval> findByMemberIdAndTitle(@Param("memberId") int memberId, @Param("title") String title, Pageable pageable);
 
-    public Approval findById(String approvalNo){
-        return manager.find(Approval.class, approvalNo);
-    }
+    //내가 쓴 기안 목록 갯수
+    @Query("SELECT COUNT(a) FROM Approval a WHERE a.memberId = :memberId AND a.approvalStatus != '임시저장' AND a.approvalTitle LIKE %:title%")
+    int countByMemberIdAndTItle(@Param("memberId") int memberId, @Param("title")String title);
 
-    public void update(Approval approval){
-        manager.merge(approval);
-    }
+    //내 임시저장
+    @Query("SELECT a FROM Approval a WHERE a.memberId = :memberId AND a.approvalStatus = '임시저장'")
+    List<Approval> findTempByMemberId(@Param("memberId") int memberId);
 
+    //임시저장 제목 검색 + 페이지
+    @Query("SELECT a FROM Approval a WHERE a.memberId = :memberId AND a.approvalStatus = '임시저장' AND a.approvalTitle LIKE %:title%")
+    Page<Approval> findTempByMemberIdAndTitle(@Param("memberId") int memberId, @Param("title")String title, Pageable pageable);
 
-    //상신 목록 리스트 반환
-    public List<Approval> findByMemberId(int memberId) {
-        String query = "SELECT approval_no, member_id, approval_title, approval_content, approval_date,  approval_status, reject_reason, form_no" +
-                " FROM approval" +
-                " WHERE member_id = ?" +
-                " AND approval_status != '임시저장'";
-
-        List<Approval> approvalList = manager.createNativeQuery(query, Approval.class)
-                .setParameter(1, memberId)
-                .getResultList();
-
-        return approvalList;
-    }
-
-    //상신 목록 페이지 반환
-    public Page<Approval> findByMemberId(int memberId, Pageable pageable, String direction, String title){
-        String sql = "SELECT approval_no, member_id, approval_title, approval_content, approval_date,  approval_status, reject_reason, form_no" +
-                " FROM approval" +
-                " WHERE member_id = ?" +
-                " AND approval_status != '임시저장' "+
-                " AND approval_title LIKE ?";
-
-        if(direction == "ASC" || direction.equals("ASC")){
-            sql += " ORDER BY approval_date ASC";
-        }
-        else{
-            sql += " ORDER BY approval_date DESC";
-        }
-
-        Query query = manager.createNativeQuery(sql, Approval.class);
-        query.setParameter(1, memberId)
-            .setParameter(2, "%" + title + "%");
-
-        int pageNumber = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-        int offset = pageNumber * pageSize;
-
-        query.setFirstResult(offset);
-        query.setMaxResults(pageSize);
-
-        List<Approval> resultList = query.getResultList();
-
-        int total = getNotTempTotalCount(memberId, title);
-        System.out.println("전체 갯수 : " + total);
-
-        return new PageImpl<>(resultList, pageable, total);
-    }
-
-    //상신 목록 총 갯수
-    private int getNotTempTotalCount(int memberId, String title) {
-
-        String countSql = "SELECT COUNT(*)" +
-                " FROM approval" +
-                " WHERE member_id = ?" +
-                " AND approval_status != '임시저장'" +
-                " AND approval_title LIKE ?";
-
-        Query countQuery = manager.createNativeQuery(countSql);
-        countQuery.setParameter(1, memberId)
-                .setParameter(2, "%" + title + "%");
-
-        return ((Number)countQuery.getSingleResult()).intValue();
-
-    }
-
-    //임시저장목록 리스트 반환
-    public List<Approval> findTempByMemberId(int memberId) {
-        String query =  "SELECT approval_no, member_id, approval_title, approval_content, approval_date,  approval_status, reject_reason, form_no" +
-                " FROM approval" +
-                " WHERE member_id = ?" +
-                " AND approval_status = '임시저장'";
-
-        List<Approval> approvalList = manager.createNativeQuery(query, Approval.class)
-                .setParameter(1, memberId)
-                .getResultList();
-
-        return approvalList;
-    }
-
-    //임시저장목록 페이지 반환
-    public Page<Approval> findTempByMemberId(int memberId, Pageable pageable, String direction, String title){
-        String sql =  "SELECT approval_no, member_id, approval_title, approval_content, approval_date,  approval_status, reject_reason, form_no" +
-                " FROM approval" +
-                " WHERE member_id = ?" +
-                " AND approval_status = '임시저장'" +
-                " AND approval_title LIKE ?";
-
-        if(direction == "ASC" || direction.equals("ASC")){
-            sql += " ORDER BY approval_date ASC";
-        }
-        else{
-            sql += " ORDER BY approval_date DESC";
-        }
-
-        Query query = manager.createNativeQuery(sql, Approval.class);
-        query.setParameter(1, memberId)
-                .setParameter(2, "%" + title + "%");
-
-        int pageNumber = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-        int offset = pageNumber * pageSize;
-
-        query.setFirstResult(offset);
-        query.setMaxResults(pageSize);
-
-        List<Approval> resultList = query.getResultList();
-
-
-        int total = getTempTotalCount(memberId, title);
-        return new PageImpl<>(resultList, pageable, total);
-
-    }
-
-    //임시저장 목록 총 갯수
-    private int getTempTotalCount(int memberId, String title) {
-
-        String countSql = "SELECT COUNT(*)" +
-                " FROM approval" +
-                " WHERE member_id = ?" +
-                " AND approval_status = '임시저장'" +
-                " AND approval_title LIKE ?";
-
-        Query countQuery = manager.createNativeQuery(countSql);
-        countQuery.setParameter(1, memberId)
-                .setParameter(2, "%" + title + "%");
-
-        return ((Number)countQuery.getSingleResult()).intValue();
-
-    }
+    //내 임시저장 목록 갯수
+    @Query("SELECT COUNT(a) FROM Approval a WHERE a.memberId = :memberId AND a.approvalStatus = '임시저장' AND a.approvalTitle LIKE %:title%")
+    int countTempByMemberIdAndTitle(@Param("memberId")int memberId, @Param("title")String title);
 
     //전자결재 삭제
-    public void deleteById(String approvalNo) {
-        Approval approval = findById(approvalNo);
-        Approval managedApproval = manager.merge(approval);
-        manager.remove(managedApproval);
-    }
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Approval a WHERE a.approvalNo = :approvalNo")
+    void deleteById(@Param("approvalNo") String approvalNo);
 
-
-    //가장 마지막 전자결재 번호 조회
-    public String findByApprovalNo(String yearFormNo) {
-
-        String sql = "SELECT approval_no" +
-                " FROM approval" +
-                " WHERE approval_no LIKE ?" +
-                " ORDER BY approval_date desc" +
-                " limit 1";
-
-        Query query = manager.createNativeQuery(sql)
-                .setParameter(1, "%" + yearFormNo + "%");
-
-
-
-        return (String)query.getSingleResult();
-    }
+    //해당 연도+폼 번호 로 가장 마지막에 등록된 결재번호 가져오기
+    @Query("SELECT a.approvalNo FROM Approval a WHERE a.approvalNo LIKE %:yearFormNo% ORDER BY a.approvalNo DESC")
+    List<String> findLastApprovalNo(@Param("yearFormNo") String yearFormNo, Pageable pageable);
 }
-
