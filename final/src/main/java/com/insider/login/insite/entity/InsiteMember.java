@@ -28,6 +28,13 @@ public class InsiteMember {
     @JoinColumn(name = "depart_no", referencedColumnName = "depart_no")
     private InsiteDepartment department;
 
+    @Column(name = "gender", nullable = true)
+    private String gender;
+
+    @Column(name = "birthday", nullable = true)
+    private LocalDate birthday;
+
+
     protected InsiteMember () {}
 
 }
