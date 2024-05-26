@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ApproverRepository extends JpaRepository<Approver, String> {
@@ -47,4 +48,7 @@ public interface ApproverRepository extends JpaRepository<Approver, String> {
     @Transactional
     @Query("DELETE FROM Approver a WHERE a.approvalNo = :approvalNo")
     void deleteByApprovalNo(@Param("approvalNo") String approvalNo);
+
+    @Query("SELECT a FROM Approver a WHERE a.approvalNo = :approvalNo AND a.approverStatus = :approverStatus")
+    Optional<Approver> findByApprovalNoAndApprovalStatus(@Param("approvalNo") String approvalNo, @Param("approverStatus") String approverStatus);
 }
