@@ -198,6 +198,124 @@ public class ApprovalServiceTest {
 
     }
 
+    @DisplayName("전자결재 재임시저장 테스트")
+    @Test
+    void testResaveTempApproval(){
+        //given
+        String approvalNo = "2024-ovt00009";
+        ApprovalDTO approvalDTO = new ApprovalDTO();
+
+        List<ApproverDTO> approverList  = new ArrayList<>();
+        List<ReferencerDTO> referencerList = new ArrayList<>();
+        List<MultipartFile> files = new ArrayList<>();
+
+        //결재번호 : 현재 날짜(연도) - form번호 0000순번(해당 연도-form의 순번)
+        //결재자번호 : 결재번호_apr00순번
+        //참조자번호 : 결재번호_ref00순번
+        //첨부파일번호: 결재번호_f00순번
+        ApproverDTO approverDTO1 = new ApproverDTO("2024-ovt00009_apr001", "2024-ovt00009", 1, "대기", null, 240401004);
+        ApproverDTO approverDTO2 = new ApproverDTO("2024-ovt00009_apr002", "2024-ovt00009", 2, "대기", null, 2024001003);
+
+        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-ovt00009_ref001", "2024-ovt00009", 2024001001, 1);
+        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-ovt00009_ref002", "2024-ovt00009", 241811, 2);
+
+        approverList.add(approverDTO1);
+        approverList.add(approverDTO2);
+
+        referencerList.add(referencerDTO1);
+        referencerList.add(referencerDTO2);
+
+        approvalDTO.setApprovalNo("2024-ovt00009");
+        approvalDTO.setMemberId(240501629);
+        approvalDTO.setApprovalTitle("연장근무_재임시저장 테스트.");
+        approvalDTO.setApprovalContent("<div name=\"wholeForm\" id=\"wholeForm\">\n" +
+                "\n" +
+                "        <table name=\"ovt_table\" id=\"ovt_table\">\n" +
+                "            <tr>\n" +
+                "                <th rowspan=\"2\">근무시간</th>\n" +
+                "                <th>근무일자</th>\n" +
+                "                <th>시간</th>\n" +
+                "                <th>총 연장근무 시간</th>\n" +
+                "            </tr>\n" +
+                "            <tr>\n" +
+                "                <td><div> 2024-05-27 </div></td>\n" +
+                "                <td><div> 04:00 </div></td>\n" +
+                "                <td><div> 04:00 </div></td>\n" +
+                "            </tr>\n" +
+                "\n" +
+                "            <tr name=\"ovt_reason\" id=\"ovt_reason\">\n" +
+                "                <th>근무사유</th>\n" +
+                "                <td colspan=\"3\"><div>ㅜㅜㅜㅜㅜ</div></td>\n" +
+                "            </tr>\n" +
+                "            <tr name=\"ovt_special\" id=\"ovt_special\">\n" +
+                "                <th>특이사항</th>\n" +
+                "                <td colspan=\"3\"><div></div></td>\n" +
+                "            </tr>\n" +
+                "            <tr>\n" +
+                "                <td colspan=\"4\" name=\"ovt_warning\" id=\"ovt_warning\">\n" +
+                "                    ※ 연장근무(휴일 포함)는 주 12시간을 초과할 수 없습니다.\n" +
+                "                </td>\n" +
+                "            </tr>\n" +
+                "        </table>\n" +
+                "    </div>\n" +
+                "    <div name=\"date\" id=\"date\">\n" +
+                "        <div></div>\n" +
+                "    </div>");
+        approvalDTO.setApprovalDate("2024-05-27 04:22:13");
+        approvalDTO.setApprovalStatus("임시저장");
+        approvalDTO.setFormNo("ovt");
+
+
+        //파일 처리
+        //테스트용 PDF 파일 생성
+        MultipartFile pdfFile = null;
+        byte[] pdfFileContent = "Test PDF Content".getBytes();
+        pdfFile = new MockMultipartFile("testfile.pdf", "testfile.pdf", "application/pdf", pdfFileContent);
+
+        //테스트용 이미지 파일 생성
+        MultipartFile imgFile = null;
+        byte[] imageFileContent = "Test Image Content".getBytes();
+        imgFile = new MockMultipartFile("testimage.jpg", "testimage.jpg", "image/jpeg", imageFileContent);
+
+        files.add(pdfFile);
+        files.add(imgFile);
+
+
+        List<AttachmentDTO> attachmentList = new ArrayList<>();
+        AttachmentDTO attachmentDTO1 = new AttachmentDTO();
+        attachmentDTO1.setFileNo("2024-ovt00009_f001");
+        attachmentDTO1.setFileOriname(pdfFile.getOriginalFilename());
+        attachmentDTO1.setFileSavename(pdfFile.getName());
+        attachmentDTO1.setFileSavepath("C:/login/upload");
+        attachmentDTO1.setApprovalNo("2024-ovt00009");
+
+        AttachmentDTO attachmentDTO2 = new AttachmentDTO();
+        attachmentDTO2.setFileNo("2024-ovt00009_f002");
+        attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
+        attachmentDTO2.setFileSavename(imgFile.getName());
+        attachmentDTO2.setFileSavepath("C:/login/upload");
+        attachmentDTO2.setApprovalNo("2024-ovt00009");
+
+        attachmentList.add(attachmentDTO1);
+        attachmentList.add(attachmentDTO2);
+
+        //파일 업로드 서비스에 테스트용 PDF 파일 전달
+
+        approvalDTO.setAttachment(attachmentList);
+
+        approvalDTO.setApprover(approverList);
+        approvalDTO.setReferencer(referencerList);
+
+        //when
+//        approvalService.insertApproval(approvalDTO);
+
+        ApprovalDTO resultDTO = approvalService.updateApproval(approvalNo, approvalDTO, files);
+
+        //then
+        Assertions.assertNotNull(resultDTO);
+        System.out.println(resultDTO);
+    }
+
     //전자결재용 부서 목록 조회 테스트
     @DisplayName("부서 목록 조회 테스트")
     @Test

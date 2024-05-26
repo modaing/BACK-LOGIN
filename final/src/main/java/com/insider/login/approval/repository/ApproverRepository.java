@@ -18,6 +18,9 @@ public interface ApproverRepository extends JpaRepository<Approver, String> {
     //결재번호로 결재자목록 조회
     List<Approver> findByApprovalNo(String approvalNo);
 
+    //결재자 번호로 결재자 조회
+    Optional<Approver> findByApproverNo(String approverNo);
+
     //지금 처리해야하는(대기자) 결재자 조회
     @Query("SELECT a FROM Approver a " +
             "WHERE a.approvalNo = :approvalNo " +

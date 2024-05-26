@@ -128,12 +128,49 @@ public class ApprovalController {
 
         log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉재 임시저장 컨트롤러 들어왔어");
 
+        log.info("기존 approval Form : " + approvalNo.substring(5,8));
+        log.info("새로운 approval Form : " + approvalDTO.getFormNo());
+
+        String newApprovalNo = "";
+
+        //폼번호 바뀔경우 결재 번호도 바뀌어야함
+        if(!approvalNo.substring(5,8).equals(approvalDTO.getFormNo()))
+        {
+            //전자결재 번호(연도+_양식번호+순번)
+            int Year = LocalDate.now().getYear();
+            String formNo = approvalDTO.getFormNo();
+            String YearFormNo = Year + "-" + formNo;
+            log.info("YearFormNo : " + YearFormNo);
+
+            String lastApprovalNo = approvalService.selectApprovalNo(YearFormNo);
+
+            log.info("lastApprovalNo : " + lastApprovalNo);
+
+            String[] parts = lastApprovalNo.split("-");
+            String lastPart = parts[parts.length -1];
+
+
+            String sequenceString = lastPart.replaceAll("\\D", "");
+            log.info("sequenceString: " + sequenceString);
+
+            int sequenceNumber = Integer.parseInt(sequenceString) +1;
+            log.info("늘어난 번호 : " + sequenceNumber);
+
+
+            newApprovalNo = Year + "-" + formNo + String.format("%05d",sequenceNumber);
+            log.info("새로운 approvalNo: " + newApprovalNo);
+
+            approvalDTO.setApprovalNo(newApprovalNo);
+
+
+        }
+
         //결재자번호(결재번호+_apr+순번)
         List<ApproverDTO> approverDTOList = approvalDTO.getApprover();
         for(int i = 0; i < approverDTOList.size(); i++){
             ApproverDTO approverDTO = approverDTOList.get(i);
-            approverDTO.setApproverNo(approvalNo + "_apr" + String.format("%03d", (i + 1)));
-            approverDTO.setApprovalNo(approvalNo);
+            approverDTO.setApproverNo(approvalDTO.getApprovalNo() + "_apr" + String.format("%03d", (i + 1)));
+            approverDTO.setApprovalNo(approvalDTO.getApprovalNo());
             approverDTO.setApproverStatus("대기");
             approverDTO.setApproverOrder(i + 1);
         }
@@ -143,8 +180,8 @@ public class ApprovalController {
         List<ReferencerDTO> referencerDTOList = approvalDTO.getReferencer();
         for(int i = 0; i < referencerDTOList.size(); i++){
             ReferencerDTO referencerDTO = referencerDTOList.get(i);
-            referencerDTO.setRefNo(approvalNo + "_ref" + String.format("%03d", (i + 1)));
-            referencerDTO.setApprovalNo(approvalNo);
+            referencerDTO.setRefNo(approvalDTO.getApprovalNo() + "_ref" + String.format("%03d", (i + 1)));
+            referencerDTO.setApprovalNo(approvalDTO.getApprovalNo());
             referencerDTO.setRefOrder(i + 1);
         }
         approvalDTO.setReferencer(referencerDTOList);
