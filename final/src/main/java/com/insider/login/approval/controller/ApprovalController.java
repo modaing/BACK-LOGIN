@@ -31,14 +31,14 @@ public class ApprovalController {
 
     private final ApprovalService approvalService;
 
-    public ApprovalController(ApprovalService approvalService){
+    public ApprovalController(ApprovalService approvalService) {
         this.approvalService = approvalService;
     }
 
 
     @Tag(name = "폼 목록 조회", description = "폼 목록 조회")
     @GetMapping("/approvals/forms")
-    public ResponseEntity<ResponseDTO> selectFormList(){
+    public ResponseEntity<ResponseDTO> selectFormList() {
 
         log.info("폼 목록 조회 controller 들어왔다");
 
@@ -47,7 +47,7 @@ public class ApprovalController {
 
     @Tag(name = "특정 폼 조회", description = "특정 폼 조회")
     @GetMapping("/approvals/forms/{formNo}")
-    public ResponseEntity<ResponseDTO> selectForm(@PathVariable(name = "formNo") String formNo){
+    public ResponseEntity<ResponseDTO> selectForm(@PathVariable(name = "formNo") String formNo) {
 
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "특정 폼 조회 성공", approvalService.selectForm(formNo)));
     }
@@ -56,7 +56,7 @@ public class ApprovalController {
     //전자결재 상세 조회
     @Tag(name = "전자결재 상세 조회", description = "전자결재 상세 조회")
     @GetMapping("/approvals/{approvalNo}")
-    public ResponseEntity<ResponseDTO> selectApprovalByNo(@PathVariable(name="approvalNo") String approvalNo){
+    public ResponseEntity<ResponseDTO> selectApprovalByNo(@PathVariable(name = "approvalNo") String approvalNo) {
        /* ApprovalDTO approvalDTO = approvalService.selectApproval(approvalNo);
         log.info("approvalDTO: " + approvalDTO);*/
 
@@ -67,15 +67,15 @@ public class ApprovalController {
     @Tag(name = "전자결재 목록 조회", description = "전자결재 목록 조회")
     @GetMapping("/approvals")
     public ResponseEntity<ResponseDTO> selectApprovalList(@RequestParam("fg") String fg,
-                                                          @RequestParam(name="page",defaultValue = "0") String page,
-                                                          @RequestParam(name="title", defaultValue = "") String title,
-                                                          @RequestParam(name="direction", defaultValue = "DESC") String direction,
-                                                          @RequestHeader(value = "memberId", required = false) String memberIdstr){
+                                                          @RequestParam(name = "page", defaultValue = "0") String page,
+                                                          @RequestParam(name = "title", defaultValue = "") String title,
+                                                          @RequestParam(name = "direction", defaultValue = "DESC") String direction,
+                                                          @RequestHeader(value = "memberId", required = false) String memberIdstr) {
         log.info("****컨트롤러 들어왔어");
 
         int memberId = 0;
 
-        if(memberIdstr == null){
+        if (memberIdstr == null) {
             //현재 사용자의 인증 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             log.info("memberId: " + authentication.getName());
@@ -83,8 +83,7 @@ public class ApprovalController {
             //인증 정보에서 사용자의 식별 정보 가져오기
             memberId = Integer.parseInt(authentication.getName());
 
-        }
-        else{
+        } else {
             memberId = Integer.parseInt(memberIdstr);
         }
         log.info("현재 사용자 : " + memberId);
@@ -100,42 +99,41 @@ public class ApprovalController {
         log.info("현재 pageNo : " + pageNo);
 
 
-        Page<ApprovalDTO> approvalDTOPage =  approvalService.selectApprovalList(memberId, condition, pageNo);
+        Page<ApprovalDTO> approvalDTOPage = approvalService.selectApprovalList(memberId, condition, pageNo);
 
         System.out.println("🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈Page 총 페이지 controller : " + approvalDTOPage.getTotalPages());
 //        log.info("approvalDTOPage : " + approvalDTOPage.getContent());
 
-            ResponseDTO response = new ResponseDTO(HttpStatus.OK, "상신 목록 조회 성공", approvalDTOPage);
-            System.out.println("조회성공");
-            return ResponseEntity.ok().body(response);
+        ResponseDTO response = new ResponseDTO(HttpStatus.OK, "상신 목록 조회 성공", approvalDTOPage);
+        System.out.println("조회성공");
+        return ResponseEntity.ok().body(response);
 
     }
 
 
     @Tag(name = "전자결재 회수", description = "회수")
     @PutMapping(value = "/approvals/{approvalNo}/status")
-    public ResponseEntity<ResponseDTO> updateApprovalstatus(@PathVariable(name="approvalNo") String approvalNo){
+    public ResponseEntity<ResponseDTO> updateApprovalstatus(@PathVariable(name = "approvalNo") String approvalNo) {
 
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자 결재 회수 성공", approvalService.updateApprovalStatus(approvalNo)));
 
     }
 
     @Tag(name = "전자결재 재 임시저장", description = "재 임시저장")
-    @PutMapping(value="/approvals/{approvalNo}")
-    public ResponseEntity<ResponseDTO> updateApprovalTemp(@PathVariable(name="approvalNo") String approvalNo,
-                                                          @RequestPart(name="approvalDTO") ApprovalDTO approvalDTO,
-                                                          @RequestPart(name="multipartFile", required = false) List<MultipartFile> multipartFile){
+    @PutMapping(value = "/approvals/{approvalNo}")
+    public ResponseEntity<ResponseDTO> updateApprovalTemp(@PathVariable(name = "approvalNo") String approvalNo,
+                                                          @RequestPart(name = "approvalDTO") ApprovalDTO approvalDTO,
+                                                          @RequestPart(name = "multipartFile", required = false) List<MultipartFile> multipartFile) {
 
         log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉재 임시저장 컨트롤러 들어왔어");
 
-        log.info("기존 approval Form : " + approvalNo.substring(5,8));
+        log.info("기존 approval Form : " + approvalNo.substring(5, 8));
         log.info("새로운 approval Form : " + approvalDTO.getFormNo());
 
         String newApprovalNo = "";
 
         //폼번호 바뀔경우 결재 번호도 바뀌어야함
-        if(!approvalNo.substring(5,8).equals(approvalDTO.getFormNo()))
-        {
+        if (!approvalNo.substring(5, 8).equals(approvalDTO.getFormNo())) {
             //전자결재 번호(연도+_양식번호+순번)
             int Year = LocalDate.now().getYear();
             String formNo = approvalDTO.getFormNo();
@@ -147,29 +145,46 @@ public class ApprovalController {
             log.info("lastApprovalNo : " + lastApprovalNo);
 
             String[] parts = lastApprovalNo.split("-");
-            String lastPart = parts[parts.length -1];
+            String lastPart = parts[parts.length - 1];
 
 
             String sequenceString = lastPart.replaceAll("\\D", "");
             log.info("sequenceString: " + sequenceString);
 
-            int sequenceNumber = Integer.parseInt(sequenceString) +1;
+            int sequenceNumber = Integer.parseInt(sequenceString) + 1;
             log.info("늘어난 번호 : " + sequenceNumber);
 
 
-            newApprovalNo = Year + "-" + formNo + String.format("%05d",sequenceNumber);
+            newApprovalNo = Year + "-" + formNo + String.format("%05d", sequenceNumber);
             log.info("새로운 approvalNo: " + newApprovalNo);
 
             approvalDTO.setApprovalNo(newApprovalNo);
 
 
-        }else{
+        } else {
             approvalDTO.setApprovalNo(approvalNo);
         }
 
+        //기안자사번
+        //현재 사용자의 인증 정보 가져오기
+        int memberId = 0;
+
+        //현재 사용자의 인증 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("memberId: " + authentication.getName());
+
+        //인증 정보에서 사용자의 식별 정보 가져오기
+        memberId = Integer.parseInt(authentication.getName());
+
+
+        log.info("현재 사용자 : " + memberId);
+
+        approvalDTO.setMemberId(memberId);
+
+
         //결재자번호(결재번호+_apr+순번)
         List<ApproverDTO> approverDTOList = approvalDTO.getApprover();
-        for(int i = 0; i < approverDTOList.size(); i++){
+        for (int i = 0; i < approverDTOList.size(); i++) {
             ApproverDTO approverDTO = approverDTOList.get(i);
             approverDTO.setApproverNo(approvalDTO.getApprovalNo() + "_apr" + String.format("%03d", (i + 1)));
             approverDTO.setApprovalNo(approvalDTO.getApprovalNo());
@@ -180,7 +195,7 @@ public class ApprovalController {
 
         //참조자번호(결재번호+_ref+순번)
         List<ReferencerDTO> referencerDTOList = approvalDTO.getReferencer();
-        for(int i = 0; i < referencerDTOList.size(); i++){
+        for (int i = 0; i < referencerDTOList.size(); i++) {
             ReferencerDTO referencerDTO = referencerDTOList.get(i);
             referencerDTO.setRefNo(approvalDTO.getApprovalNo() + "_ref" + String.format("%03d", (i + 1)));
             referencerDTO.setApprovalNo(approvalDTO.getApprovalNo());
@@ -188,7 +203,7 @@ public class ApprovalController {
         }
         approvalDTO.setReferencer(referencerDTOList);
 
-        List<AttachmentDTO> attachmentDTOList =  new ArrayList<>();
+        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
 
         String savePath = UPLOAD_DIR + FILE_DIR;
 
@@ -197,13 +212,13 @@ public class ApprovalController {
 //            multipartFile = Collections.emptyList();
 //        }
 
-        if(multipartFile!=null && !multipartFile.isEmpty()){
+        if (multipartFile != null && !multipartFile.isEmpty()) {
             log.info("multipartFile 있나요 : " + !multipartFile.isEmpty());
-            for(int i = 0; i < multipartFile.size(); i++){
+            for (int i = 0; i < multipartFile.size(); i++) {
                 MultipartFile oneFile = multipartFile.get(i);
 
                 AttachmentDTO attachmentDTO = new AttachmentDTO();
-                attachmentDTO.setFileNo(approvalDTO.getApprovalNo() + "_f" + String.format("%03d", (i +1)));
+                attachmentDTO.setFileNo(approvalDTO.getApprovalNo() + "_f" + String.format("%03d", (i + 1)));
                 attachmentDTO.setFileOriname(oneFile.getOriginalFilename());
                 attachmentDTO.setFileSavename(oneFile.getName());
                 attachmentDTO.setFileSavepath(savePath);
@@ -215,12 +230,12 @@ public class ApprovalController {
         }
         ApprovalDTO result = null;
 
-        try{
+        try {
             result = approvalService.updateApproval(approvalNo, approvalDTO, multipartFile);
             log.info("결재 임시저장 수정 결과 성공: " + result);
             return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "결재 임시저장 수정 결과 성공", result));
 
-        }catch(Exception e){
+        } catch (Exception e) {
             log.info("결재 임시저장 수정 결과 실패 : " + result);
             return ResponseEntity.badRequest().body(new ResponseDTO(HttpStatus.OK, e.getMessage(), result));
         }
@@ -231,7 +246,7 @@ public class ApprovalController {
     @PostMapping("/approvals")
     public ResponseEntity<ResponseDTO> insertApproval(@RequestPart("approvalDTO") ApprovalDTO approvalDTO,
                                                       @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile,
-                                                      @RequestHeader(name = "memberId", required = false) String memberIdstr){
+                                                      @RequestHeader(name = "memberId", required = false) String memberIdstr) {
 
         log.info("****컨트롤러 들어왔어");
         System.out.println("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉컨트롤러 들어왔어");
@@ -247,17 +262,17 @@ public class ApprovalController {
         log.info("lastApprovalNo : " + lastApprovalNo);
 
         String[] parts = lastApprovalNo.split("-");
-        String lastPart = parts[parts.length -1];
+        String lastPart = parts[parts.length - 1];
 
 
         String sequenceString = lastPart.replaceAll("\\D", "");
         log.info("sequenceString: " + sequenceString);
 
-        int sequenceNumber = Integer.parseInt(sequenceString) +1;
+        int sequenceNumber = Integer.parseInt(sequenceString) + 1;
         log.info("늘어난 번호 : " + sequenceNumber);
 
 
-        String approvalNo = Year + "-" + formNo + String.format("%05d",sequenceNumber);
+        String approvalNo = Year + "-" + formNo + String.format("%05d", sequenceNumber);
         log.info("approvalNo: " + approvalNo);
 
         approvalDTO.setApprovalNo(approvalNo);
@@ -267,7 +282,7 @@ public class ApprovalController {
         //현재 사용자의 인증 정보 가져오기
         int memberId = 0;
 
-        if(memberIdstr == null){
+        if (memberIdstr == null) {
             //현재 사용자의 인증 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             log.info("memberId: " + authentication.getName());
@@ -275,8 +290,7 @@ public class ApprovalController {
             //인증 정보에서 사용자의 식별 정보 가져오기
             memberId = Integer.parseInt(authentication.getName());
 
-        }
-        else{
+        } else {
             memberId = Integer.parseInt(memberIdstr);
         }
         log.info("현재 사용자 : " + memberId);
@@ -286,7 +300,7 @@ public class ApprovalController {
 
         //결재자번호(결재번호+_apr+순번)
         List<ApproverDTO> approverDTOList = approvalDTO.getApprover();
-        for(int i = 0; i < approverDTOList.size(); i++){
+        for (int i = 0; i < approverDTOList.size(); i++) {
             ApproverDTO approverDTO = approverDTOList.get(i);
             approverDTO.setApproverNo(approvalNo + "_apr" + String.format("%03d", (i + 1)));
             approverDTO.setApprovalNo(approvalNo);
@@ -297,7 +311,7 @@ public class ApprovalController {
 
         //참조자번호(결재번호+_ref+순번)
         List<ReferencerDTO> referencerDTOList = approvalDTO.getReferencer();
-        for(int i = 0; i < referencerDTOList.size(); i++){
+        for (int i = 0; i < referencerDTOList.size(); i++) {
             ReferencerDTO referencerDTO = referencerDTOList.get(i);
             referencerDTO.setRefNo(approvalNo + "_ref" + String.format("%03d", (i + 1)));
             referencerDTO.setApprovalNo(approvalNo);
@@ -305,7 +319,7 @@ public class ApprovalController {
         }
         approvalDTO.setReferencer(referencerDTOList);
 
-        List<AttachmentDTO> attachmentDTOList =  new ArrayList<>();
+        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
 
         String savePath = UPLOAD_DIR + FILE_DIR;
 
@@ -314,13 +328,13 @@ public class ApprovalController {
 //            multipartFile = Collections.emptyList();
 //        }
 
-        if(multipartFile!=null && !multipartFile.isEmpty()){
+        if (multipartFile != null && !multipartFile.isEmpty()) {
             log.info("multipartFile 있나요 : " + !multipartFile.isEmpty());
-            for(int i = 0; i < multipartFile.size(); i++){
+            for (int i = 0; i < multipartFile.size(); i++) {
                 MultipartFile oneFile = multipartFile.get(i);
 
                 AttachmentDTO attachmentDTO = new AttachmentDTO();
-                attachmentDTO.setFileNo(approvalNo + "_f" + String.format("%03d", (i +1)));
+                attachmentDTO.setFileNo(approvalNo + "_f" + String.format("%03d", (i + 1)));
                 attachmentDTO.setFileOriname(oneFile.getOriginalFilename());
                 attachmentDTO.setFileSavename(oneFile.getName());
                 attachmentDTO.setFileSavepath(savePath);
@@ -332,12 +346,12 @@ public class ApprovalController {
         }
         ApprovalDTO result = null;
 
-        try{
+        try {
             result = approvalService.insertApproval(approvalDTO, multipartFile);
             log.info("결재 기안 결과 성공: " + result);
             return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 기안 성공", result));
 
-        }catch(Exception e){
+        } catch (Exception e) {
             log.info("결재 기안 결과 실패 : " + result);
             return ResponseEntity.badRequest().body(new ResponseDTO(HttpStatus.OK, e.getMessage(), result));
         }
@@ -347,8 +361,7 @@ public class ApprovalController {
     @Tag(name = "전자결재 처리", description = "결재처리")
     @PutMapping("/approvers/{approverNo}")
     public ResponseEntity<ResponseDTO> updateApprover(@PathVariable(name = "approverNo") String approverNo,
-                                                      @RequestBody ApproverDTO approverDTO){
-
+                                                      @RequestBody ApproverDTO approverDTO) {
 
 
         Map<String, String> statusMap = new HashMap<>();
@@ -361,7 +374,7 @@ public class ApprovalController {
 
     @Tag(name = "전자결재 삭제", description = "전자결재 임시저장 삭제")
     @DeleteMapping("/approvals/{approvalNo}")
-    public ResponseEntity<ResponseDTO> deleteApproval(@PathVariable(name="approvalNo") String approvalNo){
+    public ResponseEntity<ResponseDTO> deleteApproval(@PathVariable(name = "approvalNo") String approvalNo) {
 
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 삭제 성공",
                 approvalService.approvalDelete(approvalNo)));
@@ -369,17 +382,16 @@ public class ApprovalController {
 
 
     @GetMapping("/approvals/members/{memberId}")
-    public ResponseEntity<ResponseDTO> selectMember(@PathVariable(name="memberId") int memberId){
+    public ResponseEntity<ResponseDTO> selectMember(@PathVariable(name = "memberId") int memberId) {
 
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "사원 조회 성공",
                 approvalService.selectMember(memberId)));
     }
 
     @GetMapping("/approvals/members")
-    public ResponseEntity<ResponseDTO> selectAllMembers(){
+    public ResponseEntity<ResponseDTO> selectAllMembers() {
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전 사원 부서순 조회 성공",
                 approvalService.selectAllMemberList()));
-
 
 
     }
