@@ -408,6 +408,8 @@ public class ApprovalService {
 
             finalApproverDate = approverInfo.map(Approver::getApproverDate).orElse(null).format(formatter);
 
+        } else if (approval.getApprovalStatus() == "임시저장" || approval.getApprovalStatus().equals("임시저장")){
+            finalApproverDate = approval.getApprovalDate().format(formatter);
         }
         log.info("마지막 " + approval.getApprovalStatus() + " 날짜 :  " + finalApproverDate);
         //진행중인 사람
@@ -435,11 +437,22 @@ public class ApprovalService {
     public ApprovalDTO updateApproval(String approvalNo, ApprovalDTO approvalDTO, List<MultipartFile> files) {
 
         int result = 0;
+        log.info("기존 approvalNo : " + approvalNo);
+        System.out.println("기존 approvalNo : " + approvalNo);
+        log.info("새로운 approvalNo : " + approvalDTO.getApprovalNo());
+        System.out.println("새로운 approvalNo : " + approvalDTO.getApprovalNo());
 
         Optional<Approval> optionalApproval = approvalRepository.findById(approvalNo);
 
         if (optionalApproval.isPresent()) {
             Approval existingApproval = optionalApproval.get();
+
+            approverRepository.deleteByApprovalNo(approvalNo);
+            referencerRepository.deleteByApprovalNo(approvalNo);
+            attachmentRepository.deleteByApprovalNo(approvalNo);
+
+            //기존 approval 삭제
+            approvalRepository.delete(existingApproval);
 
             ApprovalBuilder approvalBuilder = new ApprovalBuilder(existingApproval)
                     .approvalNo(approvalDTO.getApprovalNo())
@@ -458,68 +471,79 @@ public class ApprovalService {
             approvalRepository.save(updateApproval);
 
             // Approver 수정
+            //기존 결재선 삭제 후 새 결재선 추가
+//            approverRepository.deleteByApprovalNo(approvalNo);
+
             // 첫 결재자(기안자) 수정
-            Optional<Approver> optionalFirstApprover = approverRepository.findByApproverNo(approvalNo.concat("_apr000"));
-
-
-            Approver firstApprover = optionalFirstApprover.get();
-
-            Approver senderApprover = new ApproverBuilder(firstApprover)
-                    .approverNo(approvalDTO.getApprovalNo().concat("_apr000"))
-                    .approverOrder(0)
-                    .approverStatus("승인")
-                    .approverDate(now())
-                    .memberId(approvalDTO.getMemberId())
-                    .builder();
+            Approver senderApprover = new Approver(
+                    approvalDTO.getApprovalNo().concat("_apr000"),
+                    approvalDTO.getApprovalNo(),
+                    0,
+                    "승인",
+                    now(),
+                    approvalDTO.getMemberId()
+            );
 
             approverRepository.save(senderApprover);
 
+            //새 결재선 꺼내기
+            for (int i = 0; i < approvalDTO.getApprover().size(); i++) {
 
-            //기존 결재선 불러오기
-            List<Approver> existingApprovers = approverRepository.findByApprovalNo(approvalNo);
-            //결재선 꺼내기
-            List<ApproverDTO> approverDTOList = approvalDTO.getApprover();
 
-            for (Approver existingApprover : existingApprovers) {
-                if (existingApprover.getApproverOrder() == 0) {
-                    continue;           //0번째 결재자는 제외
-                }
-                for (int i = 0; i < approverDTOList.size(); i++) {
-                    ApproverDTO approverDTO = approverDTOList.get(i);
-                    Approver updatedApprover = new ApproverBuilder(existingApprover)
-                            .memberId(approverDTO.getMemberId())
-                            .approverNo(approverDTO.getApproverNo())
-                            .approverOrder(approverDTO.getApproverOrder())
-                            .approvalNo(approvalDTO.getApprovalNo())
-                            .approverStatus(approverDTO.getApproverStatus())
-                            .builder();
-                    approverRepository.save(updatedApprover);
-                }
+                Approver approvers = new Approver(
+                        approvalDTO.getApprover().get(i).getApproverNo(),
+                        approvalDTO.getApprover().get(i).getApprovalNo(),
+                        approvalDTO.getApprover().get(i).getApproverOrder(),
+                        approvalDTO.getApprover().get(i).getApproverStatus(),
+                        null,
+                        approvalDTO.getApprover().get(i).getMemberId()
+                );
+
+                //Approver 엔티티 저장
+                approverRepository.save(approvers);
+            }
+
+            // 참조선 수정
+            // 기존 참조선 삭제
+//            referencerRepository.deleteByApprovalNo(approvalNo);
+
+            //새 참조선 꺼내기
+            for (int i = 0; i < approvalDTO.getReferencer().size(); i++) {
+                Referencer referencer = new Referencer(
+                        approvalDTO.getReferencer().get(i).getRefNo(),
+                        approvalDTO.getReferencer().get(i).getApprovalNo(),
+                        approvalDTO.getReferencer().get(i).getMemberId(),
+                        approvalDTO.getReferencer().get(i).getRefOrder()
+                );
+
+                //Referencer 엔티티 저장
+                referencerRepository.save(referencer);
             }
 
 
-            //기존 참조선 불러오기
-            List<Referencer> existingReferencers = referencerRepository.findByApprovalNo(approvalNo);
-            //참조선 꺼내기
-            List<ReferencerDTO> referencerDTOList =  approvalDTO.getReferencer();
-            for (Referencer existingReferencer : existingReferencers) {
-                for (int i = 0; i <referencerDTOList.size(); i++) {
-                    ReferencerDTO referencerDTO = referencerDTOList.get(i);
-                    Referencer updatedReferencer = new ReferencerBuilder(existingReferencer)
-                            .refNo(referencerDTO.getRefNo())
-                            .approvalNo(referencerDTO.getApprovalNo())
-                            .memberId(referencerDTO.getMemberId())
-                            .refOrder(referencerDTO.getRefOrder())
-                            .builder();
+            // 첨부파일 수정
 
-                    referencerRepository.save(updatedReferencer);
-                }
-            }
 
             // 기존 파일 불러오기
             List<Attachment> existingAttachments = attachmentRepository.findByApprovalNo(approvalNo);
             // 파일 꺼내기
             List<AttachmentDTO> attachmentList = approvalDTO.getAttachment();
+            //기존 첨부파일 삭제
+            List<Map<String, String>> existingAttachmentList = new ArrayList<>();
+            Map<String, String> existingAttachmentMap = new HashMap<>();
+
+            for (Attachment existingAttachment : existingAttachments) {
+                existingAttachmentMap.put("saveFilename", existingAttachment.getFileSavename());
+                existingAttachmentList.add(existingAttachmentMap);
+//                attachmentRepository.delete(existingAttachment);
+            }
+
+            try {
+                deleteFile(existingAttachmentList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
 //        String savePath = UPLOAD_DIR + FILE_DIR;
 
@@ -571,32 +595,15 @@ public class ApprovalService {
 
                         fileList.add(fileMap);
 
-                        //기존 파일 삭제
-                        List<Map<String, String>> existFileList = new ArrayList<>();
-                        for(Attachment existAttachment : existingAttachments){
-                            Map<String, String> existFileMap = new HashMap<>();
-                            existFileMap.put("savedFileName", existAttachment.getFileSavename());
-                            existFileList.add(existFileMap);
-                        }
-                        deleteFile(existFileList);
 
-                        //파일 DB에서도 삭제
-                        attachmentRepository.deleteByApprovalNo(approvalNo);
-
-
-                        //새 파일 정보 저장
-                        Attachment newAttachment = new AttachmentBuilder()
-                                .fileNo(attachmentDTO.getFileNo())
-                                .fileOriname(attachmentDTO.getFileOriname())
-                                .fileSavename(attachmentDTO.getFileSavename())
-                                .fileSavepath(savePath)
-                                .approvalNo(attachmentDTO.getApprovalNo())
-                                .builder();
+                        Attachment attachment = modelMapper.map(attachmentDTO, Attachment.class);
 
                         //** 첨부파일정보 DB에 저장
-                        attachmentRepository.save(newAttachment);
+                        attachmentRepository.save(attachment);
 
                     }
+
+
                     result = 1;
 
                 } catch (IOException e) {
@@ -612,8 +619,7 @@ public class ApprovalService {
                     }
                 }
 
-
-            } else {
+            }else {
                 result = 1;
             }
         }

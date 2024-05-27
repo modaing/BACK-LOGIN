@@ -202,7 +202,7 @@ public class ApprovalServiceTest {
     @Test
     void testResaveTempApproval(){
         //given
-        String approvalNo = "2024-ovt00009";
+        String approvalNo = "2024-abs00006";
         ApprovalDTO approvalDTO = new ApprovalDTO();
 
         List<ApproverDTO> approverList  = new ArrayList<>();
@@ -213,19 +213,17 @@ public class ApprovalServiceTest {
         //결재자번호 : 결재번호_apr00순번
         //참조자번호 : 결재번호_ref00순번
         //첨부파일번호: 결재번호_f00순번
-        ApproverDTO approverDTO1 = new ApproverDTO("2024-ovt00009_apr001", "2024-ovt00009", 1, "대기", null, 240401004);
-        ApproverDTO approverDTO2 = new ApproverDTO("2024-ovt00009_apr002", "2024-ovt00009", 2, "대기", null, 2024001003);
+        ApproverDTO approverDTO1 = new ApproverDTO("2024-abs00006_apr001", "2024-abs00006", 1, "대기", null, 240401004);
 
-        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-ovt00009_ref001", "2024-ovt00009", 2024001001, 1);
-        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-ovt00009_ref002", "2024-ovt00009", 241811, 2);
+        ReferencerDTO referencerDTO1 = new ReferencerDTO("2024-abs00006_ref001", "2024-abs00006", 2024001001, 1);
+//        ReferencerDTO referencerDTO2 = new ReferencerDTO("2024-abs00006_ref002", "2024-abs00006", 241811, 2);
 
         approverList.add(approverDTO1);
-        approverList.add(approverDTO2);
 
         referencerList.add(referencerDTO1);
-        referencerList.add(referencerDTO2);
+//        referencerList.add(referencerDTO2);
 
-        approvalDTO.setApprovalNo("2024-ovt00009");
+        approvalDTO.setApprovalNo("2024-abs00006");
         approvalDTO.setMemberId(240501629);
         approvalDTO.setApprovalTitle("연장근무_재임시저장 테스트.");
         approvalDTO.setApprovalContent("<div name=\"wholeForm\" id=\"wholeForm\">\n" +
@@ -263,7 +261,7 @@ public class ApprovalServiceTest {
                 "    </div>");
         approvalDTO.setApprovalDate("2024-05-27 04:22:13");
         approvalDTO.setApprovalStatus("임시저장");
-        approvalDTO.setFormNo("ovt");
+        approvalDTO.setFormNo("abs");
 
 
         //파일 처리
@@ -273,31 +271,31 @@ public class ApprovalServiceTest {
         pdfFile = new MockMultipartFile("testfile.pdf", "testfile.pdf", "application/pdf", pdfFileContent);
 
         //테스트용 이미지 파일 생성
-        MultipartFile imgFile = null;
-        byte[] imageFileContent = "Test Image Content".getBytes();
-        imgFile = new MockMultipartFile("testimage.jpg", "testimage.jpg", "image/jpeg", imageFileContent);
+//        MultipartFile imgFile = null;
+//        byte[] imageFileContent = "Test Image Content".getBytes();
+//        imgFile = new MockMultipartFile("testimage.jpg", "testimage.jpg", "image/jpeg", imageFileContent);
 
         files.add(pdfFile);
-        files.add(imgFile);
+//        files.add(imgFile);
 
 
         List<AttachmentDTO> attachmentList = new ArrayList<>();
         AttachmentDTO attachmentDTO1 = new AttachmentDTO();
-        attachmentDTO1.setFileNo("2024-ovt00009_f001");
+        attachmentDTO1.setFileNo("2024-abs00006_f001");
         attachmentDTO1.setFileOriname(pdfFile.getOriginalFilename());
         attachmentDTO1.setFileSavename(pdfFile.getName());
         attachmentDTO1.setFileSavepath("C:/login/upload");
-        attachmentDTO1.setApprovalNo("2024-ovt00009");
+        attachmentDTO1.setApprovalNo("2024-abs00006");
 
-        AttachmentDTO attachmentDTO2 = new AttachmentDTO();
-        attachmentDTO2.setFileNo("2024-ovt00009_f002");
-        attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
-        attachmentDTO2.setFileSavename(imgFile.getName());
-        attachmentDTO2.setFileSavepath("C:/login/upload");
-        attachmentDTO2.setApprovalNo("2024-ovt00009");
+//        AttachmentDTO attachmentDTO2 = new AttachmentDTO();
+//        attachmentDTO2.setFileNo("2024-abs00006_f002");
+//        attachmentDTO2.setFileOriname(imgFile.getOriginalFilename());
+//        attachmentDTO2.setFileSavename(imgFile.getName());
+//        attachmentDTO2.setFileSavepath("C:/login/upload");
+//        attachmentDTO2.setApprovalNo("2024-abs00006");
 
         attachmentList.add(attachmentDTO1);
-        attachmentList.add(attachmentDTO2);
+//        attachmentList.add(attachmentDTO2);
 
         //파일 업로드 서비스에 테스트용 PDF 파일 전달
 

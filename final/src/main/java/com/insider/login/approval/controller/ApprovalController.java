@@ -123,7 +123,7 @@ public class ApprovalController {
     @Tag(name = "전자결재 재 임시저장", description = "재 임시저장")
     @PutMapping(value="/approvals/{approvalNo}")
     public ResponseEntity<ResponseDTO> updateApprovalTemp(@PathVariable(name="approvalNo") String approvalNo,
-                                                          @RequestPart(name="ApprovalDTO") ApprovalDTO approvalDTO,
+                                                          @RequestPart(name="approvalDTO") ApprovalDTO approvalDTO,
                                                           @RequestPart(name="multipartFile", required = false) List<MultipartFile> multipartFile){
 
         log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉재 임시저장 컨트롤러 들어왔어");
@@ -163,6 +163,8 @@ public class ApprovalController {
             approvalDTO.setApprovalNo(newApprovalNo);
 
 
+        }else{
+            approvalDTO.setApprovalNo(approvalNo);
         }
 
         //결재자번호(결재번호+_apr+순번)
@@ -201,11 +203,11 @@ public class ApprovalController {
                 MultipartFile oneFile = multipartFile.get(i);
 
                 AttachmentDTO attachmentDTO = new AttachmentDTO();
-                attachmentDTO.setFileNo(approvalNo + "_f" + String.format("%03d", (i +1)));
+                attachmentDTO.setFileNo(approvalDTO.getApprovalNo() + "_f" + String.format("%03d", (i +1)));
                 attachmentDTO.setFileOriname(oneFile.getOriginalFilename());
                 attachmentDTO.setFileSavename(oneFile.getName());
                 attachmentDTO.setFileSavepath(savePath);
-                attachmentDTO.setApprovalNo(approvalNo);
+                attachmentDTO.setApprovalNo(approvalDTO.getApprovalNo());
 
                 attachmentDTOList.add(attachmentDTO);
             }

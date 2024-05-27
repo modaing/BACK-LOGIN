@@ -12,6 +12,8 @@ public class ReferencerBuilder {
 
     private int refOrder;           // 참조 순번
 
+
+    public ReferencerBuilder() {}
     public ReferencerBuilder(String refNo) {
         this.refNo = refNo;
     }

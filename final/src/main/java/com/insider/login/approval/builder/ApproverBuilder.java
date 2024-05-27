@@ -13,6 +13,9 @@ public class ApproverBuilder {
     private LocalDateTime approverDate; // 결재처리 일시
     private int memberId;               // 결재자 사번
 
+
+    public ApproverBuilder () {}
+
     public ApproverBuilder(String approverNo){
         this.approverNo = approverNo;
     }
