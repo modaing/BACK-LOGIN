@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SubmitAndCalendarRepository extends JpaRepository<SubmitAndCalendar, Integer> {
 
+    SubmitAndCalendar findByLeaveSubNo(int refLeaveSubNo);
 }
