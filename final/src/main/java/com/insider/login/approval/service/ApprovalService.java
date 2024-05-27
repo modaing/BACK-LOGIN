@@ -366,6 +366,8 @@ public class ApprovalService {
             if (approverList.get(i).getApproverDate() != null) {
                 //날짜가 null이 아닐때
                 approverFormattedDateTime = approverList.get(i).getApproverDate().format(formatter);
+            }else{
+
             }
             //날짜 포맷
 
