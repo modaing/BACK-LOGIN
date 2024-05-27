@@ -16,7 +16,7 @@ Content-Type: application/json
   "imageUrl": "이미지 경로들어갈 곳!!!!!!",
   "address": "중구",
   "email": "1111111111@naver.com",
-  "name": "김생일",
+  "name": "김멤버",
   "password": "0000",
   "birthday": "1997-01-20",
   "gender": "m",
@@ -25,7 +25,7 @@ Content-Type: application/json
     "positionLevel": "90"
   },
   "phoneNo": "01012341234",
-  "role": "ADMIN"
+  "role": "MEMBER"
 }
 
 --WebAppBoundary

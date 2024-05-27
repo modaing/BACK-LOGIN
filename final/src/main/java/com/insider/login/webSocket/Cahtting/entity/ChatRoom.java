@@ -27,7 +27,6 @@ public class ChatRoom {
     @Column(name = "room_name")
     private String roomName;
 
-
     @Enumerated(value = EnumType.STRING)
     private RoomStatus roomStatus = RoomStatus.ENTER;
 
