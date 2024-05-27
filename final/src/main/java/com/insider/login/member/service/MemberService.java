@@ -110,6 +110,7 @@ public class MemberService {
                 System.out.println("3년뒤에 구성원 정보가 탈퇴됩니다");
             }
 
+            /* 부서와 직급이 다를 때 */
             if (!specificMember.getDepartmentDTO().getDepartName().equals(checkPositionOrDepartment.getDepartmentDTO().getDepartName()) || !specificMember.getPositionDTO().getPositionName().equals(checkPositionOrDepartment.getPositionDTO().getPositionName())) {
                 TransferredHistoryDTO transferredHistoryDTO = new TransferredHistoryDTO();
                 transferredHistoryDTO.setNewDepartNo(updatedMember.getDepartment().getDepartNo());
@@ -118,11 +119,19 @@ public class MemberService {
                 transferredHistoryDTO.setTransferredDate(LocalDate.now());
                 TransferredHistory updatedTransferredHistoryRecord = modelMapper.map(transferredHistoryDTO, TransferredHistory.class);
                 transferredHistoryRepository.save(updatedTransferredHistoryRecord);
+
+                /* update를 하기 위해서 구성원의 정보를 가져와서 setting하는 logic */
                 Member memberDetails = memberRepository.findById(specificMember.getMemberId()).orElse(null);
-                MemberDTO detailsToChange = modelMapper.map(memberDetails, MemberDTO.class);
-                detailsToChange.setDepartmentDTO(specificMember.getDepartmentDTO());
-                detailsToChange.setPositionDTO(specificMember.getPositionDTO());
-                Member detailsToSave = modelMapper.map(detailsToChange, Member.class);
+                MemberDTO originDetails = modelMapper.map(memberDetails, MemberDTO.class);
+                modelMapper.map(updatedMember, originDetails);
+                System.out.println("origin details: " + originDetails);
+                System.out.println("details to be updatted: " + updatedMember);
+//                detailsToChange.setDepartmentDTO(specificMember.getDepartmentDTO());
+//                detailsToChange.setPositionDTO(specificMember.getPositionDTO());
+                Member detailsToSave = modelMapper.map(updatedMember, Member.class);
+                System.out.println("😭😭😭😭😭😭");
+                System.out.println("updatedMember: " + updatedMember);
+                System.out.println("detailsToChange information: " + updatedMember);
                 memberRepository.save(detailsToSave);
                 //                memberDetails.setDepartment(specificMember.getDepartmentDTO());
                 System.out.println("transferred history saved and changed department or position data");
@@ -275,4 +284,10 @@ public class MemberService {
         MemberDTO currentMember = modelMapper.map(memberDetail, MemberDTO.class);
         return currentMember;
     }
+
+//    public List<MemberDTO> findMemberList(String findByDepartNo) {
+//        MemberDTO memberDTO = new MemberDTO();
+//        memberDTO.setDepartmentDTO();
+//        memberRepository.findBy()
+//    }
 }

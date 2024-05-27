@@ -486,4 +486,10 @@ public class MemberController {
             return ResponseEntity.ok("Login successful");
         }
     }
+
+//    @GetMapping("/departmentAndPosition/{departNo}")
+//    public List<MemberDTO> getMemberByDepartNo(@PathVariable("departNo") String findByDepartNo) {
+//        System.out.println("finding departNo: " + findByDepartNo);
+//        List<MemberDTO> memberDTOList = memberService.findMemberList(findByDepartNo);
+//    }
 }
