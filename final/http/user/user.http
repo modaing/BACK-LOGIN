@@ -16,8 +16,10 @@ Content-Type: application/json
   "imageUrl": "이미지 경로들어갈 곳!!!!!!",
   "address": "중구",
   "email": "1111111111@naver.com",
-  "name": "박곱창",
+  "name": "김생일",
   "password": "0000",
+  "birthday": "1997-01-20",
+  "gender": "m",
   "positionDTO": {
     "positionName": "알바",
     "positionLevel": "90"

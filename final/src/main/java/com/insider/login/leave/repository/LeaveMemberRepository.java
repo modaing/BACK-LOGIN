@@ -16,4 +16,10 @@ public interface LeaveMemberRepository extends JpaRepository<LeaveMember, Intege
 
     @Query("SELECT m FROM LeaveMember m WHERE m.name LIKE %:name%")
     List<LeaveMember> findByName(@Param("name") String name);
+
+    @Query("SELECT m.departNo FROM LeaveMember m WHERE m.memberId = :memberId")
+    int findDepartNoByMemberId(@Param("memberId") int memberId);
+
+    @Query("SELECT m.positionLevel FROM LeaveMember m WHERE m.memberId = :memberId")
+    String findPositionLevelByMemberId(@Param("memberId") int memberId);
 }
