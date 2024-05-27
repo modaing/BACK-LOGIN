@@ -185,7 +185,7 @@ public class CommuteService {
     public Map<String, Object> insertRequestForCorrect(CorrectionDTO newCorrection) {
 
         log.info("[CommuteService] insertRequestForCorrect");
-        log.info("[CommuteService] newCorrection : ", newCorrection);
+        log.info("[CommuteService] newCorrection : {}", newCorrection);
 
         Map<String, Object> result = new HashMap<>();
 
@@ -232,13 +232,15 @@ public class CommuteService {
 
                 /** 2-2. 나머지 경우 (퇴근 시간이 존재하지 않는데 퇴근 시간 정정 요청하는 경우, 출근 시간과 퇴근 시간을 모두 요청하는 경우) */
                 } else {
-                    System.out.println("출퇴근 정정 요청 error !!!!!!!!!!!!!!!!!!");
+                    System.out.println("나머지 경우 : {} " + newCorrection);
+                    System.out.println("출퇴근 정정 요청 error !!!!!!!!!!!!!!!!!! + 클라이언트 서버에서 정정 요청 퇴근 시간 입력 필드 보이지 않도록 처리");
                 }
 
-            /** 3. 출퇴근 내역이 존재하지 않는 경우 => 해당 일자에 근무를 했지만, 실수로 출퇴근을 입력하지 않고 날짜가 지나간 경우에 필요 */
+            /** 3. 출퇴근 내역이 존재하지 않는 경우 => 해당 일자에 근무를 했지만, 실수로 출퇴근을 입력하지 않고 날짜가 지나간 경우에 필요 => 오류로 인해 다른 로직으로 변경 */
             } else {
-                correctionDTO.setReqStartWork(newCorrection.getReqStartWork());
-                correctionDTO.setReqEndWork(newCorrection.getReqEndWork());
+//                correctionDTO.setReqStartWork(newCorrection.getReqStartWork());
+//                correctionDTO.setReqEndWork(newCorrection.getReqEndWork());
+                System.out.println("기존 출퇴근 내역이 null!!!!!!!!!!!");
             }
 
             correctionRepository.save(modelMapper.map(correctionDTO, Correction.class));
@@ -459,7 +461,7 @@ public class CommuteService {
         departDTOList.forEach(System.out::println);
 
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("correction", correctionDTOList);
+//        responseMap.put("correction", correctionDTOList);
         responseMap.put("currentPage", correctionPage.getNumber());
         responseMap.put("totalItems", correctionPage.getTotalElements());
         responseMap.put("totalPages", correctionPage.getTotalPages());
@@ -500,7 +502,7 @@ public class CommuteService {
         Map<String, Object> responseMap = new HashMap<>();
 
         if (commuteList != null) {
-            responseMap.put("correction",correctionDTOPage.getContent());
+//            responseMap.put("correction",correctionDTOPage.getContent());
             responseMap.put("currentPage", correctionDTOPage.getNumber());
             responseMap.put("totalItems", correctionDTOPage.getTotalElements());
             responseMap.put("totalPages", correctionDTOPage.getTotalPages());
