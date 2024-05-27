@@ -1,17 +1,14 @@
 package com.insider.login.leave.service;
 
+import com.insider.login.calendar.dto.CalendarDTO;
+import com.insider.login.calendar.entity.Calendar;
+import com.insider.login.calendar.repository.CalendarRepository;
 import com.insider.login.department.entity.Department;
 import com.insider.login.department.repository.DepartmentRepository;
-import com.insider.login.leave.dto.LeaveInfoDTO;
-import com.insider.login.leave.dto.LeaveMemberDTO;
-import com.insider.login.leave.entity.LeaveMember;
-import com.insider.login.leave.entity.Leaves;
+import com.insider.login.leave.dto.*;
+import com.insider.login.leave.entity.*;
 import com.insider.login.leave.repository.*;
 import com.insider.login.leave.util.LeaveUtil;
-import com.insider.login.leave.dto.LeaveAccrualDTO;
-import com.insider.login.leave.dto.LeaveSubmitDTO;
-import com.insider.login.leave.entity.LeaveAccrual;
-import com.insider.login.leave.entity.LeaveSubmit;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -20,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,14 +32,20 @@ public class LeaveService extends LeaveUtil {
     private final ModelMapper modelMapper;
     private final LeaveMemberRepository memberRepository;
     private final DepartmentRepository departmentRepository;
+    private final LeavePositionRepository positionRepository;
+    private final CalendarRepository calendarRepository;
+    private final SubmitAndCalendarRepository submitAndCalendarRepository;
 
-    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper, LeaveMemberRepository memberRepository, DepartmentRepository departmentRepository) {
+    public LeaveService(LeaveAccrualRepository leaveAccrualRepository, LeaveRepository leaveRepository, LeaveSubmitRepository leaveSubmitRepository, ModelMapper modelMapper, LeaveMemberRepository memberRepository, DepartmentRepository departmentRepository, LeavePositionRepository positionRepository, CalendarRepository calendarRepository, SubmitAndCalendarRepository submitAndCalendarRepository) {
         this.leaveAccrualRepository = leaveAccrualRepository;
         this.leaveRepository = leaveRepository;
         this.leaveSubmitRepository = leaveSubmitRepository;
         this.modelMapper = modelMapper;
         this.memberRepository = memberRepository;
         this.departmentRepository = departmentRepository;
+        this.positionRepository = positionRepository;
+        this.calendarRepository = calendarRepository;
+        this.submitAndCalendarRepository = submitAndCalendarRepository;
     }
 
     public Page<LeaveSubmitDTO> selectLeaveSubmitList(int applicantId, Pageable pageable) {
@@ -169,13 +174,7 @@ public class LeaveService extends LeaveUtil {
 
             // 조회된 부서 번호로 부서 이름 찾기
             for (LeaveMemberDTO DTO : DTOList) {
-                Optional<Department> departmentOptional = departmentRepository.findById(DTO.getDepartNo());
-                if (departmentOptional.isPresent()) {
-                    Department department = departmentOptional.get();
-                    DTO.setDepartment(department.getDepartName());
-                } else {
-                    DTO.setDepartment("없음");
-                }
+                DTO.setDepartment(getDepartment(DTO.getDepartNo()));
             }
 
             return DTOList;
@@ -204,11 +203,14 @@ public class LeaveService extends LeaveUtil {
             newSubmit.setLeaveSubStatus(leaveSubmitDTO.getLeaveSubStatus());
             newSubmit.setLeaveSubProcessDate(leaveSubmitDTO.getLeaveSubProcessDate());
 
-                // 반려시 반려 사유 세팅
+            // 반려시 반려 사유 세팅
             if ("반려".equals(leaveSubmitDTO.getLeaveSubStatus())) {
                 newSubmit.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
             }
 
+            LeaveSubmit updatedSubmit;
+
+            // 상위 신청 번호가 있는 경우 취소요청에 대한 처리로 간주
             if (newSubmit.getRefLeaveSubNo() != 0) {
 
                 LeaveSubmitDTO refSubmit = modelMapper.map(leaveSubmitRepository.findById(newSubmit.getRefLeaveSubNo()), LeaveSubmitDTO.class);
@@ -219,12 +221,31 @@ public class LeaveService extends LeaveUtil {
                 } else {
                     // 취소 신청 반려 시 상위 신청 번호의 처리 상태를 승인으로 복구
                     refSubmit.setLeaveSubStatus("취소반려");
+                    // 반려 사유 세팅
+                    refSubmit.setLeaveSubReason(leaveSubmitDTO.getLeaveSubReason());
                 }
-                leaveSubmitRepository.save(modelMapper.map(refSubmit, LeaveSubmit.class));
+                updatedSubmit = leaveSubmitRepository.save(modelMapper.map(refSubmit, LeaveSubmit.class));
+
+            } else {
+                //신청 업데이트
+                updatedSubmit = leaveSubmitRepository.save(modelMapper.map(newSubmit, LeaveSubmit.class));
             }
 
-            //신청 업데이트
-            leaveSubmitRepository.save(modelMapper.map(newSubmit, LeaveSubmit.class));
+            if ("승인".equals(updatedSubmit.getLeaveSubStatus())) {
+                log.info("check 승인 후 일정 등록 로직 수행");
+                // 승인 시 해당 휴가 일정을 캘린더에 등록
+                CalendarDTO check0 = submitCalendar(updatedSubmit);
+                log.info("check 0 {}", check0);
+                Calendar check1 = modelMapper.map(check0, Calendar.class);
+                log.info("check 1 Calendar {}", check1);
+                Calendar calendar = calendarRepository.save(check1);
+                log.info("check 2");
+                SubmitAndCalendarDTO submitAndCalendarDTO = new SubmitAndCalendarDTO(updatedSubmit.getLeaveSubNo(), calendar.getCalendarNo());
+                log.info("check 3");
+                submitAndCalendarRepository.save(modelMapper.map(submitAndCalendarDTO, SubmitAndCalendar.class));
+                log.info("check 4");
+            }
+
 
             return "휴가처리 성공";
         } catch (Exception e) {
@@ -282,5 +303,80 @@ public class LeaveService extends LeaveUtil {
         DTO.setRemainingDays(remainingDays);
 
         return DTO;
+    }
+
+    public Map<String, String> getMemberInfo(int memberId) {
+        log.info("check3 0 getMemberInfo 진입");
+        String name = memberRepository.findNameByMemberId(memberId);
+        log.info("check3 1 {}", name);
+        int departNo = memberRepository.findDepartNoByMemberId(memberId);
+        log.info("check3 2 {}", departNo);
+        String department = getDepartment(departNo);
+
+        String positionLevel = memberRepository.findPositionLevelByMemberId(memberId);
+        log.info("check3 4 {}", positionLevel);
+        String position = positionRepository.findPositionNameByPositionLevel(positionLevel);
+        log.info("check3 5 {}", position);
+
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("name", name);
+        map.put("department", department);
+        map.put("position", position);
+
+        return map;
+    }
+
+    public String getDepartment(int departNo) {
+        Optional<Department> departmentOptional = departmentRepository.findById(departNo);
+        if (departmentOptional.isPresent()) {
+            Department department = departmentOptional.get();
+            return department.getDepartName();
+        } else {
+            return "없음";
+        }
+    }
+
+    public Map<String, LocalDateTime> getCalendarDateTime(LeaveSubmit updatedSubmit) {
+
+        Map<String, LocalDateTime> map = new HashMap<>();
+
+        // 일정 시작 시간 설정
+        LocalDate startDate = updatedSubmit.getLeaveSubStartDate();
+        LocalDateTime startTime = "오후반차".equals(updatedSubmit.getLeaveSubType())
+                ? startDate.atTime(14, 0)
+                : startDate.atTime(9, 0);
+
+        // 일정 종료 시간 설정
+        LocalDate endDate = updatedSubmit.getLeaveSubEndDate();
+        LocalDateTime endTime = "오전반차".equals(updatedSubmit.getLeaveSubType())
+                ? endDate.atTime(13, 0)
+                : endDate.atTime(18, 0);
+
+        map.put("start", startTime);
+        map.put("end", endTime);
+
+        return map;
+    }
+
+    public CalendarDTO submitCalendar(LeaveSubmit updatedSubmit) {
+        log.info("check2 0 submitCalendar 진입");
+        Map<String, String> memberInfo = getMemberInfo(updatedSubmit.getLeaveSubApplicant());
+        log.info("check2 1 {}", memberInfo);
+        Map<String, LocalDateTime> calendarDateTime = getCalendarDateTime(updatedSubmit);
+        log.info("check2 2 {}", calendarDateTime);
+
+        // 일정 등록 DTO 세팅
+        CalendarDTO calendarDTO = new CalendarDTO();
+
+        calendarDTO.setCalendarName(memberInfo.get("department") + " " + memberInfo.get("name") + " " + memberInfo.get("position") + " 휴가");
+        calendarDTO.setCalendarStart(calendarDateTime.get("start"));
+        calendarDTO.setCalendarEnd(calendarDateTime.get("end"));
+        calendarDTO.setColor("red");
+        calendarDTO.setDepartment(memberInfo.get("department"));
+        calendarDTO.setRegistrantId(241201001);
+
+        return calendarDTO;
     }
 }
