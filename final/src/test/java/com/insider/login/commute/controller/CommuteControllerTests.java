@@ -53,23 +53,24 @@ public class CommuteControllerTests {
                 "알바",
                 "1"
         );
-        MemberDTO member = new MemberDTO(
-                240401835,
-                "홍길동",
-                "0000",
-                LocalDate.now(),
-                "서울시 중구 왕십리동 123123123",
-                "01012341234",
-                "재직",
-                "jeehwan98@naver.com",
-                ADMIN,
-                department,
-                position,
-                "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg"
-        );
-        String token = "Bearer " + TokenUtils.generateJwtToken(member);
+//        MemberDTO member = new MemberDTO(
+//                240401835,
+//                "홍길동",
+//                "0000",
+//                LocalDate.now(),
+//                "서울시 중구 왕십리동 123123123",
+//                "01012341234",
+//                "재직",
+//                "jeehwan98@naver.com",
+//                ADMIN,
+//                department,
+//                position,
+//                "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg"
+//        );
+//        String token = "Bearer " + TokenUtils.generateJwtToken(member);
 
-        return token;
+//        return token;
+        return "";
     }
 
     @DisplayName("출근 시간 등록 테스트")

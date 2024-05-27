@@ -14,7 +14,10 @@ public class LeaveMember {
     private String name;
 
     @Column(name = "depart_no", nullable = false)
-    private String departNo;
+    private int departNo;
+
+    @Column(name = "position_level")
+    private String positionLevel;
 
     public int getMemberId() {
         return memberId;
@@ -24,8 +27,12 @@ public class LeaveMember {
         return name;
     }
 
-    public String getDepartNo() {
+    public int getDepartNo() {
         return departNo;
+    }
+
+    public String getPositionLevel() {
+        return positionLevel;
     }
 
     @Override
@@ -34,6 +41,7 @@ public class LeaveMember {
                 "memberId=" + memberId +
                 ", name='" + name + '\'' +
                 ", departNo='" + departNo + '\'' +
+                ", positionLevel='" + positionLevel + '\'' +
                 '}';
     }
 }

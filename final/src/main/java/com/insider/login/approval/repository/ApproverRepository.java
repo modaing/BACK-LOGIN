@@ -1,93 +1,57 @@
 package com.insider.login.approval.repository;
 
 import com.insider.login.approval.entity.Approver;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public class ApproverRepository {
+public interface ApproverRepository extends JpaRepository<Approver, String> {
 
-    @PersistenceContext
-    private EntityManager manager;
+    //결재번호로 결재자목록 조회
+    List<Approver> findByApprovalNo(String approvalNo);
 
+    //결재자 번호로 결재자 조회
+    Optional<Approver> findByApproverNo(String approverNo);
 
-    public void save(Approver approver){
-        manager.persist(approver);
-    }
-
-    public List<Approver> findByApprovalId(String approvalNo) {
-        List<Approver> approverList = manager.createQuery("SELECT a FROM Approver a WHERE a.approvalNo = :approvalNo", Approver.class)
-                .setParameter("approvalNo", approvalNo)
-                .getResultList();
-
-        return approverList;
-    }
-
-    public void update(Approver approver) {
-
-        manager.merge(approver);
-    }
-
-    public Approver findStatusById(String approvalNo) {
-        String query = "SELECT approver_no, approval_no, approver_order, approver_status, approver_date, member_id" +
-                " FROM approver" +
-                " WHERE approval_no = ?" +
-                " AND approver_status = '대기'" +
-                " ORDER BY approver_order ASC" +
-                " LIMIT 1";
-
-        List<Approver> approverList = manager.createNativeQuery(query, Approver.class)
-                .setParameter(1, approvalNo)
-                .getResultList();
-
-        Approver approver = null;
-
-        if(approverList.size() > 0 || !approverList.isEmpty())
-        {
-            approver = approverList.get(0);
-        }
-
-        return approver;
-    }
-
-    public List<Approver> findByStandById(String title) {
-        String query = "SELECT a.approver_no, a.approval_no, a.approver_order, a.approver_status, a.approver_date, a.member_id" +
-                " FROM approver a" +
-                " JOIN (" +
-                "       SELECT d.approval_no, MIN(d.approver_order) AS min_order" +
-                "       FROM approver d" +
-                "       WHERE d.approver_status = '대기'" +
-                "       GROUP BY d.approval_no" +
-                ") b ON a.approval_no = b.approval_no AND a.approver_order = b.min_order" +
-                " WHERE a.approval_no IN (" +
-                "   SELECT c.approval_no" +
-                "   FROM approval c" +
-                "   WHERE c.approval_status = '처리 중'" +
-                ") AND EXISTS(" +
-                "   SELECT 1" +
-                "   FROM approval e" +
-                "   WHERE e.approval_no = a.approval_no" +
-                "   AND e.approval_title LIKE ?" +
-                ")";
-
-        List<Approver> approverList = manager.createNativeQuery(query, Approver.class)
-                .setParameter(1, "%" + title + "%")
-                .getResultList();
-
-        return approverList;
-    }
+    //지금 처리해야하는(대기자) 결재자 조회
+    @Query("SELECT a FROM Approver a " +
+            "WHERE a.approvalNo = :approvalNo " +
+            "AND a.approverStatus = '대기' " +
+            "ORDER BY a.approverOrder ASC")
+    List <Approver> findStandByApproversOrderAsc(@Param("approvalNo") String approvalNo, Pageable pageable);
 
 
-    public void deleteById(String approvalNo) {
+    //'처리 중'인 전자결재 중 '대기'상태인 결재자 중 가장 작은 순서의 결재자 목록 조회
+    @Query(value = "SELECT a.* FROM approver a " +
+                    "JOIN (SELECT d.approval_no, MIN(d.approver_order) AS min_order " +
+                        "FROM approver d " +
+                        "WHERE d.approver_status = '대기' " +
+                        "GROUP BY d.approval_no) b " +
+                    "ON a.approval_no = b.approval_no " +
+                    "AND a.approver_order = b.min_order " +
+                    "WHERE a.approval_no IN " +
+                        "(SELECT c.approval_no " +
+                        "FROM approval c " +
+                        "WHERE c.approval_status = '처리 중') " +
+                    "AND EXISTS(SELECT 1 " +
+                                "FROM approval e " +
+                                "WHERE e.approval_no = a.approval_no " +
+                                "AND e.approval_title LIKE %:title%)", nativeQuery = true)
+    List<Approver> findStandByApprovalsByTitleNative(@Param("title") String title);
 
-        List<Approver> approverList = findByApprovalId(approvalNo);
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Approver a WHERE a.approvalNo = :approvalNo")
+    void deleteByApprovalNo(@Param("approvalNo") String approvalNo);
 
-        for(Approver approver : approverList){
-            Approver managedApprover = manager.merge(approver);
-            manager.remove(managedApprover);
-        }
-    }
+    @Query("SELECT a FROM Approver a WHERE a.approvalNo = :approvalNo AND a.approverStatus = :approverStatus")
+    Optional<Approver> findByApprovalNoAndApprovalStatus(@Param("approvalNo") String approvalNo, @Param("approverStatus") String approverStatus);
 }

@@ -45,11 +45,15 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
     private String imageUrl;
     @OneToMany(mappedBy = "member")
     private List<ChatRoom> enteredRoom = new ArrayList<>();
+    @Column(name = "gender", nullable = true)
+    private String gender;
+    @Column(name = "birthday", nullable = true)
+    private LocalDate birthday;
 
 
     protected Member() {}
 
-    public Member(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, Department department, Position position, String imageUrl) {
+    public Member(int memberId, String name, String password, LocalDate employedDate, String address, String phoneNo, String memberStatus, String email, MemberRole role, Department department, Position position, String imageUrl, List<ChatRoom> enteredRoom, String gender, LocalDate birthday) {
         this.memberId = memberId;
         this.name = name;
         this.password = password;
@@ -62,6 +66,9 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         this.department = department;
         this.position = position;
         this.imageUrl = imageUrl;
+        this.enteredRoom = enteredRoom;
+        this.gender = gender;
+        this.birthday = birthday;
     }
 
     public int getMemberId() {
@@ -124,15 +131,13 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
         this.position = position;
     }
 
+    public String getGender() {
+        return gender;
+    }
 
-
-//    public List<Commute> getCommutes() {
-//        return commutes;
-//    }
-//
-//    public void setCommutes(List<Commute> commutes) {
-//        this.commutes = commutes;
-//    }
+    public LocalDate getBirthday() {
+        return birthday;
+    }
 
 
     public String getImageUrl() {
@@ -165,7 +170,9 @@ public class Member {                 // JPA를 사용을 할 것이기 때문�
                 ", department=" + department +
                 ", position=" + position +
                 ", imageUrl='" + imageUrl + '\'' +
-//                ", commutes=" + commutes +
+//                ", enteredRoom=" + enteredRoom +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
                 '}';
     }
 }

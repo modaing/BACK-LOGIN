@@ -13,6 +13,5 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     List<Member> findByDepartment_DepartNo(int departNo);
 
-
-
+    List<Member> findByPosition_PositionLevel(String positionLevel);
 }

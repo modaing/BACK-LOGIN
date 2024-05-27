@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping
@@ -116,21 +113,128 @@ public class ApprovalController {
 
 
     @Tag(name = "전자결재 회수", description = "회수")
-    @PutMapping(value = "/approvals/{approvalNo}")
-    public ResponseEntity<ResponseDTO> updateApproval(@PathVariable(name="approvalNo") String approvalNo){
+    @PutMapping(value = "/approvals/{approvalNo}/status")
+    public ResponseEntity<ResponseDTO> updateApprovalstatus(@PathVariable(name="approvalNo") String approvalNo){
 
-        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자 결재 회수 성공", approvalService.updateApproval(approvalNo)));
+        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자 결재 회수 성공", approvalService.updateApprovalStatus(approvalNo)));
+
+    }
+
+    @Tag(name = "전자결재 재 임시저장", description = "재 임시저장")
+    @PutMapping(value="/approvals/{approvalNo}")
+    public ResponseEntity<ResponseDTO> updateApprovalTemp(@PathVariable(name="approvalNo") String approvalNo,
+                                                          @RequestPart(name="approvalDTO") ApprovalDTO approvalDTO,
+                                                          @RequestPart(name="multipartFile", required = false) List<MultipartFile> multipartFile){
+
+        log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉재 임시저장 컨트롤러 들어왔어");
+
+        log.info("기존 approval Form : " + approvalNo.substring(5,8));
+        log.info("새로운 approval Form : " + approvalDTO.getFormNo());
+
+        String newApprovalNo = "";
+
+        //폼번호 바뀔경우 결재 번호도 바뀌어야함
+        if(!approvalNo.substring(5,8).equals(approvalDTO.getFormNo()))
+        {
+            //전자결재 번호(연도+_양식번호+순번)
+            int Year = LocalDate.now().getYear();
+            String formNo = approvalDTO.getFormNo();
+            String YearFormNo = Year + "-" + formNo;
+            log.info("YearFormNo : " + YearFormNo);
+
+            String lastApprovalNo = approvalService.selectApprovalNo(YearFormNo);
+
+            log.info("lastApprovalNo : " + lastApprovalNo);
+
+            String[] parts = lastApprovalNo.split("-");
+            String lastPart = parts[parts.length -1];
+
+
+            String sequenceString = lastPart.replaceAll("\\D", "");
+            log.info("sequenceString: " + sequenceString);
+
+            int sequenceNumber = Integer.parseInt(sequenceString) +1;
+            log.info("늘어난 번호 : " + sequenceNumber);
+
+
+            newApprovalNo = Year + "-" + formNo + String.format("%05d",sequenceNumber);
+            log.info("새로운 approvalNo: " + newApprovalNo);
+
+            approvalDTO.setApprovalNo(newApprovalNo);
+
+
+        }else{
+            approvalDTO.setApprovalNo(approvalNo);
+        }
+
+        //결재자번호(결재번호+_apr+순번)
+        List<ApproverDTO> approverDTOList = approvalDTO.getApprover();
+        for(int i = 0; i < approverDTOList.size(); i++){
+            ApproverDTO approverDTO = approverDTOList.get(i);
+            approverDTO.setApproverNo(approvalDTO.getApprovalNo() + "_apr" + String.format("%03d", (i + 1)));
+            approverDTO.setApprovalNo(approvalDTO.getApprovalNo());
+            approverDTO.setApproverStatus("대기");
+            approverDTO.setApproverOrder(i + 1);
+        }
+        approvalDTO.setApprover(approverDTOList);
+
+        //참조자번호(결재번호+_ref+순번)
+        List<ReferencerDTO> referencerDTOList = approvalDTO.getReferencer();
+        for(int i = 0; i < referencerDTOList.size(); i++){
+            ReferencerDTO referencerDTO = referencerDTOList.get(i);
+            referencerDTO.setRefNo(approvalDTO.getApprovalNo() + "_ref" + String.format("%03d", (i + 1)));
+            referencerDTO.setApprovalNo(approvalDTO.getApprovalNo());
+            referencerDTO.setRefOrder(i + 1);
+        }
+        approvalDTO.setReferencer(referencerDTOList);
+
+        List<AttachmentDTO> attachmentDTOList =  new ArrayList<>();
+
+        String savePath = UPLOAD_DIR + FILE_DIR;
+
+        //첨부파일번호(결재번호+_f+순번)
+//        if(multipartFile == null){
+//            multipartFile = Collections.emptyList();
+//        }
+
+        if(multipartFile!=null && !multipartFile.isEmpty()){
+            log.info("multipartFile 있나요 : " + !multipartFile.isEmpty());
+            for(int i = 0; i < multipartFile.size(); i++){
+                MultipartFile oneFile = multipartFile.get(i);
+
+                AttachmentDTO attachmentDTO = new AttachmentDTO();
+                attachmentDTO.setFileNo(approvalDTO.getApprovalNo() + "_f" + String.format("%03d", (i +1)));
+                attachmentDTO.setFileOriname(oneFile.getOriginalFilename());
+                attachmentDTO.setFileSavename(oneFile.getName());
+                attachmentDTO.setFileSavepath(savePath);
+                attachmentDTO.setApprovalNo(approvalDTO.getApprovalNo());
+
+                attachmentDTOList.add(attachmentDTO);
+            }
+            approvalDTO.setAttachment(attachmentDTOList);
+        }
+        ApprovalDTO result = null;
+
+        try{
+            result = approvalService.updateApproval(approvalNo, approvalDTO, multipartFile);
+            log.info("결재 임시저장 수정 결과 성공: " + result);
+            return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "결재 임시저장 수정 결과 성공", result));
+
+        }catch(Exception e){
+            log.info("결재 임시저장 수정 결과 실패 : " + result);
+            return ResponseEntity.badRequest().body(new ResponseDTO(HttpStatus.OK, e.getMessage(), result));
+        }
 
     }
 
     @Tag(name = "전자결재 기안", description = "기안")
     @PostMapping("/approvals")
-    public ResponseEntity<ResponseDTO> insertApproval(@ModelAttribute ApprovalDTO approvalDTO,
-                                                      @RequestParam("multipartFile") List<MultipartFile> multipartFile,
+    public ResponseEntity<ResponseDTO> insertApproval(@RequestPart("approvalDTO") ApprovalDTO approvalDTO,
+                                                      @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile,
                                                       @RequestHeader(name = "memberId", required = false) String memberIdstr){
 
         log.info("****컨트롤러 들어왔어");
-        System.out.println("*****컨트롤러 들어왔어");
+        System.out.println("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉컨트롤러 들어왔어");
 
         //전자결재 번호(연도+_양식번호+순번)
         int Year = LocalDate.now().getYear();
@@ -206,7 +310,12 @@ public class ApprovalController {
         String savePath = UPLOAD_DIR + FILE_DIR;
 
         //첨부파일번호(결재번호+_f+순번)
-        if(!multipartFile.isEmpty()){
+//        if(multipartFile == null){
+//            multipartFile = Collections.emptyList();
+//        }
+
+        if(multipartFile!=null && !multipartFile.isEmpty()){
+            log.info("multipartFile 있나요 : " + !multipartFile.isEmpty());
             for(int i = 0; i < multipartFile.size(); i++){
                 MultipartFile oneFile = multipartFile.get(i);
 
@@ -221,10 +330,18 @@ public class ApprovalController {
             }
             approvalDTO.setAttachment(attachmentDTOList);
         }
+        ApprovalDTO result = null;
 
+        try{
+            result = approvalService.insertApproval(approvalDTO, multipartFile);
+            log.info("결재 기안 결과 성공: " + result);
+            return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 기안 성공", result));
 
-        return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자결재 기안 성공",
-                approvalService.insertApproval(approvalDTO, multipartFile)));
+        }catch(Exception e){
+            log.info("결재 기안 결과 실패 : " + result);
+            return ResponseEntity.badRequest().body(new ResponseDTO(HttpStatus.OK, e.getMessage(), result));
+        }
+
     }
 
     @Tag(name = "전자결재 처리", description = "결재처리")

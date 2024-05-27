@@ -10,9 +10,9 @@ Content-Type: application/json
 Authorization: BEARER eyJkYXRlIjoxNzE1NDUyNTYzODMxLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNTUzODk2MywiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.xbs2kanmXScmF9CoAFpaRWWHs2pvaAXAXD7mzIk1FkI
 
 ### 전자결재 회수(update)
-PUT http://localhost:8080/approvals/2024-con00001
+PUT http://localhost:8080/approvals/2024-abs00007/status
 Content-Type: application/json
-Authorization: BEARER eyJkYXRlIjoxNzE1MDQyNjg4NTc4LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDExMzkiLCJyb2xlIjoiQURNSU4iLCJpbWFnZVVybCI6IuydtOuvuOyngCDqsr3roZzrk6TslrTqsIgg6rOzISEhISEhIiwibmFtZSI6Iuq5gOyngO2ZmOydtOydtOydtOydtOydtOydtOOFoyIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNTEyOTA4OCwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDExMzl9.WAoAxg3y9bB_LBqZ2D9-nu-VukroP4Qn1unkIFMBXjA
+Authorization: BEARER eyJkYXRlIjoxNzE2NTcyNTU5NzM3LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNjY1ODk1OSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.a1nOX7HFCeY8BakbQATKC9naB92QhD1FP38bo5AnEEA
 
 ### 전자결재 상세조회(get)
 GET http://localhost:8080/approvals/2024-con00001
@@ -28,45 +28,33 @@ Authorization: BEARER eyJkYXRlIjoxNzE1ODIwNTUzMjY1LCJ0eXBlIjoiand0IiwiYWxnIjoiSF
 POST http://localhost:8080/approvals
 Content-Type: multipart/form-data; multipart/form-data; boundary=WebAppBoundary
 Accept: */*
-Authorization: BEARER eyJkYXRlIjoxNzE1ODIwNTUzMjY1LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNTkwNjk1MywiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.5VDnIm6EAJyBwDTNhfGtDOiudh88eVmtKY9EN1AJXTc
+Authorization: BEARER eyJkYXRlIjoxNzE2NjQ5NDc1NzEyLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNjczNTg3NSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.sq2BV8Y8tLm8BESsOeRGx8y1bCHlzeXRtQZMojLkZIo
 
 --WebAppBoundary
-Content-Disposition: form-data; name="memberId"
+Content-Disposition: form-data;; name="approvalDTO"; filename="approvalDTO.json"
+Content-Type: application/json
 
-240501629
---WebAppBoundary
-Content-Disposition: form-data; name="approvalTitle"
-
-제목2
---WebAppBoundary
-Content-Disposition: form-data; name="approvalContent"
-
-내용2
---WebAppBoundary
-Content-Disposition: form-data; name="approvalStatus"
-
-처리 중
---WebAppBoundary
-Content-Disposition: form-data; name="formNo"
-
-abs
---WebAppBoundary
-Content-Disposition: form-data; name="approver[0].memberId"
-
-240401004
---WebAppBoundary
-Content-Disposition: form-data; name="approver[1].memberId"
-
-2024001003
---WebAppBoundary
-Content-Disposition: form-data; name="referencer[0].memberId"
-
-240401004
---WebAppBoundary
-Content-Disposition: form-data; name="multipartFile"; filename="image.png"
-
-< ./image.png
+{
+ "approvalContent": "<div id=\"wholeForm\" class=\"wholeForm\" contenteditable=\"false\"><table contenteditable=\"false\"><tbody contenteditable=\"false\"><tr contenteditable=\"false\"><th contenteditable=\"false\">휴직 시작일자</th><td contenteditable=\"true\">2024-05-24<div>&nbsp;</div><div contenteditable=\"false\">&nbsp;</div></td></tr><tr contenteditable=\"false\"><th contenteditable=\"false\">휴직 종료일자</th><td contenteditable=\"true\">2024-05-31<div contenteditable=\"false\">&nbsp;</div></td></tr><tr contenteditable=\"false\"><th contenteditable=\"false\">복직 예정일자</th><td contenteditable=\"true\"><div>2024-06-01</div><div contenteditable=\"false\">&nbsp;</div></td></tr><tr id=\"abs_reason\" contenteditable=\"false\"><th contenteditable=\"false\">휴직사유</th><td contenteditable=\"true\"><div>&nbsp;</div>쉬고싶습니다...<div contenteditable=\"false\">&nbsp;</div></td></tr><tr id=\"orders\" contenteditable=\"false\"><th contenteditable=\"false\">기타사항</th><td contenteditable=\"true\"><div>&nbsp;</div>드르렁<div contenteditable=\"false\">&nbsp;</div></td></tr><tr contenteditable=\"false\"><th contenteditable=\"false\">연락처</th><td contenteditable=\"true\"><div>01011112222</div><div contenteditable=\"false\">&nbsp;</div></td></tr></tbody></table></div><div id=\"date\" contenteditable=\"false\"><div contenteditable=\"false\">2024. 5. 24.</div></div>",
+  "formNo": "con",
+  "approvalTitle": "제목3",
+  "approvalStatus": "임시저장",
+  "memberId": "240501629",
+  "approver": [
+    {"memberId": "240401004"},
+    {"memberId": "2024001003"}
+  ],
+  "referencer": [
+    {"memberId": "240401004"},
+    {"memberId": "240501721"}
+  ]
+}
 --WebAppBoundary--
+#Content-Disposition: form-data; name="multipartFile"; filename="image.png"
+#Content-Type: image/png
+#
+#< ./image.png
+#--WebAppBoundary--
 
 ### 전자결재 처리 (put)
 PUT http://localhost:8080/approvers/2024-exp00001_apr001
@@ -92,3 +80,35 @@ Authorization: BEARER eyJkYXRlIjoxNzE2MzA4MTM2NzMzLCJ0eXBlIjoiand0IiwiYWxnIjoiSF
 GET http://localhost:8080/approvals/members
 Content-Type: application/json
 Authorization: BEARER eyJkYXRlIjoxNzE2MzA4MTM2NzMzLCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNjM5NDUzNiwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.ecn462nqLRmpXN_COAiNKPyRQaSNHVzVHc-Rk2LJOT4
+
+### 전자결재 임시저장 재저장 (put)
+PUT http://localhost:8080/approvals/2024-abs00011
+Content-Type: multipart/form-data; multipart/form-data; boundary=WebAppBoundary
+Accept: */*
+Authorization: BEARER eyJkYXRlIjoxNzE2Nzc5NjkxMTY1LCJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYifQ.eyJwb3NpdGlvbk5hbWUiOiLslYzrsJQiLCJzdWIiOiIyNDA1MDE2MjkiLCJkZXBhcnRObyI6MSwicm9sZSI6IkFETUlOIiwiaW1hZ2VVcmwiOiIxIiwibmFtZSI6IuydtOynhOyVhCIsIm1lbWJlclN0YXR1cyI6IuyerOyngSIsImV4cCI6MTcxNjg2NjA5MSwiZGVwYXJ0TmFtZSI6IuyduOyCrO2MgCIsIm1lbWJlcklkIjoyNDA1MDE2Mjl9.QasmS2D6rC0xjSQ1UwoqktVha2XmiHBbkU2TZ7fonUw
+
+--WebAppBoundary
+Content-Disposition: form-data;; name="approvalDTO"; filename="approvalDTO.json"
+Content-Type: application/json
+
+{
+ "approvalContent": "<div id=\"wholeForm\" class=\"wholeForm\" contenteditable=\"false\"><table contenteditable=\"false\"><tbody contenteditable=\"false\"><tr contenteditable=\"false\"><th contenteditable=\"false\">휴직 시작일자</th><td contenteditable=\"true\">2024-05-24<div>&nbsp;</div><div contenteditable=\"false\">&nbsp;</div></td></tr><tr contenteditable=\"false\"><th contenteditable=\"false\">휴직 종료일자</th><td contenteditable=\"true\">2024-05-31<div contenteditable=\"false\">&nbsp;</div></td></tr><tr contenteditable=\"false\"><th contenteditable=\"false\">복직 예정일자</th><td contenteditable=\"true\"><div>2024-06-01</div><div contenteditable=\"false\">&nbsp;</div></td></tr><tr id=\"abs_reason\" contenteditable=\"false\"><th contenteditable=\"false\">휴직사유</th><td contenteditable=\"true\"><div>&nbsp;</div>쉬고싶습니다...<div contenteditable=\"false\">&nbsp;</div></td></tr><tr id=\"orders\" contenteditable=\"false\"><th contenteditable=\"false\">기타사항</th><td contenteditable=\"true\"><div>&nbsp;</div>드르렁<div contenteditable=\"false\">&nbsp;</div></td></tr><tr contenteditable=\"false\"><th contenteditable=\"false\">연락처</th><td contenteditable=\"true\"><div>01011112222</div><div contenteditable=\"false\">&nbsp;</div></td></tr></tbody></table></div><div id=\"date\" contenteditable=\"false\"><div contenteditable=\"false\">2024. 5. 24.</div></div>",
+  "formNo": "abs",
+  "approvalTitle": "임시저장 재저장 테스트4 - http",
+  "approvalStatus": "임시저장",
+  "memberId": "240501629",
+  "approver": [
+    {"memberId": "240401004"},
+    {"memberId": "2024001003"},
+    {"memberId":  "240501721"}
+  ],
+  "referencer": [
+    {"memberId": "240501668"}
+  ]
+}
+--WebAppBoundary
+Content-Disposition: form-data; name="multipartFile"; filename="image.png"
+Content-Type: image/png
+
+< ./image.png
+--WebAppBoundary--

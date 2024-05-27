@@ -3,41 +3,23 @@ package com.insider.login.approval.repository;
 import com.insider.login.approval.entity.Attachment;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public class AttachmentRepository {
-
-    @PersistenceContext
-    private EntityManager  manager;
+public interface AttachmentRepository extends JpaRepository<Attachment, String> {
 
 
-    public void save(Attachment attachment){
-        manager.persist(attachment);
-    }
+    public List<Attachment> findByApprovalNo(String approvalNo);
 
-    public List<Attachment> findByApprovalId(String approvalNo) {
-        List<Attachment> attachmentList = manager.createQuery("SELECT a FROM Apr_attachment a WHERE a.approvalNo = :approvalNo", Attachment.class)
-                .setParameter("approvalNo", approvalNo)
-                .getResultList();
-
-        return attachmentList;
-    }
-
-    public void deleteById(String approvalNo) {
-        List<Attachment> attachmentList = findByApprovalId(approvalNo);
-
-        if(!attachmentList.isEmpty()){
-            for(Attachment attachment : attachmentList){
-                Attachment managedAttachment = manager.merge(attachment);
-                manager.remove(managedAttachment);
-            }
-
-        }else{
-
-        }
-
-    }
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Apr_attachment a WHERE a.approvalNo = :approvalNo")
+    public void deleteByApprovalNo(@Param("approvalNo") String approvalNo);
 }

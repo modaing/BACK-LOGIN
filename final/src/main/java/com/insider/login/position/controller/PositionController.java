@@ -1,12 +1,15 @@
 package com.insider.login.position.controller;
 
+import com.insider.login.member.service.MemberService;
 import com.insider.login.position.dto.PositionChangeNameDTO;
 import com.insider.login.position.dto.PositionDTO;
+import com.insider.login.position.dto.PositionDetailsDTO;
 import com.insider.login.position.service.PositionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,9 +17,11 @@ import java.util.Map;
 public class PositionController {
 
     private final PositionService positionService;
+    private final MemberService memberService;
 
-    public PositionController (PositionService positionService) {
+    public PositionController (PositionService positionService, MemberService memberService) {
         this.positionService = positionService;
+        this.memberService = memberService;
     }
 
     /** 직급 등록 */
@@ -28,6 +33,16 @@ public class PositionController {
 //            int positionLevel = Integer.parseInt(positionLevelInString);
             System.out.println("inputted position name: " + newPositionName);
             System.out.println("inputted position level: " + positionLevelInString);
+            List<PositionDetailsDTO> existingPositions = showAllPositionList();
+
+            boolean positionNameExists = existingPositions.stream().anyMatch(position -> position.getPositionName().equalsIgnoreCase(newPositionName));
+            boolean positionLevelExists = existingPositions.stream().anyMatch(position -> position.getPositionLevel().equalsIgnoreCase(positionLevelInString));
+
+            if (positionNameExists) {
+                return ResponseEntity.badRequest().body("Position name already exists");
+            } else if (positionLevelExists) {
+                return ResponseEntity.badRequest().body("Position level already exists");
+            }
             PositionDTO insertNewPositionInfo = new PositionDTO();
             insertNewPositionInfo.setPositionLevel(positionLevelInString);
             insertNewPositionInfo.setPositionName(newPositionName);
@@ -40,10 +55,24 @@ public class PositionController {
 
     /** 직급 조회 */
     @GetMapping("/showAllPosition")
-    public List<PositionDTO> showAllPositionList() {
+    public List<PositionDetailsDTO> showAllPositionList() {
         List<PositionDTO> positionDTOList = positionService.findAllPositionList();
+        List<PositionDetailsDTO> positionDetailsDTOList = new ArrayList<>();
 
-        return positionDTOList;
+        for (PositionDTO positionDTO : positionDTOList) {
+            int noOfMembersInPosition = membersInPosition(positionDTO.getPositionLevel());
+            PositionDetailsDTO positionDetailsDTO = new PositionDetailsDTO();
+
+            positionDetailsDTO.setPositionName(positionDTO.getPositionName());
+            positionDetailsDTO.setPositionLevel(positionDTO.getPositionLevel());
+            positionDetailsDTO.setNoOfPeople(noOfMembersInPosition);
+
+            positionDetailsDTOList.add(positionDetailsDTO);
+        }
+
+        System.out.println("positionDetailsDTOList: " + positionDetailsDTOList);
+
+        return positionDetailsDTOList;
     }
 
     /** 직급 삭제 */
@@ -99,6 +128,13 @@ public class PositionController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update position name: " + e.getMessage());
         }
+    }
+
+    public int membersInPosition(String positionLevel) {
+        System.out.println("positionLevel: " + positionLevel);
+
+        int noOfMembersInPosition = memberService.findNoOfMembersInPosition(positionLevel);
+        return noOfMembersInPosition;
     }
 
 
