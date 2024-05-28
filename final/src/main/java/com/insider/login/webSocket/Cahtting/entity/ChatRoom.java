@@ -2,12 +2,14 @@ package com.insider.login.webSocket.Cahtting.entity;
 
 import com.insider.login.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "entered_room")
 public class ChatRoom {
 
@@ -30,13 +32,28 @@ public class ChatRoom {
     @Enumerated(value = EnumType.STRING)
     private RoomStatus roomStatus = RoomStatus.ENTER;
 
+    @Column(name = "sender_delete_yn")
+    private String senderDeleteYn;
 
-    public ChatRoom(Member member, Member receiverMember, String roomName) {
+    @Column(name = "receiver_delete_Yn")
+    private String receiverDeleteYn;
+
+
+    public ChatRoom(Member member, Member receiverMember, String roomName, String senderDeleteYn, String receiverDeleteYn) {
         this.member = member;
         this.receiverMember = receiverMember;
         this.roomName = roomName;
+        this.senderDeleteYn = senderDeleteYn;
+        this.receiverDeleteYn = receiverDeleteYn;
     }
 
+    public void markSenderAsDeleted() {
+        this.senderDeleteYn = "Y";
+    }
+
+    public void markReceiverAsDeleted() {
+        this.receiverDeleteYn = "Y";
+    }
 
 
 }

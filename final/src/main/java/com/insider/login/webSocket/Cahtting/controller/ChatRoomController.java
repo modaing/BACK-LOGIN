@@ -39,7 +39,6 @@ public class ChatRoomController {
 
     @GetMapping("/")
     public List<EntRoomReqDTO> selectRoomList(@RequestParam("memberId") int memberId) {
-
         Optional<Member> member = memberRepository.findById(memberId);
         return enteredRoomService.selectRoomList(member);
     }
@@ -53,7 +52,10 @@ public class ChatRoomController {
         int receiverId = request.getReceiverId();
         String roomName = request.getRoomName();
 
-        ChatRoom enteredRoom = enteredRoomService.save(memberId, receiverId, roomName);
+        request.setSenderDeleteYn("N");
+        request.setReceiverDeleteYn("N");
+
+        ChatRoom enteredRoom = enteredRoomService.save(memberId, receiverId, roomName, request.getSenderDeleteYn(), request.getReceiverDeleteYn());
 
         if (enteredRoom == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -66,7 +68,6 @@ public class ChatRoomController {
     @DeleteMapping("/{enteredRoomId}")
     public ResponseEntity<ChatRoom> deleteEnteredRoom(@PathVariable("enteredRoomId") int enteredRoomId) {
 
-        System.out.println("❤️" + enteredRoomId);
         ChatRoom enteredRoom =  enteredRoomService.deleteRoom(enteredRoomId);
         if (enteredRoom == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -76,6 +77,14 @@ public class ChatRoomController {
 
     }
 
+    @PutMapping("/{enteredRoomId}")
+    public String updateRoom(
+            @PathVariable("enteredRoomId") int enteredRoomId,
+            @RequestParam("memberId") int memberId,
+            @RequestParam("action") String action) {
+        enteredRoomService.updateRoom(enteredRoomId, memberId, action);
+        return "Room updated successfully";
+    }
 
 
 
