@@ -37,14 +37,8 @@ public interface  InsiteRepository extends JpaRepository<InsiteMember, Integer> 
     @Query("SELECT COUNT(a) FROM InsiteApprover a WHERE a.approverStatus = '대기'")
     List<Object[]> selectApproverCounts();
 
-    @Query("SELECT ls.leaveMember.memberId, " +
-            "SUM(DISTINCT l.leaveDays) AS totalLeaveDays, " +
-            "SUM(DISTINCT DATEDIFF(ls.leaveSubEndDate, ls.leaveSubStartDate) + 1) AS consumedDays " +
-            "FROM InsiteLeaveSubmit ls " +
-            "JOIN insiteLeaves l ON ls.leaveMember.memberId = l.memberId " +
-            "WHERE ls.leaveSubStatus = '승인' " +
-            "GROUP BY ls.leaveMember.memberId")
-    List<Object[]> findAllLeaveInfoCounts();
+
+//    List<Object[]> findAllLeaveInfoCounts();
 
     @Query(value = "SELECT COUNT(DISTINCT m.member_id) AS totalMembers, " +
             "COUNT(DISTINCT CASE WHEN CURDATE() BETWEEN l.LEAVE_SUB_START_DATE AND l.LEAVE_SUB_END_DATE AND l.LEAVE_SUB_STATUS = '승인' THEN m.member_id END) AS leaveCount, " +

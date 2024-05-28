@@ -42,28 +42,6 @@ public class InsiteService {
         return insiteRepository.selectApproverCounts();
     }
 
-//    public List<Object[]> selectLeaveInfoCounts(int memberId) {
-//
-//
-//        return insiteRepository.findLeaveInfoCounts(memberId);
-//    }
-
-    public List<InsiteLeaveInfoDTO> getAllLeaveInfo(int memberId) {
-        List<Object[]> results = insiteRepository.findAllLeaveInfoCounts();
-        List<InsiteLeaveInfoDTO> leaveInfoList = new ArrayList<>();
-
-        for (Object[] result : results) {
-
-            int consumedDays = ((Number) result[0]).intValue();
-            memberId = ((Number) result[1]).intValue();
-            int totalLeaveDays = ((Number) result[2]).intValue();
-
-            InsiteLeaveInfoDTO leaveInfo = new InsiteLeaveInfoDTO(consumedDays, memberId, totalLeaveDays);
-            leaveInfoList.add(leaveInfo);
-        }
-
-        return leaveInfoList;
-    }
 
     public List<Object[]> leavesCommuteMemberCounts() {
         return insiteRepository.leavesCommuteMemberCounts();
