@@ -3,6 +3,7 @@ package com.insider.login.insite.controller;
 import com.insider.login.insite.dto.InsiteLeaveInfoDTO;
 import com.insider.login.insite.service.InsiteService;
 import com.insider.login.leave.dto.LeaveInfoDTO;
+import com.insider.login.leave.service.LeaveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,8 @@ import java.util.Map;
 public class InsiteController {
 
     private final InsiteService insiteService;
+
+    private final LeaveService leaveService;
 
     /** 팀 별 구성원 수 */
     @GetMapping("/departments")
@@ -52,9 +55,9 @@ public class InsiteController {
 
     /** 휴가 잔여일 */
     @GetMapping("/leaves/{memberId}")
-    public List<InsiteLeaveInfoDTO> getLeaveInfo(@PathVariable("memberId") int memberId) {
+    public LeaveInfoDTO getLeaveInfo(@PathVariable("memberId") int memberId) {
 
-        return insiteService.getAllLeaveInfo(memberId);
+        return leaveService.getLeaveInfoById(memberId);
     }
 
     /** 금일 휴가자 + 출근자 + 전체 구성원 수 */
