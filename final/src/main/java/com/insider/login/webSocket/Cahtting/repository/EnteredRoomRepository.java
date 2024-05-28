@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface EnteredRoomRepository extends JpaRepository<ChatRoom, Integer> {
 
-    @Query("SELECT er FROM ChatRoom er WHERE er.member = :member or er.receiverMember = :member AND er.roomStatus = :roomStatus")
-    List<ChatRoom> findAllList(@Param("roomStatus") RoomStatus roomStatus, @Param("member") Optional<Member> member);
+    @Query("SELECT e FROM ChatRoom e WHERE (e.member = :member OR e.receiverMember = :member) AND (e.senderDeleteYn = 'N' OR e.receiverDeleteYn = 'N')")
+    List<ChatRoom> findAllActiveRooms(@Param("member") Member member);
 
 }
