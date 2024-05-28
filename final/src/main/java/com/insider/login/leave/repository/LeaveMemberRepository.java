@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface LeaveMemberRepository extends JpaRepository<LeaveMember, Integer> {
 
+    List<LeaveMember> findAll();
+
     @Query("SELECT m.name FROM LeaveMember m WHERE m.memberId = :memberId")
     String findNameByMemberId(@Param("memberId") int memberId);
 
