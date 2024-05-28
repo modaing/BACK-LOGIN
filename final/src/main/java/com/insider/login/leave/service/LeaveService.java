@@ -369,7 +369,7 @@ public class LeaveService extends LeaveUtil {
         calendarDTO.setCalendarName(memberInfo.get("department") + " " + memberInfo.get("name") + " " + memberInfo.get("position") + " 휴가");
         calendarDTO.setCalendarStart(calendarDateTime.get("start"));
         calendarDTO.setCalendarEnd(calendarDateTime.get("end"));
-        calendarDTO.setColor("red");
+        calendarDTO.setColor("yellow");
         calendarDTO.setDepartment(memberInfo.get("department"));
         calendarDTO.setRegistrantId(getTokenInfo().getMemberId());
 
