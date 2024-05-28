@@ -132,12 +132,19 @@ public class CommuteController {
     }
 
     /**
-     * 출퇴근 시간 정정 요청 등록
+     * 출퇴근 시간 정정 요청 등록 (출퇴근 내역 존재)
      */
     @PostMapping("/corrections")
     public ResponseEntity<ResponseMessage> insertRequestForCorrect(@RequestBody CorrectionDTO newCorrection) {
         System.out.println("newCorrection : {} " + newCorrection);
         return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", commuteService.insertRequestForCorrect(newCorrection)));
+    }
+
+    /** 출퇴근 시간 정정 요청 등록 (출퇴근 내역 미존재) */
+    @PostMapping("/corrections/newCorrection")
+    public ResponseEntity<ResponseMessage> insertNewCorrect(@RequestBody NewCorrectionDTO newCorrection) {
+        System.out.println("newCorrection : {} " + newCorrection);
+        return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", commuteService.insertNewCorrect(newCorrection)));
     }
 
     /**
@@ -208,8 +215,9 @@ public class CommuteController {
                     processedCommute.put("corrNo", commute.getCorrection().getCorrNo());
                     processedCorrectionList.add(processedCommute);
 
+
                 } else {
-                    System.out.println("정정 내역이 없음!!!!");
+                    System.out.println("해당 출퇴근 내역에 정정 내역이 없음!!!!");
                 }
             }
 

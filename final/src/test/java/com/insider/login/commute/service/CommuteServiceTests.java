@@ -1,9 +1,6 @@
 package com.insider.login.commute.service;
 
-import com.insider.login.commute.dto.CommuteDTO;
-import com.insider.login.commute.dto.CorrectionDTO;
-import com.insider.login.commute.dto.UpdateProcessForCorrectionDTO;
-import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
+import com.insider.login.commute.dto.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -164,6 +161,35 @@ public class CommuteServiceTests {
         //then
         Assertions.assertDoesNotThrow(
                 () -> commuteService.insertRequestForCorrect(newCorrection));
+    }
+
+    @DisplayName("출퇴근 시간 정정 등록 테스트")
+    @Test
+    void testInsertNewCorrect() {
+        //given
+        int memberId = 240401835;
+        LocalDate workingDate = LocalDate.now();
+        String reqStartWork = "09:00";
+        String reqEndWork = "18:00";
+        LocalDate corrRegistrationDate = LocalDate.now();
+        String reasonForCorr = "실수로 출퇴근 시간을 입력하지 못하였습니다.";
+        String corrStatus = "대기";
+
+        NewCorrectionDTO newCorrection = new NewCorrectionDTO(
+                memberId,
+                workingDate,
+                reqStartWork,
+                reqEndWork,
+                corrRegistrationDate,
+                corrStatus,
+                reasonForCorr
+        );
+
+        //when
+
+        //then
+        Assertions.assertDoesNotThrow(
+                () -> commuteService.insertNewCorrect(newCorrection));
     }
 
     @DisplayName("출퇴근 시간 정정 처리 테스트")

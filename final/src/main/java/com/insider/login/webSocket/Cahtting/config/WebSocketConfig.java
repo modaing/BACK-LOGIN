@@ -24,7 +24,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(socketHandler, "/wss/chatting")
                 .addInterceptors(new HttpSessionHandshakeInterceptor(), new CustomHandshakeInterceptor())
                 .setAllowedOrigins("*");
-
     }
 
 

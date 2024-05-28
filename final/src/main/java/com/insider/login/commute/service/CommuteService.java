@@ -238,8 +238,6 @@ public class CommuteService {
 
             /** 3. 출퇴근 내역이 존재하지 않는 경우 => 해당 일자에 근무를 했지만, 실수로 출퇴근을 입력하지 않고 날짜가 지나간 경우에 필요 => 오류로 인해 다른 로직으로 변경 */
             } else {
-//                correctionDTO.setReqStartWork(newCorrection.getReqStartWork());
-//                correctionDTO.setReqEndWork(newCorrection.getReqEndWork());
                 System.out.println("기존 출퇴근 내역이 null!!!!!!!!!!!");
             }
 
@@ -260,8 +258,11 @@ public class CommuteService {
                 newNotice.setNoticeDateTime(LocalDateTime.now());
 
                 noticeService.insertNewNotice(newNotice);
+                System.out.println("newNotice : " + newNotice);
             }
 
+            result.put("notice", adminCommuteMembers);
+            System.out.println(adminCommuteMembers);
             log.info("[CommuteService] 출퇴근 정정 요청 등록 후 ");
 
         } catch (Exception e ) {
@@ -271,6 +272,49 @@ public class CommuteService {
         }
 
         log.info("[CommuteService] insertRequestForCorrect End ================");
+
+        return result;
+    }
+
+    @Transactional
+    public Map<String, Object> insertNewCorrect(NewCorrectionDTO newCorrection) {
+        log.info("[CommuteService] insertNewCorrect");
+        log.info("[CommuteService] newCorrection : ", newCorrection);
+
+        Map<String, Object> result = new HashMap<>();
+
+        NewCommuteDTO newCommuteDTO = new NewCommuteDTO();
+
+        newCommuteDTO.setMemberId(newCorrection.getMemberId());
+        newCommuteDTO.setWorkingDate(newCorrection.getWorkingDate());
+        newCommuteDTO.setStartWork(LocalTime.MIDNIGHT);
+        newCommuteDTO.setEndWork(LocalTime.MIDNIGHT);
+        newCommuteDTO.setWorkingStatus("출퇴근 미입력으로 정정 대기 중");
+        newCommuteDTO.setTotalWorkingHours(0);
+
+        System.out.println("newCommuteDTO : " + newCommuteDTO);
+
+        // 출퇴근 db에 임의로 저장
+        Commute savedCommute = commuteRepository.save(modelMapper.map(newCommuteDTO, Commute.class));
+
+        int commuteNo = savedCommute.getCommuteNo();
+
+        NewCorrectionDTO newCorrectionDTO = new NewCorrectionDTO();
+
+        newCorrectionDTO.setCommuteNo(commuteNo);
+        newCorrectionDTO.setMemberId(newCorrection.getMemberId());
+        newCorrectionDTO.setReqStartWork(newCorrection.getReqStartWork());
+        newCorrectionDTO.setReqEndWork(newCorrection.getReqEndWork());
+        newCorrectionDTO.setReasonForCorr(newCorrection.getReasonForCorr());
+        newCorrectionDTO.setCorrRegistrationDate(newCorrection.getCorrRegistrationDate());
+        newCorrectionDTO.setCorrStatus(newCorrection.getCorrStatus());
+
+        System.out.println("newCorrectionDTO : " + newCorrectionDTO);
+
+        // 출퇴근 정정 db에 임의로 저장
+        correctionRepository.save(modelMapper.map(newCorrectionDTO, Correction.class));
+
+        result.put("result", true);
 
         return result;
     }
@@ -329,7 +373,7 @@ public class CommuteService {
 
                         commuteDTO.setStartWork(updateStartWork);
                         commuteDTO.setEndWork(updateEndWork);
-//                        commuteDTO.setWorkingStatus("퇴근");                  // 무단 결근 상황에서 개인 연차를 사용하여 출퇴근 시간을 정상으로 정정 요청 할 때
+                        commuteDTO.setWorkingStatus("퇴근");                  // 실수로 출퇴근을 하지 않고 날짜가 지나서 출퇴근 시간을 정상으로 정정 요청 할 때
                         commuteDTO.setTotalWorkingHours(totalWorkingHours);
 
                         log.info("[CommuteService] 출근시간, 퇴근시간 모두 정정 처리 후 ");
@@ -345,7 +389,7 @@ public class CommuteService {
 
                         commuteDTO.setStartWork(updateStartWork);
                         commuteDTO.setTotalWorkingHours(totalWorkingHours);
-
+                        log.info("[dddddddddddddddd]" + commuteDTO);
                         log.info("[CommuteService] 출근시간만 정정 처리 후 ");
 
                         /** 1-1-2-3. 퇴근시간만 정정 */
@@ -544,7 +588,6 @@ public class CommuteService {
             return null;
         }
     }
-
 
 
 }
