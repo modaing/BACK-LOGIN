@@ -258,13 +258,26 @@ public class LeaveService extends LeaveUtil {
 
     public Page<LeaveInfoDTO> selectLeavesList(Pageable pageable) {
         try {
-            Page<Integer> leavesPage = leaveRepository.findDistinctMemberIds(pageable);
+            List<LeaveMember> memberList = memberRepository.findAll();
 
-            List<LeaveInfoDTO> infoDTOList = leavesPage.stream()
-                    .map(this::getLeaveInfoById)
+            List<LeaveInfoDTO> infoDTOList = memberList.stream()
+                    // 모든 회원을 조회한 후 휴가 정보가 없으면 휴가가 0인 상태로 반환
+                    .map(member -> {
+                        LeaveInfoDTO infoDTO = getLeaveInfoById(member.getMemberId());
+                        if (infoDTO == null) {
+                            infoDTO = new LeaveInfoDTO(member.getMemberId(), member.getName(), 0, 0, 0, 0, 0);
+                        }
+                        return infoDTO;
+                    })
                     .collect(Collectors.toList());
 
-            return new PageImpl<>(infoDTOList, pageable, leavesPage.getTotalElements());
+            int start = (int) pageable.getOffset();
+            // 오프셋부터 10개를 가져올 때, 마지막 페이지의 경우 항목 수가 부족할 수 있으니 min 으로 선택
+            int end = Math.min((start + pageable.getPageSize()), memberList.size());
+            // start 부터 end-1 인덱스에 해당하는 것들을 subList로 묶음
+            List<LeaveInfoDTO> pagedInfoDTOList = infoDTOList.subList(start, end);
+
+            return new PageImpl<>(pagedInfoDTOList, pageable, infoDTOList.size());
         } catch (Exception e) {
             return null;
         }
@@ -275,9 +288,15 @@ public class LeaveService extends LeaveUtil {
 
         List<Leaves> leavesList = leaveRepository.findByMemberId(memberId);
 
+        if (leavesList.isEmpty()) {
+            return null;
+        }
+
         LeaveInfoDTO info = leaveInfoCalc(leavesList);
 
+
         String name = memberRepository.findNameByMemberId(memberId);
+
         info.setName(name);
 
         return addLeaveInfo(info);
@@ -372,6 +391,7 @@ public class LeaveService extends LeaveUtil {
         calendarDTO.setColor("yellow");
         calendarDTO.setDepartment(memberInfo.get("department"));
         calendarDTO.setRegistrantId(getTokenInfo().getMemberId());
+        calendarDTO.setDetail(updatedSubmit.getLeaveSubType());
 
         return calendarDTO;
     }
