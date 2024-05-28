@@ -115,6 +115,8 @@ public class ApprovalController {
     @PutMapping(value = "/approvals/{approvalNo}/status")
     public ResponseEntity<ResponseDTO> updateApprovalstatus(@PathVariable(name = "approvalNo") String approvalNo) {
 
+
+        log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉회수 컨트롤러 들어왔어");
         return ResponseEntity.ok().body(new ResponseDTO(HttpStatus.OK, "전자 결재 회수 성공", approvalService.updateApprovalStatus(approvalNo)));
 
     }
@@ -261,19 +263,26 @@ public class ApprovalController {
 
         log.info("lastApprovalNo : " + lastApprovalNo);
 
-        String[] parts = lastApprovalNo.split("-");
-        String lastPart = parts[parts.length - 1];
+        String approvalNo = "";
+        if(lastApprovalNo != null){
+            String[] parts = lastApprovalNo.split("-");
+            String lastPart = parts[parts.length - 1];
 
 
-        String sequenceString = lastPart.replaceAll("\\D", "");
-        log.info("sequenceString: " + sequenceString);
+            String sequenceString = lastPart.replaceAll("\\D", "");
+            log.info("sequenceString: " + sequenceString);
 
-        int sequenceNumber = Integer.parseInt(sequenceString) + 1;
-        log.info("늘어난 번호 : " + sequenceNumber);
+            int sequenceNumber = Integer.parseInt(sequenceString) + 1;
+            log.info("늘어난 번호 : " + sequenceNumber);
 
 
-        String approvalNo = Year + "-" + formNo + String.format("%05d", sequenceNumber);
-        log.info("approvalNo: " + approvalNo);
+            approvalNo = Year + "-" + formNo + String.format("%05d", sequenceNumber);
+            log.info("approvalNo: " + approvalNo);
+        }
+        else{
+            approvalNo = Year + "-" + formNo + String.format("%05d", 1);
+        }
+
 
         approvalDTO.setApprovalNo(approvalNo);
 
@@ -363,6 +372,8 @@ public class ApprovalController {
     public ResponseEntity<ResponseDTO> updateApprover(@PathVariable(name = "approverNo") String approverNo,
                                                       @RequestBody ApproverDTO approverDTO) {
 
+
+        log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉결재 컨트롤러 들어왔어");
 
         Map<String, String> statusMap = new HashMap<>();
         statusMap.put("approverStatus", approverDTO.getApproverStatus());
