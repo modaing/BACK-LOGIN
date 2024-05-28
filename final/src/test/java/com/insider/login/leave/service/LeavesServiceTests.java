@@ -289,7 +289,6 @@ public class LeavesServiceTests extends CommonController {
         Assertions.assertEquals(result, "휴가처리 성공");
     }
 
-
     @Test
     @DisplayName("휴가 보유 내역 조회")
     void testSelectLeavesList() {

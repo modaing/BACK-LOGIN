@@ -1,6 +1,9 @@
 package com.insider.login.webSocket.Cahtting.dto;
 
+import com.insider.login.webSocket.Cahtting.entity.ChatRoom;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 
 @Data
@@ -11,10 +14,16 @@ import lombok.*;
 @ToString
 public class MessageDTO implements java.io.Serializable {
 
+    private int messageId;
+
+    private int senderId;
+
+    private String senderName;
+
     private String message;
 
-    private String writer;
+    private int enteredRoomId;
 
-
+    private LocalDateTime createdAt;
 
 }

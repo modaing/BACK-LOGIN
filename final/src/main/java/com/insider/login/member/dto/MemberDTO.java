@@ -173,6 +173,7 @@ public class MemberDTO {
         this.departmentDTO = departmentDTO;
     }
 
+
     public void setDepartment(Department department) {
         if (department != null) {
             this.departmentDTO = new DepartmentDTO();

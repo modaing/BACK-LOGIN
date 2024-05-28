@@ -2,10 +2,7 @@ package com.insider.login.commute.controller;
 
 import com.insider.login.common.CommonController;
 import com.insider.login.common.ResponseMessage;
-import com.insider.login.commute.dto.CommuteDTO;
-import com.insider.login.commute.dto.CorrectionDTO;
-import com.insider.login.commute.dto.UpdateProcessForCorrectionDTO;
-import com.insider.login.commute.dto.UpdateTimeOfCommuteDTO;
+import com.insider.login.commute.dto.*;
 import com.insider.login.commute.entity.Commute;
 import com.insider.login.commute.service.CommuteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,7 @@ import java.nio.charset.Charset;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,20 +33,26 @@ public class CommuteController {
         this.commuteService = commuteService;
     }
 
-    /** 출근 시간 등록 */
+    /**
+     * 출근 시간 등록
+     */
     @PostMapping("/commutes")
     public ResponseEntity<ResponseMessage> insertTimeOfCommute(@RequestBody CommuteDTO newCommute) {
         return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", commuteService.insertTimeOfCommute(newCommute)));
     }
 
-    /** 퇴근 시간 등록 (update) */
+    /**
+     * 퇴근 시간 등록 (update)
+     */
     @PutMapping("/commutes/{commuteNo}")
     public ResponseEntity<ResponseMessage> updateTimeOfCommute(@PathVariable("commuteNo") int commuteNo,
-                                                                @RequestBody UpdateTimeOfCommuteDTO updateCommute) {
+                                                               @RequestBody UpdateTimeOfCommuteDTO updateCommute) {
         return ResponseEntity.ok().body(new ResponseMessage(200, "추가 등록 성공", commuteService.updateTimeOfCommuteByCommuteNo(commuteNo, updateCommute)));
     }
 
-    /** 출퇴근 내역 조회 (부서별, 회원별) */
+    /**
+     * 출퇴근 내역 조회 (부서별, 회원별)
+     */
     @GetMapping("/commutes")
     public ResponseEntity<ResponseMessage> selectCommuteList(@RequestParam(value = "target") String target,
                                                              @RequestParam(value = "targetValue", required = false) String targetValue,
@@ -69,11 +73,48 @@ public class CommuteController {
         LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
 
-        if("depart".equals(target)) {
+        if ("depart".equals(target)) {
             int departNo = Integer.parseInt(targetValue);
-            result.put("result", commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth));   // 부서별
+            result = commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth);
+//            result.put("result", commuteService.selectCommuteListByDepartNo(departNo, startDayOfMonth, endDayOfMonth));   // 부서별
 
-        } else if("member".equals(target)) {
+            // 가공 과정
+//            result.forEach((key, value) -> {
+//                System.out.println(key + " : " + value);
+//            });
+            List<Map<String, Object>> processedMembersList = new ArrayList<>();
+            List<CommuteMemberDTO> members = (List<CommuteMemberDTO>) result.get("members");
+            List<CommuteDTO> commuteList = (List<CommuteDTO>) result.get("commute");
+
+            for (CommuteMemberDTO member : members) {
+                Map<String, Object> processedMember = new HashMap<>();
+                processedMember.put("name", member.getName());
+
+                List<Map<String, Object>> processedCommuteList = new ArrayList<>();
+                for (CommuteDTO commute : commuteList) {
+                    if (commute.getMemberId() == member.getMemberId()) {
+                        Map<String, Object> processedCommute = new HashMap<>();
+                        processedCommute.put("workingDate", commute.getWorkingDate());
+                        processedCommute.put("startWork", commute.getStartWork());
+                        processedCommute.put("endWork", commute.getEndWork());
+                        processedCommute.put("totalWorkingHours", commute.getTotalWorkingHours());
+
+                        processedCommuteList.add(processedCommute);
+                        System.out.println("출퇴근 가공" + processedCommuteList);
+                    }
+                }
+
+                processedMember.put("commuteList", processedCommuteList);
+                processedMembersList.add(processedMember);
+            }
+
+            result.put("result", processedMembersList);
+
+            result.forEach((key, value) -> {
+                System.out.println(key + " : " + value);
+            });
+
+        } else if ("member".equals(target)) {
             int memberId = Integer.parseInt(targetValue);
             result.put("result", commuteService.selectCommuteListByMemberId(memberId, startWeek, endWeek));     // 회원별
 
@@ -90,20 +131,27 @@ public class CommuteController {
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
-    /** 출퇴근 시간 정정 요청 등록 */
+    /**
+     * 출퇴근 시간 정정 요청 등록
+     */
     @PostMapping("/corrections")
     public ResponseEntity<ResponseMessage> insertRequestForCorrect(@RequestBody CorrectionDTO newCorrection) {
+        System.out.println("newCorrection : {} " + newCorrection);
         return ResponseEntity.ok().body(new ResponseMessage(200, "등록 성공", commuteService.insertRequestForCorrect(newCorrection)));
     }
 
-    /** 출퇴근 시간 정정 처리 등록 (update) */
+    /**
+     * 출퇴근 시간 정정 처리 등록 (update)
+     */
     @PutMapping("/corrections/{corrNo}")
     public ResponseEntity<ResponseMessage> updateProcessForCorrectByCorrNo(@PathVariable("corrNo") int corrNo,
                                                                            @RequestBody UpdateProcessForCorrectionDTO updateCorrection) {
-        return ResponseEntity.ok().body(new ResponseMessage(200, "정정 처리 성공",commuteService.updateProcessForCorrectByCorrNo(corrNo, updateCorrection)));
+        return ResponseEntity.ok().body(new ResponseMessage(200, "정정 처리 성공", commuteService.updateProcessForCorrectByCorrNo(corrNo, updateCorrection)));
     }
 
-    /** 출퇴근 시간 정정 내역 조회 (전체, 멤버별) */
+    /**
+     * 출퇴근 시간 정정 내역 조회 (전체, 멤버별)
+     */
     @GetMapping("/corrections")
     public ResponseEntity<ResponseMessage> selectRequestForCorrectList(@RequestParam(value = "memberId", required = false) Integer memberId,
                                                                        @RequestParam(value = "date") LocalDate date,
@@ -121,13 +169,115 @@ public class CommuteController {
         LocalDate startDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate endDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
 
-        if(memberId != null) {
-
+        if (memberId != null) {
+            /** 멤버별 본인 내역 조회 */
             responseMap = commuteService.selectRequestForCorrectListByMemberId(memberId, startDayOfMonth, endDayOfMonth, pageable);
 
-        } else {
+            // 가공 과정
+            responseMap.forEach((key, value) -> {
+                System.out.println(key + " : " + value);
+            });
+            List<Map<String, Object>> processedCorrectionList = new ArrayList<>();
+            List<CommuteDTO> commuteList = (List<CommuteDTO>) responseMap.get("commute");
 
+            for (CommuteDTO commute : commuteList) {
+                if (commute.getCorrection() != null) {
+                    Map<String, Object> processedCommute = new HashMap<>();
+                    processedCommute.put("workingDate", commute.getWorkingDate());
+                    if (commute.getStartWork() != null) {
+                        processedCommute.put("startWork", commute.getStartWork());
+                    }
+                    if (commute.getEndWork() != null) {
+                        processedCommute.put("endWork", commute.getEndWork());
+                    }
+                    if (commute.getCorrection().getReqStartWork() != null) {
+                        processedCommute.put("reqStartWork", commute.getCorrection().getReqStartWork());
+                    }
+                    if (commute.getCorrection().getReqEndWork() != null) {
+                        processedCommute.put("reqEndWork", commute.getCorrection().getReqEndWork());
+                    }
+                    processedCommute.put("reasonForCorr", commute.getCorrection().getReasonForCorr());
+                    processedCommute.put("corrRegistrationDate", commute.getCorrection().getCorrRegistrationDate());
+                    processedCommute.put("corrStatus", commute.getCorrection().getCorrStatus());
+                    if (commute.getCorrection().getReasonForRejection() != null) {
+                        processedCommute.put("reasonForRejection", commute.getCorrection().getReasonForRejection());
+                    }
+                    if (commute.getCorrection().getCorrProcessingDate() != null) {
+                        processedCommute.put("corrProcessingDate", commute.getCorrection().getCorrProcessingDate());
+                    }
+                    processedCommute.put("corrNo", commute.getCorrection().getCorrNo());
+                    processedCorrectionList.add(processedCommute);
+
+                } else {
+                    System.out.println("정정 내역이 없음!!!!");
+                }
+            }
+
+            responseMap.put("result", processedCorrectionList);
+
+            responseMap.forEach((key, value) -> {
+                System.out.println(key + " : " + value);
+            });
+
+        } else {
+            /** 부서별 내역 조회 */
             responseMap = commuteService.selectRequestForCorrectList(startDayOfMonth, endDayOfMonth, pageable);
+            // 가공 과정
+            responseMap.forEach((key, value) -> {
+                System.out.println(key + " : " + value);
+            });
+
+            List<Map<String, Object>> processedCorrectionList = new ArrayList<>();
+            List<CommuteMemberDTO> members = (List<CommuteMemberDTO>) responseMap.get("member");
+            List<CommuteDepartmentDTO> departs = (List<CommuteDepartmentDTO>) responseMap.get("depart");
+            List<CommuteDTO> commuteList = (List<CommuteDTO>) responseMap.get("commute");
+
+            for (CommuteDTO commute : commuteList) {
+                Map<String, Object> processedCommute = new HashMap<>();
+                processedCommute.put("workingDate", commute.getWorkingDate());
+                if (commute.getStartWork() != null) {
+                    processedCommute.put("startWork", commute.getStartWork());
+                }
+                if (commute.getEndWork() != null) {
+                    processedCommute.put("endWork", commute.getEndWork());
+                }
+
+                if (commute.getCorrection() != null) {
+                    if (commute.getCorrection().getReqStartWork() != null) {
+                        processedCommute.put("reqStartWork", commute.getCorrection().getReqStartWork());
+                    }
+                    if (commute.getCorrection().getReqEndWork() != null) {
+                        processedCommute.put("reqEndWork", commute.getCorrection().getReqEndWork());
+                    }
+                    processedCommute.put("reasonForCorr", commute.getCorrection().getReasonForCorr());
+                    processedCommute.put("corrRegistrationDate", commute.getCorrection().getCorrRegistrationDate());
+                    processedCommute.put("corrStatus", commute.getCorrection().getCorrStatus());
+                    if (commute.getCorrection().getReasonForRejection() != null) {
+                        processedCommute.put("reasonForRejection", commute.getCorrection().getReasonForRejection());
+                    }
+                    if (commute.getCorrection().getCorrProcessingDate() != null) {
+                        processedCommute.put("corrProcessingDate", commute.getCorrection().getCorrProcessingDate());
+                    }
+                    processedCommute.put("corrNo", commute.getCorrection().getCorrNo());
+                }
+
+                for (CommuteMemberDTO member : members) {
+                    if (commute.getMemberId() == member.getMemberId()) {
+                        processedCommute.put("name", member.getName());
+                    }
+                }
+
+                for (CommuteDepartmentDTO depart : departs) {
+                    processedCommute.put("departName", depart.getDepartName());
+                }
+                processedCorrectionList.add(processedCommute);
+            }
+
+            responseMap.put("result", processedCorrectionList);
+
+            responseMap.forEach((key, value) -> {
+                System.out.println(key + " : " + value);
+            });
         }
 
         ResponseMessage responseMessage = new ResponseMessage(200, "조회 성공", responseMap);
@@ -135,7 +285,9 @@ public class CommuteController {
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
-    /** 출퇴근 시간 정정 요청 상세 조회 */
+    /**
+     * 출퇴근 시간 정정 요청 상세 조회
+     */
     @GetMapping("/corrections/{corrNo}")
     public ResponseEntity<ResponseMessage> selectRequestForCorrectByCorrNo(@PathVariable("corrNo") int corrNo) {
         HttpHeaders headers = new HttpHeaders();
@@ -151,7 +303,9 @@ public class CommuteController {
         return new ResponseEntity<>(responseMessage, headers, HttpStatus.OK);
     }
 
-    /** 출퇴근 내역 상세 조회 */
+    /**
+     * 출퇴근 내역 상세 조회
+     */
     @GetMapping("/commutes/{commuteNo}")
     public ResponseEntity<ResponseMessage> selectCommuteDetailByCommuteNo(@PathVariable("commuteNo") int commuteNo) {
         HttpHeaders headers = new HttpHeaders();

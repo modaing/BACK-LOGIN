@@ -42,21 +42,6 @@ public class ChatRoomService {
 
     }
 
-    /** 방 조회 */
-//    public List<EntRoomReqDTO> selectRoomList() {
-//
-//        List<EnteredRoom> rooms = enteredRoomRepository.findAllList();
-//
-//        List<EntRoomReqDTO> roomList = new ArrayList<>();
-//
-//        for (EnteredRoom room : rooms) {
-//            EntRoomReqDTO enteredRoom = modelMapper.map(room, EntRoomReqDTO.class);
-//            roomList.add(enteredRoom);
-//        }
-//
-//        return roomList;
-//
-//    }
     public List<EntRoomReqDTO> selectRoomList(Optional<Member> member) {
 
 
@@ -82,4 +67,8 @@ public class ChatRoomService {
         return enteredRoom;
     }
 
+    public ChatRoom findChatRoomById(int enteredRoomId) {
+
+        return enteredRoomRepository.findById(enteredRoomId).orElse(null);
+    }
 }

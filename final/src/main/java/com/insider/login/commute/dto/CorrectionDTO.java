@@ -20,7 +20,7 @@ public class CorrectionDTO {
     private String corrStatus;                  // 정정 상태
     private String reasonForRejection;          // 반려 사유
     private LocalDate corrProcessingDate;       // 정정 처리 일자
-    private CommuteDTO commuteDTO;              // 출퇴근
+//    private CommuteDTO commuteDTO;              // 출퇴근
 
     public CorrectionDTO(int commuteNo, String reqStartWork, String reqEndWork, String reasonForCorr, LocalDate corrRegistrationDate, String corrStatus, String reasonForRejection, LocalDate corrProcessingDate) {
         this.commuteNo = commuteNo;
