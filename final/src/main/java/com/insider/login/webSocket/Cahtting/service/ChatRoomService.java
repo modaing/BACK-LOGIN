@@ -27,37 +27,55 @@ public class ChatRoomService {
 
     private final ModelMapper modelMapper;
 
-    /** 방 생성 */
-    public ChatRoom save(int memberId, int receiverMemberId, String roomName) {
+    /**
+     * 방 생성
+     */
+    public ChatRoom save(int memberId, int receiverMemberId, String roomName, String senderDeleteYn, String receiverDeleteYn) {
         Member member = memberRepository.findById(memberId).orElse(null);
         Member receiverMember = memberRepository.findById(receiverMemberId).orElse(null);
 
-        if (member == null || receiverMember == null ) {
+        if (member == null || receiverMember == null) {
             System.out.println("실패 했음");
         }
         String enteredRoomName = roomName;
-        ChatRoom enteredRoom = new ChatRoom(member, receiverMember, enteredRoomName);
+
+        senderDeleteYn = "N";
+        receiverDeleteYn = "N";
+
+        ChatRoom enteredRoom = new ChatRoom(member, receiverMember, enteredRoomName, senderDeleteYn, receiverDeleteYn);
         enteredRoomRepository.save(enteredRoom);
         return enteredRoom;
 
     }
 
+
     public List<EntRoomReqDTO> selectRoomList(Optional<Member> member) {
+        if (member.isPresent()) {
+            Member memberEntity = member.get();
+            List<ChatRoom> rooms = enteredRoomRepository.findAllActiveRooms(memberEntity);
 
+            if (rooms.isEmpty()) {
+                System.out.println("No rooms found for member: " + memberEntity.getMemberId());
+                return new ArrayList<>();
+            }
 
-        List<ChatRoom> rooms = enteredRoomRepository.findAllList(RoomStatus.ENTER, member);
+            List<EntRoomReqDTO> roomList = new ArrayList<>();
+            for (ChatRoom room : rooms) {
+                EntRoomReqDTO enteredRoom = modelMapper.map(room, EntRoomReqDTO.class);
+                roomList.add(enteredRoom);
+            }
 
-        List<EntRoomReqDTO> roomList = new ArrayList<>();
-
-        for (ChatRoom room : rooms) {
-            EntRoomReqDTO enteredRoom = modelMapper.map(room, EntRoomReqDTO.class);
-            roomList.add(enteredRoom);
+            System.out.println("Found rooms: " + roomList);
+            return roomList;
+        } else {
+            System.out.println("Member not found.");
+            return new ArrayList<>();
         }
-
-        return roomList;
     }
 
-    /** 방 삭제 */
+    /**
+     * 방 삭제
+     */
     public ChatRoom deleteRoom(int enteredRoomId) {
         ChatRoom enteredRoom = enteredRoomRepository.findById(enteredRoomId).orElse(null);
 
@@ -67,8 +85,26 @@ public class ChatRoomService {
         return enteredRoom;
     }
 
-    public ChatRoom findChatRoomById(int enteredRoomId) {
+    /**
+     * 방 삭제 (수정)
+     */
+    public void updateRoom(int roomId, int memberId, String action) {
+        ChatRoom room = enteredRoomRepository.findById(roomId).orElse(null);
+        if (room != null) {
+            if (memberId == room.getMember().getMemberId()) {
+                if ("delete".equalsIgnoreCase(action)) {
+                    room.markSenderAsDeleted();
+                } else {
 
-        return enteredRoomRepository.findById(enteredRoomId).orElse(null);
+                }
+            } else if (memberId == room.getReceiverMember().getMemberId()) {
+                if ("delete".equalsIgnoreCase(action)) {
+                    room.markReceiverAsDeleted();
+                } else {
+
+                }
+            }
+            enteredRoomRepository.save(room);
+        }
     }
 }

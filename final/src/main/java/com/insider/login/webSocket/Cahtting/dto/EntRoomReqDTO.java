@@ -1,5 +1,6 @@
 package com.insider.login.webSocket.Cahtting.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Setter
@@ -17,5 +18,8 @@ public class EntRoomReqDTO {
 
         private String roomName;
 
+        private String senderDeleteYn;
+
+        private String receiverDeleteYn;
 
 }
