@@ -34,7 +34,6 @@ public class NoticeServiceTests {
                 noticeContent
         );
 
-
         //when
 
         //then
