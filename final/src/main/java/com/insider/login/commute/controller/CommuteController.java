@@ -215,8 +215,9 @@ public class CommuteController {
                     processedCommute.put("corrNo", commute.getCorrection().getCorrNo());
                     processedCorrectionList.add(processedCommute);
 
+
                 } else {
-                    System.out.println("정정 내역이 없음!!!!");
+                    System.out.println("해당 출퇴근 내역에 정정 내역이 없음!!!!");
                 }
             }
 
