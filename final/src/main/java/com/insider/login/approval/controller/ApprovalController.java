@@ -229,8 +229,28 @@ public class ApprovalController {
                                                       @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile,
                                                       @RequestHeader(name = "memberId", required = false) String memberIdstr) {
 
-        log.info("****컨트롤러 들어왔어");
+        log.info("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉등록 컨트롤러 들어왔어");
         System.out.println("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉컨트롤러 들어왔어");
+
+
+        // 처음부터 처리 : approvalNo 가 없음 => 기안/임시저장 됨
+        // 임시저장 -> 기안 : approvalNo 가 있음 => 기존 approvalNo 를 꺼내서 ims 일 경우 삭제
+        // 기존 approvalNo
+        String originApprovalNo = approvalDTO.getApprovalNo();
+
+        if(originApprovalNo != null){
+            //기존 결재번호가 있다면
+            log.info("기존 결재번호 있단다 : " + originApprovalNo);
+            //임시저장(ims) 이었다면
+            String wasTemp =  originApprovalNo.substring(5, 8);
+            log.info("기존 폼 번호 : " + wasTemp);
+
+            if(wasTemp.equals("ims")){
+                //기존 전자결재 삭제
+                approvalService.approvalDelete(originApprovalNo);
+                log.info("기존 전자결재 삭제됨 ! : "+ originApprovalNo);
+            }
+        }
 
         String approvalStatus = approvalDTO.getApprovalStatus();
         String YearFormNo = "";
@@ -271,6 +291,7 @@ public class ApprovalController {
             approvalNo = Year + "-" + formNo + String.format("%05d", 1);
         }
 
+        System.out.println("등록 하는 전자결재 번호 : " + approvalNo);
 
         approvalDTO.setApprovalNo(approvalNo);
 
