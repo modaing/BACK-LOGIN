@@ -21,7 +21,7 @@ public interface ApprovalMemberRepository extends JpaRepository<Member, Integer>
     @Query(value = "SELECT d.depart_name, m.name, m.member_id, m.password, m.depart_no, m.position_level, m.employed_date, m.address, m.phone_no, m.member_status, m.email, m.member_role, m.image_url " +
             "FROM member_info m " +
             "join department_info d ON d.depart_no = m.depart_no " +
-            "order by d.depart_no, CAST(m.position_level AS UNSIGNED) DESC",
+            "order by d.depart_no, CAST(m.position_level AS UNSIGNED) ASC",
     nativeQuery = true)
     List<Object[]> findAllMembersWithDepartmentOrderedNative();
 }

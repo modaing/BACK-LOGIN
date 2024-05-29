@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -415,29 +416,47 @@ public class ApprovalController {
 
     }
 
+    @Tag(name = "파일 다운로드", description = "파일 다운로드")
     @GetMapping("/approvals/files")
-    public ResponseEntity<Resource> dounloadFile(@RequestParam String fileSavepath,
-                                                 @RequestParam String fileSavename,
-                                                 @RequestParam String fileOriname){
+    public ResponseEntity<Resource> dounloadFile(@RequestParam(name = "fileSavepath") String fileSavepath,
+                                                 @RequestParam(name = "fileSavename") String fileSavename,
+                                                 @RequestParam(name = "fileOriname") String fileOriname){
+
+        System.out.println("🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈파일 컨트롤러 들어왔어🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈");
         try{
+
+            System.out.println("fileSavepath : " + fileSavepath +", fileSavename : " + fileSavename + ", fileOriname :" + fileOriname);
             Path filePath = Paths.get(fileSavepath).resolve(fileSavename).normalize();
+            System.out.println("filePath: " + filePath);
             Resource resource = new UrlResource(filePath.toUri());
 
             if(resource.exists()){
                 //파일의 MIME 타입을 감지
                 String contentType = Files.probeContentType(filePath);
+
+                System.out.println("파일 타입 : " + contentType);
+
                 if(contentType == null){
                     contentType = "application/octet-stream";
                 }
 
+                //HttpHeaders 설정
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileOriname + "\"");
+                headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+
+
+
                 return ResponseEntity.ok()
+                        .headers(headers)
                         .contentType(MediaType.parseMediaType(contentType))
-                        .header(HttpHeaders.CONTENT_DISPOSITION,  "attachment; filename=\"" + fileOriname + "\"")
                         .body(resource);
             }else{
+                System.out.println("파일이 존재하지 않습니다.");
                 return ResponseEntity.notFound().build();
             }
         }catch(Exception e){
+            System.out.println("파일 다운로드 중 오류 발생: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
