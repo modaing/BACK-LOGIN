@@ -1,10 +1,16 @@
 package com.insider.login.leave.dto;
 
+import java.time.LocalDate;
+
 public class LeaveAccrualDTO {
 
     private int leaveAccrualNo;                 // 발생 번호
 
     private int recipientId;                    // 대상자 사번
+
+    private LocalDate leaveSubStartDate;
+
+    private LocalDate leaveSubEndDate;
 
     private String recipientName;               // 대상자 사원명
 
@@ -29,11 +35,14 @@ public class LeaveAccrualDTO {
         this.leaveAccrualReason = leaveAccrualReason;
     }
 
-    public LeaveAccrualDTO(int leaveAccrualNo, int recipientId, String recipientName, String recipientDepart, int leaveAccrualDays, String leaveAccrualReason, int grantorId, String grantorName) {
+    public LeaveAccrualDTO(int leaveAccrualNo, int recipientId, LocalDate leaveSubStartDate, LocalDate leaveSubEndDate, String recipientName, String recipientDepart, String accrualDate, int leaveAccrualDays, String leaveAccrualReason, int grantorId, String grantorName) {
         this.leaveAccrualNo = leaveAccrualNo;
         this.recipientId = recipientId;
+        this.leaveSubStartDate = leaveSubStartDate;
+        this.leaveSubEndDate = leaveSubEndDate;
         this.recipientName = recipientName;
         this.recipientDepart = recipientDepart;
+        this.accrualDate = accrualDate;
         this.leaveAccrualDays = leaveAccrualDays;
         this.leaveAccrualReason = leaveAccrualReason;
         this.grantorId = grantorId;
@@ -54,6 +63,22 @@ public class LeaveAccrualDTO {
 
     public void setRecipientId(int recipientId) {
         this.recipientId = recipientId;
+    }
+
+    public LocalDate getLeaveSubStartDate() {
+        return leaveSubStartDate;
+    }
+
+    public void setLeaveSubStartDate(LocalDate leaveSubStartDate) {
+        this.leaveSubStartDate = leaveSubStartDate;
+    }
+
+    public LocalDate getLeaveSubEndDate() {
+        return leaveSubEndDate;
+    }
+
+    public void setLeaveSubEndDate(LocalDate leaveSubEndDate) {
+        this.leaveSubEndDate = leaveSubEndDate;
     }
 
     public String getRecipientName() {
@@ -117,6 +142,8 @@ public class LeaveAccrualDTO {
         return "LeaveAccrualDTO{" +
                 "leaveAccrualNo=" + leaveAccrualNo +
                 ", recipientId=" + recipientId +
+                ", leaveSubStartDate=" + leaveSubStartDate +
+                ", leaveSubEndDate=" + leaveSubEndDate +
                 ", recipientName='" + recipientName + '\'' +
                 ", recipientDepart='" + recipientDepart + '\'' +
                 ", accrualDate='" + accrualDate + '\'' +
