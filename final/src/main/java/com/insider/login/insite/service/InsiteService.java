@@ -37,9 +37,9 @@ public class InsiteService {
         return insiteRepository.selectApprovalCounts();
     }
 
-    public List<Object[]> selectApproverCounts() {
+    public List<Object[]> selectApproverCounts(int memberId) {
 
-        return insiteRepository.selectApproverCounts();
+        return insiteRepository.selectApproverCounts(memberId);
     }
 
 

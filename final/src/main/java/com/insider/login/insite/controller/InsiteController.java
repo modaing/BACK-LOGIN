@@ -48,12 +48,12 @@ public class InsiteController {
     }
 
     /** 미처리 전자결재 (수신)*/
-    @GetMapping("/approvers")
-    public List<Object[]> approverMemberCounts() {
-        return insiteService.selectApproverCounts();
+    @GetMapping("/approvers/{memberId}")
+    public List<Object[]> approverMemberCounts(@PathVariable ("memberId") int membeId) {
+        return insiteService.selectApproverCounts(membeId);
     }
 
-    /** 휴가 잔여일 */
+    /** 휴가 잔여일 - 기존 leave 로직 사용 */
     @GetMapping("/leaves/{memberId}")
     public LeaveInfoDTO getLeaveInfo(@PathVariable("memberId") int memberId) {
 
