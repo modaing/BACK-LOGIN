@@ -5,14 +5,21 @@ import com.insider.login.approval.service.ApprovalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -28,6 +35,7 @@ public class ApprovalController {
     @Value("${file.file-dir}")
     private String FILE_DIR;
 
+    private final Path fileStorageLocation = Paths.get(UPLOAD_DIR + FILE_DIR).toAbsolutePath();
 
     private final ApprovalService approvalService;
 
@@ -405,5 +413,32 @@ public class ApprovalController {
                 approvalService.selectAllMemberList()));
 
 
+    }
+
+    @GetMapping("/approvals/files")
+    public ResponseEntity<Resource> dounloadFile(@RequestParam String fileSavepath,
+                                                 @RequestParam String fileSavename,
+                                                 @RequestParam String fileOriname){
+        try{
+            Path filePath = Paths.get(fileSavepath).resolve(fileSavename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if(resource.exists()){
+                //파일의 MIME 타입을 감지
+                String contentType = Files.probeContentType(filePath);
+                if(contentType == null){
+                    contentType = "application/octet-stream";
+                }
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .header(HttpHeaders.CONTENT_DISPOSITION,  "attachment; filename=\"" + fileOriname + "\"")
+                        .body(resource);
+            }else{
+                return ResponseEntity.notFound().build();
+            }
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
