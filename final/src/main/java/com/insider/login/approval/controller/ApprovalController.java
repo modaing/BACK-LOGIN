@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -141,40 +142,9 @@ public class ApprovalController {
         log.info("기존 approval Form : " + approvalNo.substring(5, 8));
         log.info("새로운 approval Form : " + approvalDTO.getFormNo());
 
-        String newApprovalNo = "";
 
-        //폼번호 바뀔경우 결재 번호도 바뀌어야함
-        if (!approvalNo.substring(5, 8).equals(approvalDTO.getFormNo())) {
-            //전자결재 번호(연도+_양식번호+순번)
-            int Year = LocalDate.now().getYear();
-            String formNo = approvalDTO.getFormNo();
-            String YearFormNo = Year + "-" + formNo;
-            log.info("YearFormNo : " + YearFormNo);
+        approvalDTO.setApprovalNo(approvalNo);
 
-            String lastApprovalNo = approvalService.selectApprovalNo(YearFormNo);
-
-            log.info("lastApprovalNo : " + lastApprovalNo);
-
-            String[] parts = lastApprovalNo.split("-");
-            String lastPart = parts[parts.length - 1];
-
-
-            String sequenceString = lastPart.replaceAll("\\D", "");
-            log.info("sequenceString: " + sequenceString);
-
-            int sequenceNumber = Integer.parseInt(sequenceString) + 1;
-            log.info("늘어난 번호 : " + sequenceNumber);
-
-
-            newApprovalNo = Year + "-" + formNo + String.format("%05d", sequenceNumber);
-            log.info("새로운 approvalNo: " + newApprovalNo);
-
-            approvalDTO.setApprovalNo(newApprovalNo);
-
-
-        } else {
-            approvalDTO.setApprovalNo(approvalNo);
-        }
 
         //기안자사번
         //현재 사용자의 인증 정보 가져오기
@@ -262,10 +232,19 @@ public class ApprovalController {
         log.info("****컨트롤러 들어왔어");
         System.out.println("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉컨트롤러 들어왔어");
 
-        //전자결재 번호(연도+_양식번호+순번)
+        String approvalStatus = approvalDTO.getApprovalStatus();
+        String YearFormNo = "";
         int Year = LocalDate.now().getYear();
+
+        //전자결재 번호(연도+_양식번호+순번)
         String formNo = approvalDTO.getFormNo();
-        String YearFormNo = Year + "-" + formNo;
+
+        if(approvalStatus.equals("임시저장")) {
+            //전자결재 번호(연도+_ims+순번)
+            formNo = "ims";
+        }
+
+        YearFormNo = Year + "-" + formNo;
         log.info("YearFormNo : " + YearFormNo);
 
         String lastApprovalNo = approvalService.selectApprovalNo(YearFormNo);
@@ -440,9 +419,12 @@ public class ApprovalController {
                     contentType = "application/octet-stream";
                 }
 
+                //파일 이름 인코딩
+                String encodedFileName = URLEncoder.encode(fileOriname, "UTF-8").replaceAll("\\+", "%20");
+
                 //HttpHeaders 설정
                 HttpHeaders headers = new HttpHeaders();
-                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileOriname + "\"");
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
                 headers.add(HttpHeaders.CONTENT_TYPE, contentType);
 
 
@@ -455,6 +437,10 @@ public class ApprovalController {
                 System.out.println("파일이 존재하지 않습니다.");
                 return ResponseEntity.notFound().build();
             }
+        }catch(UnsupportedEncodingException e){
+            System.out.println("파일 이름 인코딩 중 오류 발생 : " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+
         }catch(Exception e){
             System.out.println("파일 다운로드 중 오류 발생: " + e.getMessage());
             return ResponseEntity.badRequest().build();
