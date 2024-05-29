@@ -903,6 +903,7 @@ public class ApprovalService {
     //전자결재 삭제
     @Transactional
     public boolean approvalDelete(String approvalNo) {
+        log.info("전자결재 삭제 : " + approvalNo);
 
         try {
 
