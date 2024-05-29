@@ -34,8 +34,8 @@ public interface  InsiteRepository extends JpaRepository<InsiteMember, Integer> 
     @Query("SELECT a.memberId, COUNT(a) AS inProgressCount FROM InsiteApproval a WHERE a.approvalStatus = '처리 중' GROUP BY a.memberId")
     List<Object[]> selectApprovalCounts();
 
-    @Query("SELECT COUNT(a) FROM InsiteApprover a WHERE a.approverStatus = '대기'")
-    List<Object[]> selectApproverCounts();
+    @Query("SELECT COUNT(a) FROM InsiteApprover a WHERE a.approverStatus = '대기' AND a.memberId = :memberId")
+    List<Object[]> selectApproverCounts(@Param("memberId")int memberId);
 
 
 //    List<Object[]> findAllLeaveInfoCounts();
