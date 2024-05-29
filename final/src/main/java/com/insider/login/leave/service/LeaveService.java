@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.insider.login.common.CommonController.nowDate;
 import static com.insider.login.common.utils.TokenUtils.getTokenInfo;
 
 @Service
@@ -157,6 +158,29 @@ public class LeaveService extends LeaveUtil {
             // 발생 등록한 정보에서 휴가 정보에 필요한 정보 추출 후 save
             Leaves leaves = new Leaves(ett.getRecipientId(), ett.getLeaveAccrualDays(), "특별휴가");
             leaveRepository.save(leaves);
+
+            // 발생 정보로 휴가 신청 처리
+            LeaveSubmitDTO submitDTO = new LeaveSubmitDTO();
+            submitDTO.setLeaveSubApplicant(accrualDTO.getRecipientId());
+            submitDTO.setLeaveSubApprover(getTokenInfo().getMemberId());
+            submitDTO.setLeaveSubStartDate(accrualDTO.getLeaveSubStartDate());
+            submitDTO.setLeaveSubEndDate(accrualDTO.getLeaveSubEndDate());
+            submitDTO.setLeaveSubApplyDate(nowDate());
+            submitDTO.setLeaveSubType("특별휴가");
+            submitDTO.setLeaveSubStatus("발생");
+            submitDTO.setLeaveSubProcessDate(nowDate());
+            submitDTO.setLeaveSubReason(accrualDTO.getLeaveAccrualReason());
+
+
+            // 신청 처리 후 일정 등록
+            LeaveSubmit submit = leaveSubmitRepository.save(modelMapper.map(submitDTO, LeaveSubmit.class));
+
+            CalendarDTO submitCalendar = submitCalendar(submit);
+
+            Calendar calendar = modelMapper.map(submitCalendar, Calendar.class);
+            calendarRepository.save(calendar);
+            SubmitAndCalendarDTO submitAndCalendarDTO = new SubmitAndCalendarDTO(submit.getLeaveSubNo(), calendar.getCalendarNo());
+            submitAndCalendarRepository.save(modelMapper.map(submitAndCalendarDTO, SubmitAndCalendar.class));
 
             return "휴가발생 등록 성공";
         } catch (Exception e) {

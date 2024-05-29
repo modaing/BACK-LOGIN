@@ -148,6 +148,7 @@ public class LeaveController extends CommonController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
+        log.info("check leaveAccrualDTO", leaveAccrualDTO);
         leaveAccrualDTO.setAccrualDate(nowDate());
         return ResponseEntity.ok().headers(headers).body(leaveService.insertAccrual(leaveAccrualDTO));
     }
