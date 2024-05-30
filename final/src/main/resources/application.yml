@@ -4,8 +4,6 @@ spring:
     username: hikdt2312
     password: hikdt2312
     driver-class-name: com.mysql.cj.jdbc.Driver
-#     username: ohgiraffers
-#     password: ohgiraffers
   servlet:
     multipart:
       max-file-size: 10MB
