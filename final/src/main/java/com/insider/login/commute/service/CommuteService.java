@@ -279,7 +279,7 @@ public class CommuteService {
     @Transactional
     public Map<String, Object> insertNewCorrect(NewCorrectionDTO newCorrection) {
         log.info("[CommuteService] insertNewCorrect");
-        log.info("[CommuteService] newCorrection : ", newCorrection);
+        log.info("[CommuteService] newCorrection : {}", newCorrection);
 
         Map<String, Object> result = new HashMap<>();
 
@@ -298,6 +298,8 @@ public class CommuteService {
         Commute savedCommute = commuteRepository.save(modelMapper.map(newCommuteDTO, Commute.class));
 
         int commuteNo = savedCommute.getCommuteNo();
+
+        System.out.println("commuteNo : " + commuteNo);
 
         NewCorrectionDTO newCorrectionDTO = new NewCorrectionDTO();
 
