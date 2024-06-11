@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,5 +86,11 @@ public class NoticeService {
         result.put("result", true);
 
         return result;
+    }
+
+    public SseEmitter subscribe(Long id) {
+    }
+
+    public void notify(Long id, String data) {
     }
 }

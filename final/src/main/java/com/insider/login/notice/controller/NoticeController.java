@@ -5,6 +5,7 @@ import com.insider.login.notice.dto.NoticeDTO;
 import com.insider.login.notice.service.NoticeService;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,16 @@ public class NoticeController {
     @Autowired
     public NoticeController(NoticeService noticeService) {
         this.noticeService = noticeService;
+    }
+
+    @GetMapping(value = "/notices/subscribe/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe(@PathVariable Long id) {
+        return noticeService.subscribe(id);
+    }
+
+    @PostMapping("/notices/send-data/{id}")
+    public void sendData(@PathVariable Long id) {
+        noticeService.notify(id, "data");
     }
 
     /** 새로운 알림 수신 (등록) */
